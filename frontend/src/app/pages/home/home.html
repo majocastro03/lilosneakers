@@ -1,0 +1,29 @@
+<!-- Hero Section (full height, sin scroll) -->
+<div class="min-h-screen flex flex-col">
+  <!-- Header siempre visible -->
+  <app-header></app-header>
+
+  <!-- Contenido principal -->
+  <div class="flex-1 flex items-center bg-gradient-to-r from-gray-800 to-secondary">
+    <div class="container mx-auto px-4 py-12 md:py-24 text-center text-white">
+      <h1 class="text-4xl md:text-6xl font-bold mb-4">Calzado que define tu estilo</h1>
+      <p class="text-xl md:text-2xl mb-8 text-gray-200 max-w-2xl mx-auto">
+        Zapatillas urbanas y deportivas diseñadas para quienes rompen moldes.
+      </p>
+      <div class="space-x-4">
+        <button 
+          routerLink="/catalogo"
+          class="bg-primary hover:bg-red-700 text-white font-bold py-3 px-8 rounded-lg text-lg transition">
+          Ver catálogo
+        </button>
+        <button 
+          class="bg-transparent border-2 border-white text-white hover:bg-white hover:text-secondary font-bold py-3 px-8 rounded-lg text-lg transition">
+          Conócenos
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <app-footer></app-footer>
+</div>
