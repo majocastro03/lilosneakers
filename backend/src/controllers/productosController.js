@@ -1,4 +1,6 @@
 const supabase = require('../config/supabaseCliente');
+const path = require('path');
+const fs = require('fs').promises;
 
 // GET /productos
 const getProductos = async (req, res) => {
@@ -19,7 +21,9 @@ const getProductos = async (req, res) => {
         imagen_url,
         descripcion,
         destacado,
-        categorias!left(nombre, slug)
+        mostrar_precio,
+        categorias!left(nombre, slug),
+        marcas!left(nombre, slug, imagen_url)
       `, { count: 'exact' })
       .order('destacado', { ascending: false })
       .order('nombre', { ascending: true });
@@ -119,7 +123,7 @@ const getProductos = async (req, res) => {
     });
 
   } catch (err) {
-    console.error('❌ Error en getProductos:', err);
+    console.error('Error en getProductos:', err);
     res.status(500).json({ error: 'Error al obtener productos' });
   }
 };
@@ -183,7 +187,7 @@ const getProductoById = async (req, res) => {
     res.json(productoFormateado);
 
   } catch (err) {
-    console.error('❌ Error en getProductoById:', err);
+    console.error('Error en getProductoById:', err);
     if (err.code === 'PGRST116') {
       return res.status(404).json({ error: 'Producto no encontrado' });
     }
@@ -191,4 +195,106 @@ const getProductoById = async (req, res) => {
   }
 };
 
-module.exports = { getProductos, getProductoById };
+// POST /productos
+const crearProducto = async (req, res) => {
+  try {
+    // 1. Validar cuerpo
+    const {
+      nombre,
+      precio,
+      descuento = 0,
+      descripcion,
+      destacado = false,
+      categoria_id,
+      colores = [],
+      tallas = []
+    } = req.body;
+
+    if (!nombre || !precio) {
+      return res.status(400).json({ error: 'Nombre y precio son requeridos' });
+    }
+
+    // 2. Manejar archivo (si se sube con multer)
+    let imagenUrl = null;
+    if (req.file) {
+      const uploadsDir = path.join(__dirname, '../../uploads/productos');
+      await fs.mkdir(uploadsDir, { recursive: true });
+
+      const filename = `${Date.now()}-${req.file.originalname}`;
+      const filepath = path.join(uploadsDir, filename);
+
+      await fs.writeFile(filepath, req.file.buffer);
+
+      // URL absoluta (clave para que funcione en frontend)
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      imagenUrl = `${baseUrl}/uploads/productos/${filename}`;
+    }
+    // 3. Insertar producto
+    const { data: producto, error: productoError } = await supabase
+      .from('productos')
+      .insert([
+        {
+          nombre,
+          precio: parseFloat(precio),
+          descuento: parseFloat(descuento),
+          imagen_url: imagenUrl,
+          descripcion,
+          destacado,
+          categoria_id: categoria_id || null
+        }
+      ])
+      .select()
+      .single();
+
+    if (productoError) throw productoError;
+
+    // 4. Insertar colores (si hay)
+    // if (colores.length > 0) {
+    //   const coloresData = colores.map(color => ({
+    //     producto_id: producto.id,
+    //     color_id: color.id
+    //   }));
+
+    //   const { error: coloresError } = await supabase
+    //     .from('producto_colores')
+    //     .insert(coloresData);
+
+    //   if (coloresError) throw coloresError;
+    // }
+
+    // 5. Insertar tallas (si hay)
+    // if (tallas.length > 0) {
+    //   const tallasData = tallas.map(t => ({
+    //     producto_id: producto.id,
+    //     talla_id: t.id,
+    //     cantidad: parseInt(t.cantidad) || 0
+    //   }));
+
+    //   const { error: tallasError } = await supabase
+    //     .from('producto_tallas')
+    //     .insert(tallasData);
+
+    //   if (tallasError) throw tallasError;
+    // }
+
+    // 6. Responder
+    res.status(201).json({
+      message: 'Producto creado con éxito',
+      producto: {
+        id: producto.id,
+        nombre: producto.nombre,
+        imagen_url: producto.imagen_url
+      }
+    });
+
+  } catch (err) {
+    console.error('Error en crearProducto:', err);
+    res.status(500).json({ error: 'Error al crear el producto' });
+  }
+};
+
+module.exports = {
+  getProductos,
+  getProductoById,
+  crearProducto
+};
