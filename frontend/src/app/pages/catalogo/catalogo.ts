@@ -1,23 +1,29 @@
 import { Component, inject, effect } from '@angular/core';
-import {ProductoService} from '../../core/services/producto';
+import { ProductoService } from '../../core/services/producto/producto-service';
 import { computed, signal } from '@angular/core';
 import { FooterComponent } from '../../shared/footer/footer';
 import { HeaderComponent } from "../../shared/header/header";
 import { Producto } from '../../core/interfaces/producto';
-import { ProductosQuery } from '../../core/interfaces/productoQuery';
+import { ProductosQuery } from '../../core/interfaces/producto-query';
+import { MarcaService } from '../../core/services/marca/marca-service';
+import { CommonModule } from '@angular/common';
+import { CategoriaService } from '../../core/services/categoria/categoria-service';
+
 
 @Component({
   selector: 'app-catalogo',
   standalone: true,
-  imports: [FooterComponent, HeaderComponent],
+  imports: [FooterComponent, HeaderComponent, CommonModule],
   templateUrl: './catalogo.html',
   styleUrl: './catalogo.css',
 })
 export class Catalogo {
   private productoService = inject(ProductoService);
-
+  private marcaService = inject(MarcaService);
+  private categoriaService = inject(CategoriaService);
   // Filtros reactivos
   searchTerm = signal<string>('');
+  marcaId = signal<string | null>(null);
   categoriaId = signal<string | null>(null);
   orderBy = signal<'relevancia' | 'precio_asc' | 'precio_desc' | 'novedades'>('relevancia');
 
@@ -26,9 +32,15 @@ export class Catalogo {
   totalPages = signal(1);
   loading = signal(false);
 
+  // Marcas
+  marcas$ = this.marcaService.getMarcas();
+
+  // Categorías
+  categorias$ = this.categoriaService.getCategorias();
   // Productos con datos derivados
   productos = signal<Producto[]>([]);
 
+  // Productos con tallas filtradas y datos adicionales
   productosConTallas = computed(() => {
     return this.productos().map(p => {
       // Filtramos tallas con stock > 0
@@ -112,8 +124,15 @@ export class Catalogo {
   }
 
   onCategoriaChange(event: Event) {
-    const select = event.target as HTMLSelectElement;
-    this.categoriaId.set(select.value || null);
+    const select = (event.target as HTMLSelectElement).value;
+    this.categoriaId.set(select || null);
+  }
+
+  onMarcaChange(event: Event): void {
+    const value = (event.target as HTMLSelectElement).value;
+    // Haz lo que necesites con el ID (ej: filtrar productos)
+    this.marcaId.set(value || null);
+    console.log('Marca seleccionada:', value);
   }
 
   onOrderByChange(event: Event) {
@@ -126,5 +145,6 @@ export class Catalogo {
     this.categoriaId.set(null);
     this.orderBy.set('relevancia');
     this.currentPage.set(1);
+    this.marcaId.set(null);
   }
 }
