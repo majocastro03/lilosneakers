@@ -37,10 +37,25 @@
         <select [value]="categoriaId() || ''" (change)="onCategoriaChange($event)"
           class="px-3 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
           <option value="">Todas</option>
-          <option value="1">Zapatillas</option>
-          <option value="2">Sandalias</option>
-          <option value="3">Botas</option>
-          <!-- Ajustar ID según backend -->
+          @if (categorias$ | async; as categorias) {
+          @for (categoria of categorias; track categoria.id) {
+          <option [value]="categoria.id">{{ categoria.nombre }}</option>
+          }
+          }
+        </select>
+      </div>
+
+      <!-- Marca -->
+      <div class="flex items-center space-x-2">
+        <label class="text-sm font-medium whitespace-nowrap">Marca:</label>
+        <select (change)="onMarcaChange($event)"
+          class="px-3 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <option value="">Todas</option>
+          @if (marcas$ | async; as marcas) {
+          @for (marca of marcas; track marca.id) {
+          <option [value]="marca.id">{{ marca.nombre }}</option>
+          }
+          }
         </select>
       </div>
 

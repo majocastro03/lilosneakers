@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ProductosQuery } from '../interfaces/productoQuery';
-import { ProductosResponse } from '../interfaces/productoResponse';
-import { Producto } from '../interfaces/producto';
+import { ProductosQuery } from '../../interfaces/producto-query';
+import { ProductosResponse } from '../../interfaces/producto-response';
+import { Producto } from '../../interfaces/producto';
 
 @Injectable({
   providedIn: 'root',
