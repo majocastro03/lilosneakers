@@ -1,22 +1,186 @@
-<header class="bg-white shadow-sm">
-  <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-    <!-- Logo -->
-    <a routerLink="/" class="flex items-center space-x-2">
-      <img src="assets/logo.svg" alt="LiloSneakers" class="h-10 w-10">
-      <span class="text-xl font-bold text-secondary">LiloSneakers</span>
-    </a>
+<header class="bg-white border-b border-gray-200">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-20">
 
-    <!-- Navegación -->
-    <nav class="hidden md:flex space-x-6">
-      <a routerLink="/catalogo" 
-         class="text-gray-700 hover:text-primary font-medium">Catálogo</a>
-    </nav>
+      <!-- Logo Section (Left) -->
+      <a routerLink="/" class="flex flex-col -space-y-1">
+        <img src="/assets/logo.png" class="h-8 w-auto" />
+      </a>
 
-    <!-- Botón login -->
-    <button 
-      (click)="onLogin()"
-      class="bg-primary hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition">
-      Iniciar sesión
-    </button>
+      <!-- Navigation Links (Center - Desktop Only) -->
+      <nav class="hidden lg:flex items-center space-x-8 absolute left-1/2 transform -translate-x-1/2">
+        @for (link of navLinks; track link.path) {
+          <a [routerLink]="link.path" 
+             class="text-base text-gray-900 hover:text-gray-600 font-normal transition">
+            {{ link.label }}
+          </a>
+        }
+      </nav>
+
+      <!-- Right Section: Buscar, Login, Cart (Desktop) -->
+      <div class="hidden lg:flex items-center space-x-6">
+        
+        <!-- Buscar Bar -->
+        <div class="flex items-center relative">
+          <svg class="absolute left-0 w-5 h-5 text-gray-900 pointer-events-none" 
+               fill="none" 
+               stroke="currentColor" 
+               viewBox="0 0 24 24">
+            <path stroke-linecap="round" 
+                  stroke-linejoin="round" 
+                  stroke-width="2" 
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z">
+            </path>
+          </svg>
+          <input 
+            type="text" 
+            placeholder="Buscar"
+            [(ngModel)]="SearchQuery"
+            class="pl-7 pr-4 py-1 border-b-2 border-gray-900 bg-transparent focus:outline-none w-40 text-gray-900 placeholder-gray-500"
+          />
+        </div>
+
+        <!-- Log In Button -->
+        <button 
+          (click)="onLogin()"
+          class="flex items-center space-x-2 text-gray-900 hover:text-gray-600 transition">
+          <svg class="w-6 h-6" 
+               fill="none" 
+               stroke="currentColor" 
+               viewBox="0 0 24 24">
+            <path stroke-linecap="round" 
+                  stroke-linejoin="round" 
+                  stroke-width="2" 
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
+            </path>
+          </svg>
+        </button>
+
+        <!-- Shopping Cart -->
+        <button 
+          (click)="onCart()"
+          class="relative hover:opacity-70 transition bg-black text-white w-9 h-9 rounded flex items-center justify-center">
+          <svg class="w-5 h-5" 
+               fill="none" 
+               stroke="currentColor" 
+               viewBox="0 0 24 24">
+            <path stroke-linecap="round" 
+                  stroke-linejoin="round" 
+                  stroke-width="2" 
+                  d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z">
+            </path>
+          </svg>
+          @if (cartItemCount > 0) {
+            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold">
+              {{cartItemCount}}
+            </span>
+          }
+        </button>
+      </div>
+
+      <!-- Mobile: Cart and Menu Button -->
+      <div class="flex lg:hidden items-center space-x-4">
+        <!-- Mobile Cart -->
+        <button 
+          (click)="onCart()"
+          class="relative hover:opacity-70 transition">
+          <svg class="w-6 h-6 text-gray-900" 
+               fill="currentColor" 
+               viewBox="0 0 24 24">
+            <path d="M16 6v2h2l2 12H4L6 8h2V6a4 4 0 118 0zm-2 0a2 2 0 10-4 0v2h4V6z"/>
+          </svg>
+          @if (cartItemCount > 0) {
+            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold">
+              {{cartItemCount}}
+            </span>
+          }
+        </button>
+
+        <!-- Mobile Menu Button -->
+        <button 
+          (click)="toggleMobileMenu()"
+          class="text-gray-900 hover:text-gray-600">
+          <svg class="w-7 h-7" 
+               fill="none" 
+               stroke="currentColor" 
+               viewBox="0 0 24 24"
+               [class.hidden]="isMobileMenuOpen">
+            <path stroke-linecap="round" 
+                  stroke-linejoin="round" 
+                  stroke-width="2" 
+                  d="M4 6h16M4 12h16M4 18h16">
+            </path>
+          </svg>
+          <svg class="w-7 h-7" 
+               fill="none" 
+               stroke="currentColor" 
+               viewBox="0 0 24 24"
+               [class.hidden]="!isMobileMenuOpen">
+            <path stroke-linecap="round" 
+                  stroke-linejoin="round" 
+                  stroke-width="2" 
+                  d="M6 18L18 6M6 6l12 12">
+            </path>
+          </svg>
+        </button>
+      </div>
+    </div>
   </div>
+
+  <!-- Mobile Menu -->
+  @if (isMobileMenuOpen) {
+    <div class="lg:hidden bg-white border-t border-gray-200">
+      <div class="max-w-7xl mx-auto px-4 py-4">
+        
+        <!-- Mobile Buscar -->
+        <div class="mb-6">
+          <div class="flex items-center relative">
+            <svg class="absolute left-0 w-5 h-5 text-gray-900 pointer-events-none" 
+                 fill="none" 
+                 stroke="currentColor" 
+                 viewBox="0 0 24 24">
+              <path stroke-linecap="round" 
+                    stroke-linejoin="round" 
+                    stroke-width="2" 
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z">
+              </path>
+            </svg>
+            <input 
+              type="text" 
+              placeholder="Buscar"
+              [(ngModel)]="SearchQuery"
+              class="pl-7 pr-4 py-2 border-b-2 border-gray-900 bg-transparent focus:outline-none w-full text-gray-900 placeholder-gray-500"
+            />
+          </div>
+        </div>
+
+        <!-- Mobile Navigation -->
+        <nav class="flex flex-col space-y-4 mb-6">
+          @for (link of navLinks; track link.path) {
+            <a [routerLink]="link.path" 
+               (click)="toggleMobileMenu()"
+               class="text-lg text-gray-900 hover:text-gray-600 font-normal">
+              {{ link.label }}
+            </a>
+          }
+        </nav>
+
+        <!-- Mobile Log In -->
+        <button 
+          (click)="onLogin()"
+          class="flex items-center space-x-3 text-gray-900 hover:text-gray-600 transition py-3">
+          <svg class="w-6 h-6" 
+               fill="none" 
+               stroke="currentColor" 
+               viewBox="0 0 24 24">
+            <path stroke-linecap="round" 
+                  stroke-linejoin="round" 
+                  stroke-width="2" 
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z">
+            </path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  }
 </header>

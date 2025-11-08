@@ -1,29 +1,17 @@
-<!-- Hero Section (full height, sin scroll) -->
-<div class="min-h-screen flex flex-col">
-  <!-- Header siempre visible -->
-  <app-header></app-header>
-
-  <!-- Contenido principal -->
-  <div class="flex-1 flex items-center bg-gradient-to-r from-gray-800 to-secondary">
-    <div class="container mx-auto px-4 py-12 md:py-24 text-center text-white">
-      <h1 class="text-4xl md:text-6xl font-bold mb-4">Calzado que define tu estilo</h1>
-      <p class="text-xl md:text-2xl mb-8 text-gray-200 max-w-2xl mx-auto">
-        Zapatillas urbanas y deportivas diseñadas para quienes rompen moldes.
-      </p>
-      <div class="space-x-4">
-        <button 
-          routerLink="/catalogo"
-          class="bg-primary hover:bg-red-700 text-white font-bold py-3 px-8 rounded-lg text-lg transition">
-          Ver catálogo
-        </button>
-        <button 
-          class="bg-transparent border-2 border-white text-white hover:bg-white hover:text-secondary font-bold py-3 px-8 rounded-lg text-lg transition">
-          Conócenos
-        </button>
-      </div>
-    </div>
+<app-header></app-header>
+<section class="relative h-screen flex items-center justify-center bg-cover bg-center"
+  style="background-image: url('../../../assets/fondo.jpg'); height: calc(100vh - 81px);">
+  <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+  <div class="relative z-10 max-w-4xl mx-auto px-6 text-white text-center md:text-left md:pl-12">
+    <h2 class="text-sm uppercase tracking-wider mb-2">Bienvenido</h2>
+    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4 leading-tight">LiloSneakers<br>
+    </h1>
+    <p class="mb-8 max-w-md">
+      Los buenos zapatos te llevan a buenos lugares
+    </p>
+    <a routerLink="/catalogo"
+      class="inline-block px-6 py-3 border border-white text-white hover:bg-white hover:text-black transition duration-300">
+      Catálogo
+    </a>
   </div>
-
-  <!-- Footer -->
-  <app-footer></app-footer>
-</div>
+</section>

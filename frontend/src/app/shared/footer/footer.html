@@ -1,6 +1,42 @@
-<footer class="bg-secondary text-white py-8 mt-12">
-  <div class="container mx-auto px-4 text-center">
-    <p>© {{ currentYear }} LiloSneakers. Todos los derechos reservados.</p>
-    <p class="mt-2 text-gray-300">Calzado urbano y deportivo de alta calidad</p>
+<footer class="bg-black text-white pt-12 pb-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <!-- Columnas principales -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+
+      <!-- Columna 1: Métodos de Pago, Envío y Devoluciones, Política de la Tienda -->
+      <div>
+        <h3 class="text-sm font-semibold uppercase tracking-wider mb-4">Métodos de Pago</h3>
+        <ul class="space-y-2 text-sm">
+          <li><a href="#" class="hover:text-gray-300">Envío y Devoluciones</a></li>
+          <li><a href="#" class="hover:text-gray-300">Política de la Tienda</a></li>
+          <li><a href="#" class="hover:text-gray-300">Métodos de Pago</a></li>
+        </ul>
+      </div>
+
+      <!-- Columna 2: Contacto -->
+      <div>
+        <h3 class="text-sm font-semibold uppercase tracking-wider mb-4">Contacto</h3>
+        <ul class="space-y-2 text-sm">
+          <li>Cel: {{ contactNumber }}</li>
+          <li><a href="mailto:info@mysite.com" class="hover:text-gray-300">Email: {{ email }}</a></li>
+        </ul>
+      </div>
+
+      <!-- Columna 3: Redes Sociales -->
+      <div>
+        <h3 class="text-sm font-semibold uppercase tracking-wider mb-4">Síguenos</h3>
+        <ul class="space-y-2 text-sm">
+          <li><a href="https://www.instagram.com/lilosneakers__/" class="hover:text-gray-300">Instagram</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- Banner inferior -->
+    <div class="pt-6 border-t border-gray-800 text-center text-xs text-gray-400">
+      © {{ currentYear }} by Majo Romero.
+    </div>
+
   </div>
 </footer>
