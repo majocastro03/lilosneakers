@@ -11,7 +11,7 @@ import { Producto } from '../../interfaces/producto';
 export class ProductoService {
   private apiUrl = 'http://localhost:3001/api'; // Cambiar en prod
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getProductos(params: ProductosQuery = {}): Observable<ProductosResponse> {
     let httpParams = new HttpParams();
@@ -35,4 +35,8 @@ export class ProductoService {
   getProductoById(id: string): Observable<Producto> {
     return this.http.get<Producto>(`${this.apiUrl}/productos/${id}`);
   }
+  eliminarProducto(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/productos/${id}`);
+  }
+
 }
