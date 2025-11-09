@@ -60,3 +60,13 @@ ng serve
 ```bash
 npm run dev
 ```
+
+### --> Para crear service en Angular
+```bash
+ng generate service core/services/autenticacion/auth-service
+```
+
+### --> Para crear componente en Angular
+```bash
+ng generate component pages/login
+```
