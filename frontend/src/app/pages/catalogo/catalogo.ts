@@ -1,14 +1,14 @@
-import { Component, inject, effect } from '@angular/core';
-import { ProductoService } from '../../core/services/producto/producto-service';
-import { computed, signal } from '@angular/core';
+import { Component, inject, effect, computed, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FooterComponent } from '../../shared/footer/footer';
-import { HeaderComponent } from "../../shared/header/header";
+import { HeaderComponent } from '../../shared/header/header';
+import { ProductoService } from '../../core/services/producto/producto-service';
+import { MarcaService } from '../../core/services/marca/marca-service';
+import { CategoriaService } from '../../core/services/categoria/categoria-service';
+import { TallaService } from '../../core/services/talla/talla-service';
+import { ColoresService } from '../../core/services/colores/colores-service';
 import { Producto } from '../../core/interfaces/producto';
 import { ProductosQuery } from '../../core/interfaces/producto-query';
-import { MarcaService } from '../../core/services/marca/marca-service';
-import { CommonModule } from '@angular/common';
-import { CategoriaService } from '../../core/services/categoria/categoria-service';
-
 
 @Component({
   selector: 'app-catalogo',
@@ -21,30 +21,37 @@ export class Catalogo {
   private productoService = inject(ProductoService);
   private marcaService = inject(MarcaService);
   private categoriaService = inject(CategoriaService);
-  // Filtros reactivos
+  private tallaService = inject(TallaService);
+  private colorService = inject(ColoresService);
+
+  // --- Filtros reactivos ---
   searchTerm = signal<string>('');
   marcaId = signal<string | null>(null);
   categoriaId = signal<string | null>(null);
-  orderBy = signal<'relevancia' | 'precio_asc' | 'precio_desc' | 'novedades'>('relevancia');
+  colorId = signal<string | null>(null);
+  tallaId = signal<string | null>(null);
+  genero = signal<string | null>(null);
+  precioMin = signal<number | null>(null);
+  precioMax = signal<number | null>(null);
+  orderBy = signal<'precio_asc' | 'precio_desc' | 'destacado'>('destacado');
 
-  // Paginación
+  // --- Paginación ---
   currentPage = signal(1);
   totalPages = signal(1);
   loading = signal(false);
 
-  // Marcas
+  // --- Catálogos para filtros ---
   marcas$ = this.marcaService.getMarcas();
-
-  // Categorías
   categorias$ = this.categoriaService.getCategorias();
-  // Productos con datos derivados
+  tallas$ = this.tallaService.getTallas();
+  colores$ = this.colorService.getColores();
+
+  // --- Productos ---
   productos = signal<Producto[]>([]);
 
-  // Productos con tallas filtradas y datos adicionales
   productosConTallas = computed(() => {
-    return this.productos().map(p => {
-      // Filtramos tallas con stock > 0
-      const tallasDisponibles = p.tallas.filter(t => t.cantidad > 0);
+    return this.productos().map((p) => {
+      const tallasDisponibles = p.tallas.filter((t) => t.cantidad > 0);
       const tallasPreview = tallasDisponibles.slice(0, 3);
       const tallasExtraCount = tallasDisponibles.length - 3;
 
@@ -57,13 +64,13 @@ export class Catalogo {
     });
   });
 
-  // Array de páginas
+  // --- Array de páginas dinámico ---
   protected readonly createPageArray = computed(() => {
     const total = this.totalPages();
     if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
 
     const current = this.currentPage();
-    const pages: (number)[] = [1];
+    const pages: number[] = [1];
 
     const start = Math.max(2, current - 2);
     const end = Math.min(total - 1, current + 2);
@@ -76,24 +83,31 @@ export class Catalogo {
     return pages;
   });
 
-  // Query reactiva (se actualiza automáticamente cuando cambian los filtros)
+  // --- Query reactiva ---
   private query = computed(() => {
     const qParams: ProductosQuery = {
       page: this.currentPage(),
       limit: 8,
-      q: this.searchTerm().trim() || undefined,
+      search: this.searchTerm().trim() || undefined,
       categoria_id: this.categoriaId() || undefined,
+      marca_id: this.marcaId() || undefined,
+      color_id: this.colorId() || undefined,
+      talla_id: this.tallaId() || undefined,
+      genero: this.genero() || undefined,
+      precio_min: this.precioMin() || undefined,
+      precio_max: this.precioMax() || undefined,
+      orderBy: this.orderBy(),
     };
     return qParams;
   });
 
-  // Efecto reactivo: cuando cambia `query`, recargamos
+  // --- Efecto reactivo ---
   protected readonly _ = effect(() => {
-    // Leer `query` para establecer la dependencia reactiva y recargar
     this.query();
     this.cargarProductos();
   });
 
+  // --- Métodos principales ---
   cargarProductos() {
     this.loading.set(true);
     const q = this.query();
@@ -114,10 +128,9 @@ export class Catalogo {
   cambiarPagina(page: number) {
     if (page === -1 || page < 1 || page > this.totalPages()) return;
     this.currentPage.set(page);
-    // El efecto reactivo ya se encarga de recargar
   }
 
-  // Métodos para filtros
+  // --- Métodos de filtros ---
   onSearch(event: Event) {
     const input = event.target as HTMLInputElement;
     this.searchTerm.set(input.value);
@@ -128,11 +141,24 @@ export class Catalogo {
     this.categoriaId.set(select || null);
   }
 
-  onMarcaChange(event: Event): void {
+  onMarcaChange(event: Event) {
     const value = (event.target as HTMLSelectElement).value;
-    // Haz lo que necesites con el ID (ej: filtrar productos)
     this.marcaId.set(value || null);
-    console.log('Marca seleccionada:', value);
+  }
+
+  onColorChange(event: Event) {
+    const value = (event.target as HTMLSelectElement).value;
+    this.colorId.set(value || null);
+  }
+
+  onTallaChange(event: Event) {
+    const value = (event.target as HTMLSelectElement).value;
+    this.tallaId.set(value || null);
+  }
+
+  onGeneroChange(event: Event) {
+    const value = (event.target as HTMLSelectElement).value;
+    this.genero.set(value || null);
   }
 
   onOrderByChange(event: Event) {
@@ -143,8 +169,13 @@ export class Catalogo {
   limpiarFiltros() {
     this.searchTerm.set('');
     this.categoriaId.set(null);
-    this.orderBy.set('relevancia');
-    this.currentPage.set(1);
     this.marcaId.set(null);
+    this.colorId.set(null);
+    this.tallaId.set(null);
+    this.genero.set(null);
+    this.precioMin.set(null);
+    this.precioMax.set(null);
+    this.orderBy.set('destacado');
+    this.currentPage.set(1);
   }
 }

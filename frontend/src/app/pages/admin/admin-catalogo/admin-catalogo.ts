@@ -15,7 +15,6 @@ import { NgxPaginationModule } from 'ngx-pagination';
     CommonModule,
     FormsModule,
     NgxPaginationModule,
-    HeaderComponent,
     FooterComponent,
   ],
   templateUrl: './admin-catalogo.html',
