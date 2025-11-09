@@ -8,6 +8,7 @@ const categoriasRoutes = require('./routes/categoriasRoutes');
 const productosRoutes = require('./routes/productosRoutes');
 const perfilesRoutes = require('./routes/perfilesRoutes');
 const marcasRoutes = require('./routes/marcasRoutes');
+const authRoutes = require('./routes/autenticacionRoutes');
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use('/api/categorias', categoriasRoutes);
 app.use('/api/productos', productosRoutes);
 app.use('/api/perfiles', perfilesRoutes);
 app.use('/api/marcas', marcasRoutes);
+app.use('/api/auth', authRoutes);
 // Ruta de salud
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
