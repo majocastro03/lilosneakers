@@ -6,12 +6,15 @@ import { PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { User } from '../../interfaces/user';
 import { LoginResponse } from '../../interfaces/login-reponse';
+import { environment } from '../../../../../../frontend/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:3001/api/auth';
+  private apiUrl = environment.apiUrl;
+  
+  
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
@@ -25,8 +28,8 @@ export class AuthService {
   login(identifier: string, password: string): Observable<User> {
     const credentials = { identifier, password };
 
-return this.http.post<LoginResponse>(`${this.apiUrl}/login`, credentials).pipe(
-  tap(response => console.log('🧩 Respuesta completa del backend:', response)),
+return this.http.post<LoginResponse>(`${this.apiUrl}/auth/login`, credentials).pipe(
+  tap(response => console.log(' Respuesta completa del backend:', response)),
   map(response => {
     if (!response || !response.user) {
       throw new Error('Respuesta inesperada del backend');
@@ -34,7 +37,7 @@ return this.http.post<LoginResponse>(`${this.apiUrl}/login`, credentials).pipe(
     return response.user;
   }),
   tap(user => {
-    console.log('✅ Usuario recibido:', user);
+    console.log('Usuario recibido:', user);
     this.currentUserSubject.next(user);
     this.setSession(user);
   }),
