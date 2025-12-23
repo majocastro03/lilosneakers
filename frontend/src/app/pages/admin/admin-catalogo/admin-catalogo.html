@@ -38,15 +38,54 @@
 
           <!-- Items por página -->
           <select [(ngModel)]="itemsPorPagina" class="px-4 py-2 border border-gray-300 rounded-lg">
-            <option value="10">Mostrar 10</option>
-            <option value="25">Mostrar 25</option>
-            <option value="50">Mostrar 50</option>
+            <option [value]="10">Mostrar 10</option>
+            <option [value]="25">Mostrar 25</option>
+            <option [value]="50">Mostrar 50</option>
           </select>
+
+          <!-- Botón limpiar filtros -->
+          <button
+            *ngIf="filtroBusqueda || filtroCategoria"
+            (click)="limpiarFiltros()"
+            class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition">
+            Limpiar filtros
+          </button>
         </div>
       </div>
 
+      <!-- Loading -->
+      <div *ngIf="loading" class="text-center py-12 bg-white border border-gray-200 rounded-xl">
+        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <p class="mt-4 text-gray-600">Cargando productos...</p>
+      </div>
+
+      <!-- Error -->
+      <div *ngIf="error" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+        <p class="text-red-800">{{ error }}</p>
+        <button (click)="cargarProductos()" class="mt-2 text-sm text-red-600 hover:text-red-800 underline">
+          Reintentar
+        </button>
+      </div>
+
       <!-- Tabla -->
-      <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+      <div *ngIf="!loading && !error" class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+        <!-- Sin resultados -->
+        <div *ngIf="productosFiltrados.length === 0" class="text-center py-12">
+          <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <h3 class="mt-2 text-sm font-medium text-gray-900">No se encontraron productos</h3>
+          <p class="mt-1 text-sm text-gray-500">No hay productos que coincidan con los filtros aplicados.</p>
+          <div class="mt-6">
+            <button (click)="filtroBusqueda = ''; filtroCategoria = ''; filtrarProductos()" 
+                    class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-red-700">
+              Limpiar filtros
+            </button>
+          </div>
+        </div>
+
+        <!-- Tabla con datos -->
+        <div *ngIf="productosFiltrados.length > 0">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
@@ -91,6 +130,7 @@
           nextLabel="Siguiente"
           class="p-4 flex justify-center">
         </pagination-controls>
+        </div>
       </div>
     </div>
   </main>

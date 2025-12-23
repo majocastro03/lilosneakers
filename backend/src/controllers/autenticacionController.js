@@ -1,116 +1,76 @@
-const supabase = require('../config/supabaseCliente'); // Debe usar SERVICE_ROLE_KEY
+const supabase = require('../config/supabaseCliente');
 
 // POST /auth/login → inicio de sesión
 const login = async (req, res) => {
   try {
-    const { identifier, password } = req.body; // identifier = email o username
-    console.log('Intentando login para:', identifier);
-    // Validación básica
-    if (!identifier || !password) {
+    const { username, password } = req.body;
+    console.log('🔐 Intentando login para:', username);
+
+    if (!username || !password) {
       return res.status(400).json({ 
-        error: 'Faltan credenciales', 
-        detalle: 'Se requiere "identifier" (email o username) y "password"' 
+        error: 'Faltan credenciales'
       });
     }
-    
-    let user = null;
 
-    // Opción 1: Intentar login con email
-    if (identifier.includes('@')) {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: identifier,
-        password
-      });
-
-      if (!error) {
-        user = data.user;
-      }
-    }
-
-    // Opción 2: Si no es email o falló, buscar por username
-    if (!user) {
-      // Buscar el perfil por username para obtener el email
-      const { data: perfil, error: perfilError } = await supabase
-        .from('perfiles')
-        .select('id, username')
-        .eq('username', identifier)
-        .single();
-
-      if (perfilError || !perfil) {
-        return res.status(401).json({ 
-          error: 'Credenciales incorrectas' 
-        });
-      }
-
-      // Ahora obtener el email desde auth.users (usando Service Role)
-      const { data: userData, error: userError } = await supabase
-        .from('auth.users')
-        .select('email')
-        .eq('id', perfil.id)
-        .single();
-
-      if (userError || !userData) {
-        return res.status(401).json({ 
-          error: 'Credenciales incorrectas' 
-        });
-      }
-
-      // Intentar login con el email encontrado
-      const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
-        email: userData.email,
-        password
-      });
-
-      if (loginError) {
-        return res.status(401).json({ 
-          error: 'Credenciales incorrectas' 
-        });
-      }
-
-      user = loginData.user;
-    }
-
-    // Verificar que el usuario tenga perfil
+    // 1. Buscar perfil por username
     const { data: perfil, error: perfilError } = await supabase
       .from('perfiles')
-      .select('tipo_usuario, nombre, username')
-      .eq('id', user.id)
+      .select('id, nombre, apellido, username, tipo_usuario')
+      .eq('username', username)
       .single();
 
     if (perfilError || !perfil) {
-      // Opcional: crear perfil mínimo si no existe (solo para migración)
-      return res.status(403).json({ 
-        error: 'Perfil no configurado. Contacte al administrador.' 
+      console.log('❌ Usuario no encontrado:', username);
+      return res.status(401).json({ 
+        error: 'Usuario o contraseña incorrectos' 
       });
     }
 
-    // Opcional: Restringir acceso solo a admins (para tu panel)
-    // Si quieres permitir clientes también, comenta esta validación
-    if (perfil.tipo_usuario !== 'admin') {
-      return res.status(403).json({ 
-        error: 'Acceso denegado. Solo administradores pueden iniciar sesión.' 
+    // 2. Obtener email del usuario desde auth.users
+    const { data: authUser, error: authError } = await supabase.auth.admin.getUserById(perfil.id);
+
+    if (authError || !authUser?.user?.email) {
+      console.log('❌ Email no encontrado para usuario:', perfil.id);
+      return res.status(401).json({ 
+        error: 'Usuario o contraseña incorrectos' 
       });
     }
 
-    // Éxito: devolver sesión + datos del perfil
+    // 3. Intentar login con email y password
+    const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
+      email: authUser.user.email,
+      password
+    });
+
+    if (loginError) {
+      console.log('❌ Contraseña incorrecta para:', username);
+      return res.status(401).json({ 
+        error: 'Usuario o contraseña incorrectos' 
+      });
+    }
+
+    // 4. Éxito
+    console.log('✅ Login exitoso:', username, '- Tipo:', perfil.tipo_usuario);
+
     res.status(200).json({
       message: 'Inicio de sesión exitoso',
       user: {
-        id: user.id,
-        email: user.email,
+        id: perfil.id,
         nombre: perfil.nombre,
+        apellido: perfil.apellido,
         username: perfil.username,
-        tipo_usuario: perfil.tipo_usuario
+        tipo_usuario: perfil.tipo_usuario,
+        email: authUser.user.email
       },
+      session: loginData.session
     });
 
   } catch (err) {
-    console.error('Error en login:', err);
+    console.error('💥 Error en login:', err);
     res.status(500).json({ 
       error: 'Error interno al procesar el inicio de sesión' 
     });
   }
-
 };
 
 // POST /auth/logout → cerrar sesión
@@ -119,7 +79,9 @@ const logout = async (req, res) => {
     const { error } = await supabase.auth.signOut();
     
     if (error) {
-      return res.status(400).json({ error: 'No se pudo cerrar la sesión', detalle: error.message });
+      return res.status(400).json({ 
+        error: 'No se pudo cerrar la sesión' 
+      });
     }
 
     res.status(200).json({ message: 'Sesión cerrada correctamente' });
@@ -129,10 +91,9 @@ const logout = async (req, res) => {
   }
 };
 
-// GET /auth/me → obtener perfil del usuario actual (para frontend)
+// GET /auth/me → obtener perfil del usuario actual
 const obtenerPerfil = async (req, res) => {
   try {
-    // Obtener sesión desde cookies (Supabase SSR)
     const { data: { session }, error } = await supabase.auth.getSession();
 
     if (error || !session) {
@@ -143,7 +104,7 @@ const obtenerPerfil = async (req, res) => {
 
     const { data: perfil, error: perfilError } = await supabase
       .from('perfiles')
-      .select('id, nombre, apellido, username, telefono, tipo_usuario, created_at, updated_at')
+      .select('*')
       .eq('id', userId)
       .single();
 

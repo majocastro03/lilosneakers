@@ -1,10 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ProductoService } from '../../../core/services/producto/producto-service';
 import { CategoriaService } from '../../../core/services/categoria/categoria-service';
-import { HeaderComponent } from '../../../shared/header/header';
 import { FooterComponent } from '../../../shared/footer/footer';
 import { NgxPaginationModule } from 'ngx-pagination';
 
@@ -15,7 +14,6 @@ import { NgxPaginationModule } from 'ngx-pagination';
     CommonModule,
     FormsModule,
     NgxPaginationModule,
-    HeaderComponent,
     FooterComponent,
   ],
   templateUrl: './admin-catalogo.html',
@@ -25,6 +23,8 @@ export class AdminCatalogo implements OnInit {
   productos: any[] = [];
   categorias: any[] = [];
   productosFiltrados: any[] = [];
+  loading = true; // Iniciar en true para mostrar loading desde el primer render
+  error: string | null = null;
 
   filtroBusqueda = '';
   filtroCategoria = '';
@@ -34,7 +34,8 @@ export class AdminCatalogo implements OnInit {
   constructor(
     private productoService: ProductoService,
     private categoriaService: CategoriaService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -43,13 +44,24 @@ export class AdminCatalogo implements OnInit {
   }
 
   cargarProductos() {
+    this.loading = true;
+    this.error = null;
+    this.cdr.detectChanges();
+    
     this.productoService.getProductos().subscribe({
       next: (data) => {
         // Si tu API devuelve un objeto con { productos, total }:
         this.productos = Array.isArray(data) ? data : data.productos ?? [];
         this.filtrarProductos();
+        this.loading = false;
+        this.cdr.detectChanges();
       },
-      error: (err) => console.error('Error al cargar productos', err),
+      error: (err) => {
+        console.error('Error al cargar productos', err);
+        this.error = 'Error al cargar los productos. Por favor intenta de nuevo.';
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
     });
   }
 
@@ -78,6 +90,12 @@ export class AdminCatalogo implements OnInit {
 
     this.productosFiltrados = filtered;
     this.paginaActual = 1;
+  }
+
+  limpiarFiltros() {
+    this.filtroBusqueda = '';
+    this.filtroCategoria = '';
+    this.filtrarProductos();
   }
 
   cambiarPagina(page: number) {

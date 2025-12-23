@@ -1,40 +1,5 @@
-# Node modules
-/node_modules
-
-# Logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-logs
-*.log
-*.out
-*.pid
-
-# Environment files
+node_modules/
 .env
-.env.local
-.env.*.local
-
-# Build output
-/dist
-/build
-/coverage
-
-# Cache and temporary files
-/.cache
-/tmp
-*.tmp
-*.temp
-
-# IDE / Editor
-/.idea
-/.vscode
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
-# OS files
+uploads/
+*.log
 .DS_Store
-Thumbs.db
