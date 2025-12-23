@@ -12,6 +12,7 @@ import { PaginatorModule } from 'primeng/paginator';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { RippleModule } from 'primeng/ripple';
+import { NgxPaginationModule } from 'ngx-pagination';
 
 @Component({
   selector: 'app-admin-catalogo',
@@ -112,15 +113,6 @@ export class AdminCatalogo implements OnInit {
     this.filtroBusqueda = '';
     this.filtroCategoria = '';
     this.filtrarProductos();
-  }
-
-  cambiarPagina(page: number) {
-    if (page < 1 || page > this.totalPages) return;
-    this.paginaActual = page;
-  }
-
-  get totalPages(): number {
-    return Math.ceil(this.productosFiltrados.length / this.itemsPorPagina);
   }
 
   editarProducto(producto: any) {

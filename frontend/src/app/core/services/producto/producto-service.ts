@@ -1,33 +1,32 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { Producto } from '../../interfaces/producto';
-import { ProductosQuery } from '../../interfaces/producto-query';
-import { ProductosResponse } from '../../interfaces/producto-response';
-import { Producto } from '../../interfaces/producto';
-import { environment } from '../../../../environments/environment';
+import { Injectable } from "@angular/core";
+import { environment } from "../../../../environments/environment";
+import { HttpClient, HttpParams } from "@angular/common/http";
+import { ProductosQuery } from "../../interfaces/producto-query";
+import { Observable } from "rxjs";
+import { Producto } from "../producto.service";
+
 
 @Injectable({ providedIn: 'root' })
 export class ProductoService {
   private apiUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   // Obtener productos con filtros opcionales (para catálogo público o admin)
   getProductos(query?: ProductosQuery): Observable<{ productos: Producto[]; totalPages: number }> {
     let params = new HttpParams();
 
     // Solo agregar parámetros si están definidos
-    if (params.page !== undefined) httpParams = httpParams.set('page', params.page.toString());
-    if (params.limit !== undefined) httpParams = httpParams.set('limit', params.limit.toString());
-    if (params.categoria_id !== undefined) {
-      httpParams = httpParams.set('categoria_id', params.categoria_id); // Ya es string (UUID)
+    if (query?.page !== undefined) params = params.set('page', query.page.toString());
+    if (query?.limit !== undefined) params = params.set('limit', query.limit.toString());
+    if (query?.categoria_id !== undefined) {
+      params = params.set('categoria_id', query.categoria_id); // Ya es string (UUID)
     }
-    if (params.destacado !== undefined) {
-      httpParams = httpParams.set('destacado', params.destacado.toString());
+    if (query?.destacado !== undefined) {
+      params = params.set('destacado', query.destacado.toString());
     }
-    if (params.q) {
-      httpParams = httpParams.set('q', params.q.trim());
+    if (query?.q) {
+      params = params.set('q', query.q.trim());
     }
 
     return this.http.get<{ productos: Producto[]; totalPages: number }>(this.apiUrl, { params });
