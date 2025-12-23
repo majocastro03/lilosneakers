@@ -1,125 +1,188 @@
 <app-header></app-header>
+
 <div class="min-h-screen flex flex-col bg-white">
-  <main class="flex-1 container mx-auto px-4 py-8">
+  <main class="flex-1 container mx-auto px-4 py-6 sm:py-8">
 
     <!-- Título -->
-    <div class="mb-6">
-      <h1 class="text-3xl font-bold text-gray-900">Catálogo</h1>
-      <p class="text-gray-600">Descubre nuestras colecciones</p>
+    <div class="mb-6 text-center sm:text-left">
+      <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Catálogo</h1>
+      <p class="text-gray-600 text-sm sm:text-base">Descubre nuestras colecciones</p>
     </div>
 
     <!-- Filtros -->
-    <div class="mb-6 flex flex-wrap gap-4 items-center">
+    <div class="mb-6 flex flex-wrap gap-4 items-center justify-between">
 
       <!-- Búsqueda -->
-      <div class="flex-1 min-w-[200px]">
+      <div class="w-full sm:flex-1 min-w-[200px]">
         <label for="search" class="sr-only">Buscar</label>
-        <input type="text" id="search" placeholder="Buscar productos..." [value]="searchTerm()"
+        <input
+          type="text"
+          id="search"
+          placeholder="Buscar productos..."
+          [value]="searchTerm()"
           (input)="onSearch($event)"
-          class="w-full px-3 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
       </div>
 
-      <!-- Ordenar por -->
-      <div class="flex items-center space-x-2">
-        <label class="text-sm font-medium whitespace-nowrap">Ordenar por:</label>
-        <select [value]="orderBy()" (change)="onOrderByChange($event)"
-          class="px-3 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-          <option value="relevancia">Relevancia</option>
-          <option value="precio_asc">Precio: Menor a Mayor</option>
-          <option value="precio_desc">Precio: Mayor a Menor</option>
-          <option value="novedades">Novedades</option>
-        </select>
-      </div>
+      <!-- Contenedor filtros desplegables -->
+      <div class="flex flex-wrap justify-between w-full sm:w-auto gap-3 sm:gap-4 mt-2 sm:mt-0">
 
-      <!-- Categoría -->
-      <div class="flex items-center space-x-2">
-        <label class="text-sm font-medium whitespace-nowrap">Categoría:</label>
-        <select [value]="categoriaId() || ''" (change)="onCategoriaChange($event)"
-          class="px-3 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-          <option value="">Todas</option>
-          @if (categorias$ | async; as categorias) {
-          @for (categoria of categorias; track categoria.id) {
-          <option [value]="categoria.id">{{ categoria.nombre }}</option>
-          }
-          }
-        </select>
-      </div>
+        <!-- Ordenar -->
+        <div class="flex items-center space-x-2 w-full sm:w-auto">
+          <label class="text-sm font-medium">Ordenar:</label>
+          <select
+            [value]="orderBy()"
+            (change)="onOrderByChange($event)"
+            class="flex-1 sm:flex-none px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="precio_asc">Precio: Menor a Mayor</option>
+            <option value="precio_desc">Precio: Mayor a Menor</option>
+            <option value="destacado">Destacados</option>
+          </select>
+        </div>
 
-      <!-- Marca -->
-      <div class="flex items-center space-x-2">
-        <label class="text-sm font-medium whitespace-nowrap">Marca:</label>
-        <select (change)="onMarcaChange($event)"
-          class="px-3 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-          <option value="">Todas</option>
-          @if (marcas$ | async; as marcas) {
-          @for (marca of marcas; track marca.id) {
-          <option [value]="marca.id">{{ marca.nombre }}</option>
-          }
-          }
-        </select>
-      </div>
+        <!-- Categoría -->
+        <div class="flex items-center space-x-2 w-full sm:w-auto">
+          <label class="text-sm font-medium">Categoría:</label>
+          <select
+            [value]="categoriaId() || ''"
+            (change)="onCategoriaChange($event)"
+            class="flex-1 sm:flex-none px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Todas</option>
+            @if (categorias$ | async; as categorias) {
+              @for (categoria of categorias; track categoria.id) {
+                <option [value]="categoria.id">{{ categoria.nombre }}</option>
+              }
+            }
+          </select>
+        </div>
 
-      <!-- Limpiar -->
-      <div class="ml-auto">
-        <button (click)="limpiarFiltros()" class="px-4 py-1.5 bg-gray-100 hover:bg-gray-200 text-sm rounded transition">
-          Limpiar filtros
-        </button>
+        <!-- Marca -->
+        <div class="flex items-center space-x-2 w-full sm:w-auto">
+          <label class="text-sm font-medium">Marca:</label>
+          <select
+            (change)="onMarcaChange($event)"
+            class="flex-1 sm:flex-none px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Todas</option>
+            @if (marcas$ | async; as marcas) {
+              @for (marca of marcas; track marca.id) {
+                <option [value]="marca.id">{{ marca.nombre }}</option>
+              }
+            }
+          </select>
+        </div>
+
+        <!-- Color -->
+        <div class="flex items-center space-x-2 w-full sm:w-auto">
+          <label class="text-sm font-medium">Color:</label>
+          <select
+            (change)="onColorChange($event)"
+            class="flex-1 sm:flex-none px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Todos</option>
+            @if (colores$ | async; as colores) {
+              @for (color of colores; track color.id) {
+                <option [value]="color.id">{{ color.nombre }}</option>
+              }
+            }
+          </select>
+        </div>
+
+        <!-- Talla -->
+        <div class="flex items-center space-x-2 w-full sm:w-auto">
+          <label class="text-sm font-medium">Talla:</label>
+          <select
+            (change)="onTallaChange($event)"
+            class="flex-1 sm:flex-none px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Todas</option>
+            @if (tallas$ | async; as tallas) {
+              @for (talla of tallas; track talla.id) {
+                <option [value]="talla.id">{{ talla.valor }}</option>
+              }
+            }
+          </select>
+        </div>
+
+        <!-- Género -->
+        <div class="flex items-center space-x-2 w-full sm:w-auto">
+          <label class="text-sm font-medium">Género:</label>
+          <select
+            (change)="onGeneroChange($event)"
+            class="flex-1 sm:flex-none px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">Todos</option>
+            <option value="hombre">Hombre</option>
+            <option value="mujer">Mujer</option>
+            <option value="unisex">Unisex</option>
+          </select>
+        </div>
+
+        <!-- Botón limpiar -->
+        <div class="w-full sm:w-auto text-right mt-2 sm:mt-0">
+          <button
+            (click)="limpiarFiltros()"
+            class="w-full sm:w-auto px-4 py-2 bg-gray-100 hover:bg-gray-200 text-sm rounded-lg transition"
+          >
+            Limpiar filtros
+          </button>
+        </div>
       </div>
     </div>
 
     <!-- Productos -->
-    <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
 
       @for (producto of productosConTallas(); track producto.id) {
-      <div class="bg-white rounded-lg overflow-hidden group hover:shadow-md transition-shadow">
-
+      <div class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition">
         <!-- Imagen -->
-        <div class="relative h-64 bg-gray-50 flex items-center justify-center">
-          <img [src]="producto.imagen_url || 'https://via.placeholder.com/300?text=Producto'" [alt]="producto.nombre"
-            class="h-full w-full object-contain p-4">
-
+        <div class="relative h-48 sm:h-56 bg-gray-50 flex items-center justify-center">
+          <img
+            [src]="producto.imagen_url || 'https://via.placeholder.com/300?text=Producto'"
+            [alt]="producto.nombre"
+            class="h-full w-full object-contain p-3"
+          />
           @if (producto.destacado) {
-          <span class="absolute top-2 left-2 bg-black text-white text-xs px-2 py-1 rounded">
-            Top Sellers
-          </span>
+            <span class="absolute top-2 left-2 bg-black text-white text-xs px-2 py-1 rounded">
+              Top Sellers
+            </span>
           }
         </div>
 
         <!-- Info -->
-        <div class="p-4">
-          <h3 class="font-medium text-gray-900 truncate">{{ producto.nombre }}</h3>
+        <div class="p-3 sm:p-4">
+          <h3 class="font-medium text-gray-900 text-sm sm:text-base truncate">{{ producto.nombre }}</h3>
 
           <!-- Precio -->
-          <div class="mt-2">
+          <div class="mt-1 sm:mt-2">
             @if (producto.mostrar_precio) {
-            @if (producto.descuento > 0) {
-            <span class="text-sm line-through text-gray-500 mr-2">
-              ${{ producto.precio }}
-            </span>
-            }
-            <span class="text-xl font-bold text-gray-900">
-              ${{ producto.precio_final }}
-            </span>
+              @if (producto.descuento > 0) {
+                <span class="text-xs sm:text-sm line-through text-gray-500 mr-2">
+                  ${{ producto.precio }}
+                </span>
+              }
+              <span class="text-base sm:text-lg font-bold text-gray-900">
+                ${{ producto.precio_final }}
+              </span>
             } @else {
-            <span class="text-sm text-gray-500 italic">
-              Precio bajo solicitud
-            </span>
+              <span class="text-xs text-gray-500 italic">Precio bajo solicitud</span>
             }
           </div>
 
-          <!-- Tallas disponibles -->
-          <div class="mt-3">
+          <!-- Tallas -->
+          <div class="mt-2 sm:mt-3">
             <p class="text-xs text-gray-500">Tallas:</p>
             <div class="flex flex-wrap gap-1">
               @for (t of producto.tallasPreview; track t.talla) {
-              <span class="px-2 py-1 bg-gray-100 text-xs rounded">
-                {{ t.talla }}
-              </span>
+                <span class="px-2 py-1 bg-gray-100 text-xs rounded">{{ t.talla }}</span>
               }
               @if (producto.tallasExtraCount > 0) {
-              <span class="px-2 py-1 bg-gray-100 text-xs rounded">
-                +{{ producto.tallasExtraCount }}
-              </span>
+                <span class="px-2 py-1 bg-gray-100 text-xs rounded">
+                  +{{ producto.tallasExtraCount }}
+                </span>
               }
             </div>
           </div>
@@ -129,15 +192,15 @@
 
       <!-- Skeleton -->
       @if (loading()) {
-      @for (_ of [1,2,3,4]; track $index) {
-      <div class="bg-white rounded-lg overflow-hidden animate-pulse">
-        <div class="h-64 bg-gray-200"></div>
-        <div class="p-4 space-y-2">
-          <div class="h-4 bg-gray-200 rounded w-3/4"></div>
-          <div class="h-6 bg-gray-200 rounded w-1/2"></div>
-        </div>
-      </div>
-      }
+        @for (_ of [1,2,3,4]; track $index) {
+          <div class="bg-white rounded-lg overflow-hidden animate-pulse">
+            <div class="h-48 sm:h-56 bg-gray-200"></div>
+            <div class="p-3 sm:p-4 space-y-2">
+              <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+              <div class="h-6 bg-gray-200 rounded w-1/2"></div>
+            </div>
+          </div>
+        }
       }
     </div>
 
@@ -146,20 +209,22 @@
     <div class="mt-8 flex justify-center">
       <nav class="flex flex-wrap justify-center gap-1">
         @for (page of createPageArray(); track page) {
-        @if (page === -1) {
-        <span class="px-3 py-1.5 text-gray-500">...</span>
-        } @else {
-        <button (click)="cambiarPagina(page)" [class.bg-blue-500]="currentPage() === page"
-          [class.text-white]="currentPage() === page"
-          class="px-3 py-1.5 rounded border border-gray-300 text-sm font-medium min-w-[36px] hover:bg-gray-100 transition">
-          {{ page }}
-        </button>
-        }
+          @if (page === -1) {
+            <span class="px-3 py-1.5 text-gray-500">...</span>
+          } @else {
+            <button
+              (click)="cambiarPagina(page)"
+              [class.bg-blue-500]="currentPage() === page"
+              [class.text-white]="currentPage() === page"
+              class="px-3 py-1.5 rounded border border-gray-300 text-sm font-medium min-w-[36px] hover:bg-gray-100 transition"
+            >
+              {{ page }}
+            </button>
+          }
         }
       </nav>
     </div>
     }
-
   </main>
 
   <app-footer></app-footer>

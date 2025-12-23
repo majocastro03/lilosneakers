@@ -34,6 +34,8 @@
     "@tailwindcss/cli": "^4.1.17",
     "express": "^5.1.0",
     "ngx-pagination": "^6.0.3",
+    "primeicons": "^7.0.0",
+    "primeng": "^20.0.0-rc.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },

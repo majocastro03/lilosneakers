@@ -1,8 +1,9 @@
+const ProductoModel = require('../models/ProductoModel');
 const supabase = require('../config/supabaseCliente');
-const path = require('path');
 const fs = require('fs').promises;
+const path = require('path');
 
-// GET /productos
+// GET /api/productos
 const getProductos = async (req, res) => {
   try {
     // Parámetros de paginación
@@ -130,7 +131,7 @@ const getProductos = async (req, res) => {
   }
 };
 
-// GET /productos/:id
+// GET /api/productos/:id
 const getProductoById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -191,15 +192,11 @@ const getProductoById = async (req, res) => {
     res.json(productoFormateado);
 
   } catch (err) {
-    console.error('Error en getProductoById:', err);
-    if (err.code === 'PGRST116') {
-      return res.status(404).json({ error: 'Producto no encontrado' });
-    }
-    res.status(500).json({ error: 'Error al obtener el producto' });
+    res.status(404).json({ error: 'Producto no encontrado' });
   }
 };
 
-// POST /productos
+// POST /api/productos
 const crearProducto = async (req, res) => {
   try {
     const {
@@ -223,7 +220,6 @@ const crearProducto = async (req, res) => {
 
       const filename = `${Date.now()}-${req.file.originalname}`;
       const filepath = path.join(uploadsDir, filename);
-
       await fs.writeFile(filepath, req.file.buffer);
 
       const baseUrl = `${req.protocol}://${req.get('host')}`;
@@ -247,7 +243,7 @@ const crearProducto = async (req, res) => {
       .select()
       .single();
 
-    if (productoError) throw productoError;
+    if (error) throw error;
 
     res.status(201).json({
       message: 'Producto creado con éxito',
@@ -350,3 +346,4 @@ module.exports = {
   actualizarProducto,
   eliminarProducto
 };
+

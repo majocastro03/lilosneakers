@@ -5,7 +5,13 @@ import { Router } from '@angular/router';
 import { ProductoService } from '../../../core/services/producto/producto-service';
 import { CategoriaService } from '../../../core/services/categoria/categoria-service';
 import { FooterComponent } from '../../../shared/footer/footer';
-import { NgxPaginationModule } from 'ngx-pagination';
+import { TableModule } from 'primeng/table';
+import { InputTextModule } from 'primeng/inputtext';
+import { ButtonModule } from 'primeng/button';
+import { PaginatorModule } from 'primeng/paginator';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
+import { RippleModule } from 'primeng/ripple';
 
 @Component({
   selector: 'app-admin-catalogo',
@@ -15,11 +21,19 @@ import { NgxPaginationModule } from 'ngx-pagination';
     FormsModule,
     NgxPaginationModule,
     FooterComponent,
+    TableModule,
+    InputTextModule,
+    ButtonModule,
+    PaginatorModule,
+    IconFieldModule,
+    InputIconModule,
+    RippleModule
   ],
   templateUrl: './admin-catalogo.html',
   styleUrls: ['./admin-catalogo.css'],
 })
 export class AdminCatalogo implements OnInit {
+
   productos: any[] = [];
   categorias: any[] = [];
   productosFiltrados: any[] = [];
@@ -50,7 +64,6 @@ export class AdminCatalogo implements OnInit {
     
     this.productoService.getProductos().subscribe({
       next: (data) => {
-        // Si tu API devuelve un objeto con { productos, total }:
         this.productos = Array.isArray(data) ? data : data.productos ?? [];
         this.filtrarProductos();
         this.loading = false;
@@ -67,7 +80,10 @@ export class AdminCatalogo implements OnInit {
 
   cargarCategorias() {
     this.categoriaService.getCategorias().subscribe({
-      next: (data) => (this.categorias = data),
+      next: (data) => {
+        this.categorias = data;
+        this.cdr.detectChanges(); // Para que el dropdown se actualice
+      },
       error: (err) => console.error('Error al cargar categorías', err),
     });
   }
@@ -125,5 +141,23 @@ export class AdminCatalogo implements OnInit {
 
   abrirModalNuevo() {
     this.router.navigate(['/admin/nuevo']);
+  }
+  // En la clase AdminCatalogo
+  get startIndex(): number {
+    return (this.paginaActual - 1) * this.itemsPorPagina;
+  }
+
+  get endIndex(): number {
+    return Math.min(this.paginaActual * this.itemsPorPagina, this.productosFiltrados.length);
+  }
+
+  get totalPages(): number {
+    return Math.ceil(this.productosFiltrados.length / this.itemsPorPagina);
+  }
+
+  cambiarPagina(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.paginaActual = page;
+    }
   }
 }
