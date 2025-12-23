@@ -22,6 +22,7 @@ const getProductos = async (req, res) => {
         descripcion,
         destacado,
         mostrar_precio,
+        categoria_id,
         categorias!left(nombre, slug),
         marcas!left(nombre, slug, imagen_url)
       `, { count: 'exact' })
@@ -103,12 +104,13 @@ const getProductos = async (req, res) => {
       nombre: p.nombre,
       precio: p.precio,
       descuento: p.descuento,
-      precio_final: Math.round(p.precio * (1 - p.descuento / 100)), // Redondeo para evitar decimales
+      precio_final: Math.round(p.precio * (1 - p.descuento / 100)),
       imagen_url: p.imagen_url,
       descripcion: p.descripcion,
       destacado: p.destacado,
       categoria: p.categorias?.nombre || 'Sin categoría',
       categoria_slug: p.categorias?.slug || null,
+      categoria_id: p.categoria_id,
       colores: coloresMap[p.id] || [],
       tallas: tallasMap[p.id] || []
     }));
@@ -144,6 +146,7 @@ const getProductoById = async (req, res) => {
         imagen_url,
         descripcion,
         destacado,
+        categoria_id,
         categorias!left(nombre)
       `)
       .eq('id', id)
@@ -177,6 +180,7 @@ const getProductoById = async (req, res) => {
       descripcion: producto.descripcion,
       destacado: producto.destacado,
       categoria: producto.categorias?.nombre || 'Sin categoría',
+      categoria_id: producto.categoria_id,
       colores: coloresRes.data.map(pc => pc.colores),
       tallas: tallasRes.data.map(pt => ({
         talla: pt.tallas.valor,
@@ -198,23 +202,20 @@ const getProductoById = async (req, res) => {
 // POST /productos
 const crearProducto = async (req, res) => {
   try {
-    // 1. Validar cuerpo
     const {
       nombre,
       precio,
       descuento = 0,
       descripcion,
       destacado = false,
-      categoria_id,
-      colores = [],
-      tallas = []
+      categoria_id
     } = req.body;
 
     if (!nombre || !precio) {
       return res.status(400).json({ error: 'Nombre y precio son requeridos' });
     }
 
-    // 2. Manejar archivo (si se sube con multer)
+    // Manejar archivo
     let imagenUrl = null;
     if (req.file) {
       const uploadsDir = path.join(__dirname, '../../uploads/productos');
@@ -225,11 +226,11 @@ const crearProducto = async (req, res) => {
 
       await fs.writeFile(filepath, req.file.buffer);
 
-      // URL absoluta (clave para que funcione en frontend)
       const baseUrl = `${req.protocol}://${req.get('host')}`;
       imagenUrl = `${baseUrl}/uploads/productos/${filename}`;
     }
-    // 3. Insertar producto
+
+    // Insertar producto
     const { data: producto, error: productoError } = await supabase
       .from('productos')
       .insert([
@@ -239,7 +240,7 @@ const crearProducto = async (req, res) => {
           descuento: parseFloat(descuento),
           imagen_url: imagenUrl,
           descripcion,
-          destacado,
+          destacado: destacado === 'true' || destacado === true,
           categoria_id: categoria_id || null
         }
       ])
@@ -248,36 +249,6 @@ const crearProducto = async (req, res) => {
 
     if (productoError) throw productoError;
 
-    // 4. Insertar colores (si hay)
-    // if (colores.length > 0) {
-    //   const coloresData = colores.map(color => ({
-    //     producto_id: producto.id,
-    //     color_id: color.id
-    //   }));
-
-    //   const { error: coloresError } = await supabase
-    //     .from('producto_colores')
-    //     .insert(coloresData);
-
-    //   if (coloresError) throw coloresError;
-    // }
-
-    // 5. Insertar tallas (si hay)
-    // if (tallas.length > 0) {
-    //   const tallasData = tallas.map(t => ({
-    //     producto_id: producto.id,
-    //     talla_id: t.id,
-    //     cantidad: parseInt(t.cantidad) || 0
-    //   }));
-
-    //   const { error: tallasError } = await supabase
-    //     .from('producto_tallas')
-    //     .insert(tallasData);
-
-    //   if (tallasError) throw tallasError;
-    // }
-
-    // 6. Responder
     res.status(201).json({
       message: 'Producto creado con éxito',
       producto: {
@@ -293,8 +264,89 @@ const crearProducto = async (req, res) => {
   }
 };
 
+// PUT /productos/:id
+const actualizarProducto = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const {
+      nombre,
+      precio,
+      descuento = 0,
+      descripcion,
+      destacado = false,
+      categoria_id
+    } = req.body;
+
+    // Construir objeto de actualización
+    const updateData = {
+      nombre,
+      precio: parseFloat(precio),
+      descuento: parseFloat(descuento),
+      descripcion,
+      destacado: destacado === 'true' || destacado === true,
+      categoria_id: categoria_id || null
+    };
+
+    // Si hay nueva imagen
+    if (req.file) {
+      const uploadsDir = path.join(__dirname, '../../uploads/productos');
+      await fs.mkdir(uploadsDir, { recursive: true });
+
+      const filename = `${Date.now()}-${req.file.originalname}`;
+      const filepath = path.join(uploadsDir, filename);
+
+      await fs.writeFile(filepath, req.file.buffer);
+
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      updateData.imagen_url = `${baseUrl}/uploads/productos/${filename}`;
+    }
+
+    // Actualizar producto
+    const { data: producto, error } = await supabase
+      .from('productos')
+      .update(updateData)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    res.json({
+      message: 'Producto actualizado con éxito',
+      producto
+    });
+
+  } catch (err) {
+    console.error('Error en actualizarProducto:', err);
+    res.status(500).json({ error: 'Error al actualizar el producto' });
+  }
+};
+
+// DELETE /productos/:id
+const eliminarProducto = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Eliminar producto
+    const { error } = await supabase
+      .from('productos')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+
+    res.json({ message: 'Producto eliminado con éxito' });
+
+  } catch (err) {
+    console.error('Error en eliminarProducto:', err);
+    res.status(500).json({ error: 'Error al eliminar el producto' });
+  }
+};
+
 module.exports = {
   getProductos,
   getProductoById,
-  crearProducto
+  crearProducto,
+  actualizarProducto,
+  eliminarProducto
 };

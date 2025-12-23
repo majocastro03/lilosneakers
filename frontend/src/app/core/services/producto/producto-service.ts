@@ -4,12 +4,13 @@ import { Observable } from 'rxjs';
 import { ProductosQuery } from '../../interfaces/producto-query';
 import { ProductosResponse } from '../../interfaces/producto-response';
 import { Producto } from '../../interfaces/producto';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ProductoService {
-  private apiUrl = 'http://localhost:3001/api'; // Cambiar en prod
+  private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) { }
 
@@ -20,7 +21,7 @@ export class ProductoService {
     if (params.page !== undefined) httpParams = httpParams.set('page', params.page.toString());
     if (params.limit !== undefined) httpParams = httpParams.set('limit', params.limit.toString());
     if (params.categoria_id !== undefined) {
-      httpParams = httpParams.set('categoria_id', params.categoria_id.toString());
+      httpParams = httpParams.set('categoria_id', params.categoria_id); // Ya es string (UUID)
     }
     if (params.destacado !== undefined) {
       httpParams = httpParams.set('destacado', params.destacado.toString());

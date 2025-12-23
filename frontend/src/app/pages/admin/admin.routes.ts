@@ -1,14 +1,16 @@
 import { Routes } from '@angular/router';
-import { AdminCatalogo } from './admin-catalogo/admin-catalogo';
-import { AuthGuard } from '../../core/guards/auth.guards';
+import { AdminProductosComponent } from './admin-productos/admin-productos.component';
+import { adminGuard } from '../../core/guards/admin.guard';
 
 export const adminRoutes: Routes = [
-  {
-    path: '',
-    canActivate: [AuthGuard],
-    children: [
-      { path: 'catalogo', component: AdminCatalogo },
-      { path: '', redirectTo: 'catalogo', pathMatch: 'full' }
-    ]
+  { 
+    path: '', 
+    redirectTo: 'productos', 
+    pathMatch: 'full' 
+  },
+  { 
+    path: 'productos', 
+    component: AdminProductosComponent,
+    canActivate: [adminGuard]
   }
 ];

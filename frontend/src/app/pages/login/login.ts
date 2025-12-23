@@ -1,38 +1,48 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 import { HeaderComponent } from "../../shared/header/header";
 import { FooterComponent } from "../../shared/footer/footer";
-import { AuthService } from '../../core/services/autenticacion/auth-service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, HeaderComponent, FooterComponent],
+  imports: [CommonModule, ReactiveFormsModule, HeaderComponent, FooterComponent],
   templateUrl: './login.html',
   styleUrls: ['./login.css'],
 })
 export class Login implements OnInit {
+  private fb = inject(FormBuilder);
+  private router = inject(Router);
+  private authService = inject(AuthService);
+
   loginForm: FormGroup;
   hidePassword = true;
   loading = false;
   loginError: string | null = null;
-  loginSuccess: string | null = null; // ✅ Para mensaje de éxito
+  loginSuccess: string | null = null;
   currentYear = new Date().getFullYear();
 
-  constructor(
-    private fb: FormBuilder,
-    private router: Router,
-    private authService: AuthService
-  ) {
+  constructor() {
     this.loginForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(3)]],
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
   }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+    // Si ya está autenticado, redirigir
+    if (this.authService.isAuthenticated()) {
+      if (this.authService.isAdmin()) {
+        this.router.navigate(['/admin/productos']);
+      } else {
+        this.router.navigate(['/']);
+      }
+    }
+  }
 
   togglePassword(): void {
     this.hidePassword = !this.hidePassword;
@@ -58,7 +68,6 @@ export class Login implements OnInit {
 
   onSubmit(): void {
     if (this.loginForm.invalid) {
-      // Marcar todos como touched para mostrar errores
       Object.keys(this.loginForm.controls).forEach(key => {
         this.loginForm.get(key)?.markAsTouched();
       });
@@ -69,17 +78,17 @@ export class Login implements OnInit {
     this.loginError = null;
     this.loginSuccess = null;
 
-    const { username: identifier, password } = this.loginForm.value;
-    console.log('📤 Enviando credenciales:', { identifier, password });
-    this.authService.login(identifier, password).subscribe({
-      next: (user) => {
+    const { username, password } = this.loginForm.value;
+    
+    this.authService.login(username, password).subscribe({
+      next: (response) => {
         this.loading = false;
-        this.loginSuccess = '¡Inicio de sesión exitoso!'; //
+        this.loginSuccess = '¡Inicio de sesión exitoso!';
 
-        // Redirigir después de breve delay (para mostrar mensaje)
+        // Redirigir según el tipo de usuario
         setTimeout(() => {
-          if (user.tipo_usuario === 'admin') {
-            this.router.navigate(['/admin/catalogo']);
+          if (response.user.tipo_usuario === 'admin') {
+            this.router.navigate(['/admin/productos']);
           } else {
             this.router.navigate(['/']);
           }
@@ -87,7 +96,8 @@ export class Login implements OnInit {
       },
       error: (err) => {
         this.loading = false;
-        this.loginError = err;
+        console.error('Error de login:', err);
+        this.loginError = err.error?.error || 'Usuario o contraseña incorrectos';
         this.loginSuccess = null;
       }
     });

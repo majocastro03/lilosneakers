@@ -13,8 +13,31 @@ const authRoutes = require('./routes/autenticacionRoutes');
 const app = express();
 
 // Middlewares
-app.use(helmet());
-app.use(cors());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" },
+  contentSecurityPolicy: false // Desactivar CSP por ahora para desarrollo
+}));
+
+// CORS - Permitir múltiples orígenes
+const allowedOrigins = [
+  'http://localhost:4200',
+  'https://lilosneakers.netlify.app', // Tu dominio de Netlify
+  process.env.FRONTEND_URL // Variable de entorno
+].filter(Boolean);
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // Permitir requests sin origin (como apps móviles o curl)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
 app.use(express.json({ limit: '10mb' }));
 
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
@@ -27,7 +50,11 @@ app.use('/api/marcas', marcasRoutes);
 app.use('/api/auth', authRoutes);
 // Ruta de salud
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  res.json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
+  });
 });
 
 // Manejo de rutas no encontradas
