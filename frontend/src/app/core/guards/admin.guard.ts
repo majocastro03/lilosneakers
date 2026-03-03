@@ -8,12 +8,11 @@ export const adminGuard: CanActivateFn = () => {
   const router = inject(Router);
   const platformId = inject(PLATFORM_ID);
 
-  // Si estamos en SSR, permitir (la verificación real será en el cliente)
+  // En SSR, denegar acceso (la verificación real será en el cliente)
   if (!isPlatformBrowser(platformId)) {
-    return true;
+    return false;
   }
 
-  // Verificaciones en el navegador
   if (!authService.isAuthenticated()) {
     router.navigate(['/login']);
     return false;
@@ -21,7 +20,6 @@ export const adminGuard: CanActivateFn = () => {
 
   if (!authService.isAdmin()) {
     router.navigate(['/']);
-    alert('No tienes permisos de administrador');
     return false;
   }
 

@@ -1,0 +1,41 @@
+import { Component, inject, signal, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { RouterLink } from '@angular/router';
+
+@Component({
+  selector: 'app-admin-tallas',
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterLink],
+  templateUrl: './admin-tallas.html',
+  styleUrl: './admin-tallas.css'
+})
+export class AdminTallasComponent implements OnInit {
+  private http = inject(HttpClient);
+  tallas = signal<any[]>([]);
+  showModal = signal(false);
+  editingId = signal<string | null>(null);
+  form = { valor: '', tipo: 'numerica' };
+  message = signal<string | null>(null);
+
+  ngOnInit() { this.load(); }
+
+  load() { this.http.get<any[]>('/api/tallas').subscribe({ next: (data) => this.tallas.set(data) }); }
+  openCreate() { this.form = { valor: '', tipo: 'numerica' }; this.editingId.set(null); this.showModal.set(true); }
+  openEdit(item: any) { this.form = { valor: item.valor, tipo: item.tipo || 'numerica' }; this.editingId.set(item.id); this.showModal.set(true); }
+
+  save() {
+    const id = this.editingId();
+    const obs = id ? this.http.put(`/api/tallas/${id}`, this.form) : this.http.post('/api/tallas', this.form);
+    obs.subscribe({
+      next: () => { this.showModal.set(false); this.message.set('Guardado'); this.load(); setTimeout(() => this.message.set(null), 2000); },
+      error: (err) => this.message.set(err.error?.error || 'Error')
+    });
+  }
+
+  delete(id: string) {
+    if (!confirm('¿Eliminar esta talla?')) return;
+    this.http.delete(`/api/tallas/${id}`).subscribe({ next: () => { this.message.set('Eliminada'); this.load(); setTimeout(() => this.message.set(null), 2000); } });
+  }
+}

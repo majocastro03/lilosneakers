@@ -6,10 +6,12 @@ const {
     eliminarColorProducto,
     eliminarTallaProducto,
 } = require('../controllers/modificacionesController');
+const { authMiddleware, adminMiddleware } = require('../middleware/auth');
 
-router.post('/:producto_id/colores', asignarColores);
-router.delete('/:producto_id/colores/:color_id', eliminarColorProducto);
-router.post('/:producto_id/tallas', asignarTallas);
-router.delete('/:producto_id/tallas/:talla_id', eliminarTallaProducto);
+// Todas las rutas de modificaciones son admin-only
+router.post('/:producto_id/colores', authMiddleware, adminMiddleware, asignarColores);
+router.delete('/:producto_id/colores/:color_id', authMiddleware, adminMiddleware, eliminarColorProducto);
+router.post('/:producto_id/tallas', authMiddleware, adminMiddleware, asignarTallas);
+router.delete('/:producto_id/tallas/:talla_id', authMiddleware, adminMiddleware, eliminarTallaProducto);
 
 module.exports = router;
