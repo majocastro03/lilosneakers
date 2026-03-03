@@ -28,7 +28,6 @@ export class AdminProductosComponent implements OnInit {
   // Modal
   showModal = false;
   modoEdicion = false;
-  productoActual: Partial<Producto> = {};
 
   // Formulario
   form = {
@@ -38,7 +37,7 @@ export class AdminProductosComponent implements OnInit {
     descuento: 0,
     descripcion: '',
     destacado: false,
-    categoria_id: null as string | null,
+    categoria_id: '' as string,
     imagen: null as File | null
   };
 
@@ -62,8 +61,13 @@ export class AdminProductosComponent implements OnInit {
 
   cargarCategorias() {
     this.categoriaService.getCategorias().subscribe({
-      next: (data) => this.categorias = data,
-      error: (err) => console.error('Error al cargar categorías:', err)
+      next: (data) => {
+        this.categorias = data;
+      },
+      error: (err) => {
+        console.error('Error al cargar categorías:', err);
+        this.error = 'Error al cargar categorías';
+      }
     });
   }
 
@@ -92,7 +96,9 @@ export class AdminProductosComponent implements OnInit {
 
   abrirModalEditar(producto: Producto) {
     this.modoEdicion = true;
-    this.productoActual = producto;
+    
+    // Buscar el UUID de la categoría basándose en el nombre
+    const categoriaEncontrada = this.categorias.find(c => c.nombre === producto.categoria);
     
     this.form = {
       id: producto.id,
@@ -101,7 +107,7 @@ export class AdminProductosComponent implements OnInit {
       descuento: producto.descuento,
       descripcion: producto.descripcion || '',
       destacado: producto.destacado,
-      categoria_id: producto.categoria,
+      categoria_id: categoriaEncontrada?.id || '',
       imagen: null
     };
     
@@ -122,7 +128,7 @@ export class AdminProductosComponent implements OnInit {
       descuento: 0,
       descripcion: '',
       destacado: false,
-      categoria_id: null,
+      categoria_id: '',
       imagen: null
     };
     this.imagenPreview = null;
@@ -142,8 +148,23 @@ export class AdminProductosComponent implements OnInit {
   }
 
   guardarProducto() {
+    // Validaciones
     if (!this.form.nombre || !this.form.precio) {
       this.error = 'Nombre y precio son requeridos';
+      setTimeout(() => this.error = null, 3000);
+      return;
+    }
+
+    if (!this.form.categoria_id) {
+      this.error = 'Categoría es requerida';
+      setTimeout(() => this.error = null, 3000);
+      return;
+    }
+
+    // Validación de imagen para crear nuevo producto
+    if (!this.modoEdicion && !this.form.imagen) {
+      this.error = 'La imagen es requerida para crear un producto';
+      setTimeout(() => this.error = null, 3000);
       return;
     }
 
@@ -153,10 +174,7 @@ export class AdminProductosComponent implements OnInit {
     formData.append('descuento', this.form.descuento.toString());
     formData.append('descripcion', this.form.descripcion);
     formData.append('destacado', this.form.destacado.toString());
-    
-    if (this.form.categoria_id) {
-      formData.append('categoria_id', this.form.categoria_id.toString());
-    }
+    formData.append('categoria_id', this.form.categoria_id);
     
     if (this.form.imagen) {
       formData.append('imagen', this.form.imagen);
@@ -183,8 +201,9 @@ export class AdminProductosComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error al guardar producto:', err);
-        this.error = 'Error al guardar el producto';
+        this.error = err.error?.error || 'Error al guardar el producto';
         this.loading = false;
+        setTimeout(() => this.error = null, 5000);
       }
     });
   }
@@ -206,8 +225,9 @@ export class AdminProductosComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error al eliminar producto:', err);
-        this.error = 'Error al eliminar el producto';
+        this.error = err.error?.error || 'Error al eliminar el producto';
         this.loading = false;
+        setTimeout(() => this.error = null, 5000);
       }
     });
   }
