@@ -81,13 +81,12 @@ export class Login implements OnInit {
     const { username, password } = this.loginForm.value;
     
     this.authService.login(username, password).subscribe({
-      next: (response) => {
+      next: () => {
         this.loading = false;
         this.loginSuccess = '¡Inicio de sesión exitoso!';
 
-        // Redirigir según el tipo de usuario
         setTimeout(() => {
-          if (response.user.tipo_usuario === 'admin') {
+          if (this.authService.isAdmin()) {
             this.router.navigate(['/admin/productos']);
           } else {
             this.router.navigate(['/']);
@@ -96,8 +95,7 @@ export class Login implements OnInit {
       },
       error: (err) => {
         this.loading = false;
-        console.error('Error de login:', err);
-        this.loginError = err.error?.error || 'Usuario o contraseña incorrectos';
+        this.loginError = typeof err === 'string' ? err : 'Usuario o contraseña incorrectos';
         this.loginSuccess = null;
       }
     });
@@ -108,6 +106,6 @@ export class Login implements OnInit {
   }
 
   onRegister(): void {
-    alert('El registro de nuevos usuarios está deshabilitado temporalmente.');
+    this.router.navigate(['/registro']);
   }
 }

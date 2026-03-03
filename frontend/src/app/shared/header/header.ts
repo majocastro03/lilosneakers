@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
+import { CartService } from '../../core/services/cart.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-header',
@@ -12,25 +13,45 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './header.css'
 })
 export class HeaderComponent {
+  private router = inject(Router);
+  cartService = inject(CartService);
+  authService = inject(AuthService);
 
   isMobileMenuOpen = false;
-  cartItemCount = 0; 
-  SearchQuery = '';
+  searchQuery = '';
   navLinks = [
-    { path: '/catalogo', label: 'Catálogo' },
+    { path: '/catalogo', label: 'Catalogo' },
     { path: '/nosotros', label: 'Nosotros' },
-    { path: '/regalos', label: 'Regalos' },
     { path: '/contacto', label: 'Contacto' }
   ];
 
-  constructor(private router: Router) {}
-
   onLogin(): void {
-    this.router.navigate(['/login']);
+    if (this.authService.isAuthenticated()) {
+      if (this.authService.isAdmin()) {
+        this.router.navigate(['/admin/productos']);
+      } else {
+        this.router.navigate(['/catalogo']);
+      }
+    } else {
+      this.router.navigate(['/login']);
+    }
   }
 
   onCart(): void {
     this.router.navigate(['/carrito']);
+  }
+
+  onSearch(): void {
+    if (this.searchQuery.trim()) {
+      this.router.navigate(['/catalogo'], { queryParams: { q: this.searchQuery.trim() } });
+      this.searchQuery = '';
+      this.isMobileMenuOpen = false;
+    }
+  }
+
+  onLogout(): void {
+    this.authService.logout();
+    this.isMobileMenuOpen = false;
   }
 
   toggleMobileMenu(): void {

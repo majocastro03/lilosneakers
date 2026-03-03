@@ -1,0 +1,43 @@
+<div class="p-6">
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-900">Órdenes</h1>
+    <nav class="text-sm text-gray-500 mt-1"><a routerLink="/admin/productos" class="hover:underline">Admin</a> / Órdenes</nav>
+  </div>
+  @if (message()) { <div class="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-2 rounded mb-4 text-sm">{{ message() }}</div> }
+  @if (loading()) { <div class="text-center py-12"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div></div> }
+  @else {
+    <div class="bg-white rounded-lg shadow overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-4 py-3 text-left">ID</th>
+            <th class="px-4 py-3 text-left">Cliente</th>
+            <th class="px-4 py-3 text-left">Total</th>
+            <th class="px-4 py-3 text-left">Estado</th>
+            <th class="px-4 py-3 text-left">Fecha</th>
+            <th class="px-4 py-3 text-right">Cambiar Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (orden of ordenes(); track orden.id) {
+            <tr class="border-t">
+              <td class="px-4 py-3 font-mono text-xs">{{ orden.id | slice:0:8 }}...</td>
+              <td class="px-4 py-3">{{ orden.perfiles?.nombre || 'N/A' }} {{ orden.perfiles?.apellido || '' }}</td>
+              <td class="px-4 py-3 font-bold">${{ orden.total | number:'1.0-0' }}</td>
+              <td class="px-4 py-3"><span [class]="getEstadoColor(orden.estado)" class="px-2 py-1 rounded-full text-xs font-medium capitalize">{{ orden.estado }}</span></td>
+              <td class="px-4 py-3 text-gray-500">{{ orden.created_at | date:'short' }}</td>
+              <td class="px-4 py-3 text-right">
+                <select (change)="cambiarEstado(orden.id, $any($event.target).value)" [value]="orden.estado" class="px-2 py-1 border rounded text-xs">
+                  @for (estado of estadosValidos; track estado) { <option [value]="estado">{{ estado }}</option> }
+                </select>
+              </td>
+            </tr>
+          }
+          @if (ordenes().length === 0) {
+            <tr><td colspan="6" class="px-4 py-8 text-center text-gray-500">No hay órdenes</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

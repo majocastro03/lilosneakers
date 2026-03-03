@@ -1,7 +1,7 @@
 import { Injectable, inject, signal, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, catchError, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 
 export interface User {
@@ -14,8 +14,13 @@ export interface User {
 }
 
 export interface LoginResponse {
+  message: string;
   user: User;
-  session: any;
+  session: {
+    access_token: string;
+    refresh_token: string;
+    expires_at: number;
+  };
 }
 
 @Injectable({
@@ -25,17 +30,15 @@ export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
   private platformId = inject(PLATFORM_ID);
-  
-  // Signal para reactive state
+
   currentUser = signal<User | null>(null);
-  
+
   private apiUrl = '/api/auth';
   private isBrowser: boolean;
 
   constructor() {
     this.isBrowser = isPlatformBrowser(this.platformId);
-    
-    // Solo cargar del storage si estamos en el navegador
+
     if (this.isBrowser) {
       this.loadUserFromStorage();
     }
@@ -51,45 +54,67 @@ export class AuthService {
         this.currentUser.set(user);
       }
     } catch (error) {
-      console.error('Error al cargar usuario:', error);
       localStorage.removeItem('currentUser');
+      localStorage.removeItem('session');
     }
   }
 
   private saveToStorage(key: string, value: any) {
     if (!this.isBrowser) return;
-    
     try {
       localStorage.setItem(key, JSON.stringify(value));
     } catch (error) {
-      console.error('Error al guardar en storage:', error);
+      // Storage not available
     }
   }
 
   private removeFromStorage(key: string) {
     if (!this.isBrowser) return;
-    
     try {
       localStorage.removeItem(key);
     } catch (error) {
-      console.error('Error al eliminar de storage:', error);
+      // Storage not available
     }
   }
 
+  getAccessToken(): string | null {
+    if (!this.isBrowser) return null;
+    try {
+      const sessionJson = localStorage.getItem('session');
+      if (sessionJson) {
+        const session = JSON.parse(sessionJson);
+        return session?.access_token || null;
+      }
+    } catch {
+      // Invalid session data
+    }
+    return null;
+  }
+
   login(username: string, password: string): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, { 
-      username, 
-      password 
+    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, {
+      username,
+      password
     }).pipe(
       tap(response => {
         this.currentUser.set(response.user);
         this.saveToStorage('currentUser', response.user);
         this.saveToStorage('session', response.session);
+      }),
+      catchError(error => {
+        const msg = error.error?.error || 'Error al iniciar sesión';
+        return throwError(() => msg);
       })
     );
   }
 
   logout() {
+    const token = this.getAccessToken();
+    if (token) {
+      this.http.post(`${this.apiUrl}/logout`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      }).subscribe({ error: () => {} });
+    }
     this.currentUser.set(null);
     this.removeFromStorage('currentUser');
     this.removeFromStorage('session');

@@ -12,6 +12,7 @@ export interface Producto {
   descripcion: string;
   destacado: boolean;
   categoria: string;
+  categoria_id?: string;
   categoria_slug?: string;
   mostrar_precio: boolean;
   colores: Color[];
