@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface Categoria {
   id: string; // UUID
@@ -14,7 +15,7 @@ export interface Categoria {
 })
 export class CategoriaService {
   private http = inject(HttpClient);
-  private apiUrl = '/api/categorias';
+  private apiUrl = `${environment.apiUrl}/categorias`;
 
   getCategorias(): Observable<Categoria[]> {
     return this.http.get<Categoria[]>(this.apiUrl);

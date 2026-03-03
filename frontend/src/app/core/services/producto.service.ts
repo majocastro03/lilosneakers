@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface Color {
   nombre: string;
@@ -13,7 +14,7 @@ export interface Talla {
 }
 
 export interface Producto {
-  id: number;
+  id: string;
   nombre: string;
   precio: number;
   descuento: number;
@@ -22,7 +23,10 @@ export interface Producto {
   descripcion: string;
   destacado: boolean;
   categoria: string;
-  categoria_slug: string | null;
+  categoria_id?: string;
+  categoria_slug?: string;
+  mostrar_precio?: boolean;
+  marca?: any;
   colores: Color[];
   tallas: Talla[];
 }
@@ -48,7 +52,7 @@ export interface FiltrosProducto {
 })
 export class ProductoService {
   private http = inject(HttpClient);
-  private apiUrl = '/api/productos';
+  private apiUrl = `${environment.apiUrl}/productos`;
 
   getProductos(filtros: FiltrosProducto = {}): Observable<ProductosResponse> {
     let params = new HttpParams();
@@ -62,7 +66,7 @@ export class ProductoService {
     return this.http.get<ProductosResponse>(this.apiUrl, { params });
   }
 
-  getProductoById(id: number): Observable<Producto> {
+  getProductoById(id: string): Observable<Producto> {
     return this.http.get<Producto>(`${this.apiUrl}/${id}`);
   }
 
@@ -70,11 +74,11 @@ export class ProductoService {
     return this.http.post(this.apiUrl, formData);
   }
 
-  actualizarProducto(id: number, formData: FormData): Observable<any> {
+  actualizarProducto(id: string, formData: FormData): Observable<any> {
     return this.http.put(`${this.apiUrl}/${id}`, formData);
   }
 
-  eliminarProducto(id: number): Observable<any> {
+  eliminarProducto(id: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
 }
