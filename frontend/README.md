@@ -1,59 +1,277 @@
-# Frontend
+# 🛍️ Lilo Sneakers - E-commerce Platform
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.1.
+![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![Angular](https://img.shields.io/badge/Angular-20.3-red)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)
+![Status](https://img.shields.io/badge/status-active-success)
 
-## Development server
+E-commerce platform completo para venta de zapatillas con panel de administración.
 
-To start a local development server, run:
+---
 
-```bash
-ng serve
-```
+## 🚀 Inicio Rápido
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+### Prerequisitos
+- Node.js 18+ y npm
+- Backend corriendo en puerto 3001
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+### Instalación y Ejecución
 
 ```bash
-ng generate --help
+# 1. Limpiar archivos duplicados (solo primera vez)
+cd C:\Proyectos\lilosneakers\frontend
+.\limpiar-proyecto.ps1
+
+# 2. Instalar dependencias (si no están instaladas)
+npm install
+
+# 3. Iniciar servidor de desarrollo
+npm start
 ```
 
-## Building
+La aplicación se abrirá en `http://localhost:4200`
 
-To build the project run:
+---
+
+## 📁 Estructura del Proyecto
+
+```
+src/app/
+├── core/
+│   ├── guards/           # Guards de autenticación
+│   └── services/         # Servicios HTTP
+├── pages/
+│   ├── admin/           # Panel administrador
+│   ├── catalogo/        # Catálogo público
+│   ├── home/            # Página principal
+│   └── login/           # Login
+└── shared/              # Componentes compartidos
+```
+
+---
+
+## ✨ Características
+
+### Para Usuarios
+- ✅ Catálogo de productos responsive
+- ✅ Búsqueda en tiempo real
+- ✅ Filtros por categoría y destacados
+- ✅ Paginación
+- ✅ Visualización de colores y tallas disponibles
+
+### Para Administradores
+- ✅ Login seguro con roles
+- ✅ CRUD completo de productos
+- ✅ Upload de imágenes
+- ✅ Gestión de categorías
+- ✅ Destacar productos
+
+---
+
+## 🔧 Tecnologías
+
+- **Framework**: Angular 20.3 (Standalone Components)
+- **Styling**: Tailwind CSS 3.4
+- **State Management**: Angular Signals
+- **HTTP**: Angular HttpClient con RxJS
+- **Routing**: Angular Router con Lazy Loading
+- **Forms**: Reactive Forms y Template-driven Forms
+- **SSR**: Angular Universal
+
+---
+
+## 📚 Documentación
+
+- [INICIO-RAPIDO.md](./INICIO-RAPIDO.md) - Guía de 3 pasos para iniciar
+- [CORRECCIONES-COMPLETAS.md](./CORRECCIONES-COMPLETAS.md) - Documentación técnica completa
+- [CHECKLIST-COMPLETO.md](./CHECKLIST-COMPLETO.md) - Checklist de verificación
+- [RESUMEN-EJECUTIVO.md](./RESUMEN-EJECUTIVO.md) - Resumen de implementación
+
+---
+
+## 🛠️ Scripts Disponibles
 
 ```bash
-ng build
+# Desarrollo
+npm start              # Inicia servidor de desarrollo
+
+# Build
+npm run build          # Build para producción
+
+# Testing
+npm test               # Ejecuta tests unitarios
+
+# Limpieza
+.\limpiar-proyecto.ps1 # Elimina archivos duplicados
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+---
 
-## Running unit tests
+## 🔐 Autenticación
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+### Credenciales de Prueba
 
+**Admin:**
+- Username: `admin`
+- Password: (configurado en BD)
+
+**Protección:**
+- ✅ Guards en rutas protegidas
+- ✅ Verificación de rol
+- ✅ Sesión persistente
+- ✅ Protección SSR con `isPlatformBrowser`
+
+---
+
+## 🌐 Rutas
+
+| Ruta | Descripción | Protegida |
+|------|-------------|-----------|
+| `/` | Home | No |
+| `/catalogo` | Catálogo de productos | No |
+| `/login` | Inicio de sesión | No |
+| `/admin/productos` | Administrar productos | Sí (Admin) |
+
+---
+
+## 🎨 Componentes Principales
+
+### Catálogo
+- Grid responsive de productos
+- Búsqueda con debounce (500ms)
+- Filtros dinámicos
+- Paginación con navegación intuitiva
+- Loading states y error handling
+
+### Admin Panel
+- Tabla de productos
+- Modal para CRUD
+- Upload de imágenes con preview
+- Validaciones de formulario
+- Mensajes de éxito/error
+
+---
+
+## 🔌 API Integration
+
+### Servicios
+
+**AuthService**
+- `login(username, password)` - Autenticación
+- `logout()` - Cerrar sesión
+- `isAuthenticated()` - Verificar autenticación
+- `isAdmin()` - Verificar rol admin
+
+**ProductoService**
+- `getProductos(filtros)` - Listar productos
+- `crearProducto(formData)` - Crear producto
+- `actualizarProducto(id, formData)` - Actualizar
+- `eliminarProducto(id)` - Eliminar
+
+**CategoriaService**
+- `getCategorias()` - Listar categorías
+
+### Proxy Configuration
+
+```json
+{
+  "/api": {
+    "target": "http://localhost:3001",
+    "secure": false,
+    "changeOrigin": true
+  }
+}
+```
+
+---
+
+## 🐛 Troubleshooting
+
+### Error: "Cannot find module"
 ```bash
-ng test
+npm install
 ```
 
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
+### Error: Port 4200 already in use
 ```bash
-ng e2e
+npx kill-port 4200
+npm start
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+### Error: Proxy no funciona
+1. Verificar que backend esté en puerto 3001
+2. Reiniciar el frontend
+3. Ver logs de proxy en consola
 
-## Additional Resources
+### Error: localStorage SSR
+Ya está solucionado con `isPlatformBrowser` en todos los servicios.
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+---
+
+## 📱 Responsive Design
+
+- **Desktop**: 4 columnas en grid
+- **Tablet**: 2-3 columnas
+- **Mobile**: 1 columna con menú hamburguesa
+
+---
+
+## 🔄 Estado del Proyecto
+
+- ✅ Estructura limpia y organizada
+- ✅ Sin archivos duplicados
+- ✅ Código TypeScript estricto
+- ✅ Componentes standalone
+- ✅ Guards implementados
+- ✅ SSR protection
+- ✅ Documentación completa
+
+---
+
+## 📝 Próximos Pasos
+
+- [ ] Implementar detalle de producto
+- [ ] Agregar carrito de compras
+- [ ] Sistema de favoritos
+- [ ] Más filtros (precio, marca, talla)
+- [ ] Sistema de pagos
+- [ ] Dashboard de ventas
+
+---
+
+## 👥 Contribución
+
+Este proyecto es parte de un sistema de e-commerce completo. Para contribuir:
+
+1. Revisar la documentación en `/docs`
+2. Seguir las convenciones de código de Angular
+3. Probar todas las funcionalidades antes de commit
+4. Mantener la documentación actualizada
+
+---
+
+## 📄 Licencia
+
+Proyecto privado - Todos los derechos reservados
+
+---
+
+## 📞 Contacto
+
+**Desarrollador**: María José
+**Proyecto**: Lilo Sneakers
+**Fecha**: Diciembre 2025
+
+---
+
+## 🎉 Estado
+
+```
+✅ PROYECTO COMPLETAMENTE FUNCIONAL
+✅ CÓDIGO LIMPIO Y DOCUMENTADO
+✅ LISTO PARA DESARROLLO CONTINUO
+```
+
+---
+
+*Última actualización: 22 de diciembre de 2025*
