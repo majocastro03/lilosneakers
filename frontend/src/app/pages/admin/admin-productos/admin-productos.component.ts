@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { ProductoService, Producto, ProductosResponse } from '../../../core/services/producto.service';
 import { CategoriaService, Categoria } from '../../../core/services/categoria.service';
 import { AuthService } from '../../../core/services/auth.service';
@@ -9,7 +9,7 @@ import { AuthService } from '../../../core/services/auth.service';
 @Component({
   selector: 'app-admin-productos',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink, RouterLinkActive],
   templateUrl: './admin-productos.component.html',
   styleUrl: './admin-productos.component.css'
 })
