@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { HeaderComponent } from '../../shared/header/header';
 import { FooterComponent } from '../../shared/footer/footer';
 import { CartService } from '../../core/services/cart.service';
@@ -9,7 +9,7 @@ import { AuthService } from '../../core/services/auth.service';
 @Component({
   selector: 'app-carrito',
   standalone: true,
-  imports: [CommonModule, HeaderComponent, FooterComponent, RouterLink],
+  imports: [CommonModule, HeaderComponent, FooterComponent],
   templateUrl: './carrito.html',
   styleUrl: './carrito.css'
 })

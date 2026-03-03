@@ -79,4 +79,8 @@ export class CheckoutComponent {
     const control = this.checkoutForm.get(controlName);
     return !!control && (control.dirty || control.touched) && !!control.errors;
   }
+
+  goToCatalogo() {
+    this.router.navigate(['/catalogo']);
+  }
 }

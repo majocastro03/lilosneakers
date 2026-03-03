@@ -3,6 +3,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap, catchError, throwError } from 'rxjs';
 import { Router } from '@angular/router';
+import { environment } from '../../../environments/environment';
 
 export interface User {
   id: string;
@@ -33,7 +34,7 @@ export class AuthService {
 
   currentUser = signal<User | null>(null);
 
-  private apiUrl = '/api/auth';
+  private apiUrl = `${environment.apiUrl}/auth`;
   private isBrowser: boolean;
 
   constructor() {
