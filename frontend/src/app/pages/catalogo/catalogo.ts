@@ -1,5 +1,6 @@
 import { Component, inject, effect, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { FooterComponent } from '../../shared/footer/footer';
 import { HeaderComponent } from '../../shared/header/header';
 import { ProductoService } from '../../core/services/producto/producto-service';
@@ -13,7 +14,7 @@ import { ProductosQuery } from '../../core/interfaces/producto-query';
 @Component({
   selector: 'app-catalogo',
   standalone: true,
-  imports: [FooterComponent, HeaderComponent, CommonModule],
+  imports: [FooterComponent, HeaderComponent, CommonModule, RouterLink],
   templateUrl: './catalogo.html',
   styleUrl: './catalogo.css',
 })

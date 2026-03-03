@@ -10,13 +10,44 @@
             {{ currentUser?.tipo_usuario }}
           </span>
         </div>
-        <button
-          (click)="logout()"
-          class="px-4 py-2 text-sm text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
-        >
-          Cerrar Sesión
-        </button>
+        <div class="flex items-center gap-3">
+          <a routerLink="/" class="text-sm text-blue-600 hover:text-blue-800">Ver tienda</a>
+          <button
+            (click)="logout()"
+            class="px-4 py-2 text-sm text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
+          >
+            Cerrar Sesión
+          </button>
+        </div>
       </div>
+
+      <!-- Admin Nav -->
+      <nav class="flex flex-wrap gap-2 mb-6 border-b border-gray-200 pb-3">
+        <a routerLink="/admin/productos" routerLinkActive="bg-blue-600 text-white" [routerLinkActiveOptions]="{exact: true}"
+          class="px-4 py-2 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors">
+          Productos
+        </a>
+        <a routerLink="/admin/categorias" routerLinkActive="bg-blue-600 text-white"
+          class="px-4 py-2 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors">
+          Categorías
+        </a>
+        <a routerLink="/admin/marcas" routerLinkActive="bg-blue-600 text-white"
+          class="px-4 py-2 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors">
+          Marcas
+        </a>
+        <a routerLink="/admin/colores" routerLinkActive="bg-blue-600 text-white"
+          class="px-4 py-2 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors">
+          Colores
+        </a>
+        <a routerLink="/admin/tallas" routerLinkActive="bg-blue-600 text-white"
+          class="px-4 py-2 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors">
+          Tallas
+        </a>
+        <a routerLink="/admin/ordenes" routerLinkActive="bg-blue-600 text-white"
+          class="px-4 py-2 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors">
+          Órdenes
+        </a>
+      </nav>
 
       <!-- Title -->
       <div class="flex justify-between items-center">

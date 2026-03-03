@@ -7,11 +7,16 @@ const {
     actualizarMarca,
     eliminarMarca
 } = require('../controllers/marcasController');
+const { authMiddleware, adminMiddleware } = require('../middleware/auth');
+const { validateMarca } = require('../middleware/validate');
 
+// Rutas públicas
 router.get('/', getMarcas);
 router.get('/:id', getMarcaById);
-router.post('/', crearMarca);
-router.put('/:id', actualizarMarca);
-router.delete('/:id', eliminarMarca);
+
+// Rutas protegidas (admin)
+router.post('/', authMiddleware, adminMiddleware, validateMarca, crearMarca);
+router.put('/:id', authMiddleware, adminMiddleware, validateMarca, actualizarMarca);
+router.delete('/:id', authMiddleware, adminMiddleware, eliminarMarca);
 
 module.exports = router;

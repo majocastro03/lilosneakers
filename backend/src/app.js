@@ -13,27 +13,46 @@ const authRoutes = require('./routes/autenticacionRoutes');
 const coloresRoutes = require('./routes/coloresRoutes');
 const tallasRoutes = require('./routes/tallasRoutes');
 const modificacionesRoutes = require('./routes/modificacionesRoutes');
+const carritoRoutes = require('./routes/carritoRoutes');
+const ordenesRoutes = require('./routes/ordenesRoutes');
+
+// Importar middleware
+const errorHandler = require('./middleware/errorHandler');
+const { apiLimiter } = require('./middleware/rateLimiter');
 
 const app = express();
 
-// Middlewares
+// Middlewares de seguridad
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" },
-  contentSecurityPolicy: false // Desactivar CSP por ahora para desarrollo
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "https:", "blob:"],
+      connectSrc: ["'self'", process.env.SUPABASE_URL || ''].filter(Boolean),
+    }
+  }
 }));
 
 // CORS - Permitir múltiples orígenes
 const allowedOrigins = [
   'http://localhost:4200',
-  'https://lilosneakers.netlify.app', // Tu dominio de Netlify
-  process.env.FRONTEND_URL // Variable de entorno
+  'https://lilosneakers.netlify.app',
+  process.env.FRONTEND_URL
 ].filter(Boolean);
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Permitir requests sin origin (como apps móviles o curl)
-    if (!origin) return callback(null, true);
-    
+    // Permitir requests sin origin (apps móviles, curl) solo en desarrollo
+    if (!origin) {
+      if (process.env.NODE_ENV === 'production') {
+        return callback(new Error('Not allowed by CORS'));
+      }
+      return callback(null, true);
+    }
+
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
@@ -42,7 +61,11 @@ app.use(cors({
   },
   credentials: true
 }));
+
 app.use(express.json({ limit: '10mb' }));
+
+// Rate limiting global para API
+app.use('/api', apiLimiter);
 
 // Servir archivos estáticos (imágenes subidas)
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
@@ -56,11 +79,13 @@ app.use('/api/auth', authRoutes);
 app.use('/api/colores', coloresRoutes);
 app.use('/api/tallas', tallasRoutes);
 app.use('/api/modificaciones', modificacionesRoutes);
+app.use('/api/carrito', carritoRoutes);
+app.use('/api/ordenes', ordenesRoutes);
 
 // Ruta de salud
 app.get('/health', (req, res) => {
-  res.json({ 
-    status: 'ok', 
+  res.json({
+    status: 'ok',
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || 'development'
   });
@@ -70,5 +95,8 @@ app.get('/health', (req, res) => {
 app.use((req, res) => {
   res.status(404).json({ error: 'Ruta no encontrada' });
 });
+
+// Middleware global de errores (DEBE ir al final)
+app.use(errorHandler);
 
 module.exports = app;

@@ -1,0 +1,171 @@
+<app-header></app-header>
+
+<div class="min-h-screen bg-white">
+  <div class="container mx-auto px-4 py-6 sm:py-8">
+
+    <!-- Back button -->
+    <button (click)="goBack()" class="mb-6 flex items-center text-gray-600 hover:text-gray-900 transition" aria-label="Volver al catálogo">
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+      </svg>
+      Volver al catálogo
+    </button>
+
+    <!-- Loading -->
+    @if (loading()) {
+      <div class="flex justify-center py-20">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+      </div>
+    }
+
+    <!-- Error -->
+    @if (error()) {
+      <div class="text-center py-20">
+        <p class="text-red-600 text-lg mb-4">{{ error() }}</p>
+        <button (click)="goBack()" class="px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition">
+          Volver al catálogo
+        </button>
+      </div>
+    }
+
+    <!-- Product Detail -->
+    @if (producto(); as prod) {
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+
+        <!-- Image -->
+        <div class="relative bg-gray-50 rounded-xl overflow-hidden">
+          <img
+            [src]="prod.imagen_url || 'assets/placeholder-product.jpg'"
+            [alt]="prod.nombre"
+            class="w-full h-[400px] sm:h-[500px] object-contain p-6"
+            (error)="$any($event.target).src='assets/placeholder-product.jpg'"
+          />
+          @if (prod.destacado) {
+            <span class="absolute top-4 left-4 bg-black text-white text-xs px-3 py-1 rounded">
+              Top Seller
+            </span>
+          }
+          @if (prod.descuento > 0) {
+            <span class="absolute top-4 right-4 bg-red-500 text-white text-xs px-3 py-1 rounded font-bold">
+              -{{ prod.descuento }}%
+            </span>
+          }
+        </div>
+
+        <!-- Info -->
+        <div class="flex flex-col">
+          <!-- Category -->
+          <p class="text-sm text-gray-500 mb-1">{{ prod.categoria }}</p>
+
+          <!-- Name -->
+          <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">{{ prod.nombre }}</h1>
+
+          <!-- Price -->
+          <div class="flex items-baseline gap-3 mb-6">
+            @if (prod.mostrar_precio) {
+              @if (prod.descuento > 0) {
+                <span class="text-3xl font-bold text-gray-900">${{ prod.precio_final | number:'1.0-0' }}</span>
+                <span class="text-xl text-gray-400 line-through">${{ prod.precio | number:'1.0-0' }}</span>
+              } @else {
+                <span class="text-3xl font-bold text-gray-900">${{ prod.precio | number:'1.0-0' }}</span>
+              }
+            } @else {
+              <span class="text-lg text-gray-500 italic">Precio bajo solicitud</span>
+            }
+          </div>
+
+          <!-- Description -->
+          @if (prod.descripcion) {
+            <p class="text-gray-600 mb-6 leading-relaxed">{{ prod.descripcion }}</p>
+          }
+
+          <!-- Colors -->
+          @if (prod.colores.length > 0) {
+            <div class="mb-6">
+              <h3 class="text-sm font-medium text-gray-900 mb-2">Colores disponibles</h3>
+              <div class="flex gap-2">
+                @for (color of prod.colores; track color.nombre) {
+                  <div
+                    [style.background-color]="color.codigo_hex"
+                    [title]="color.nombre"
+                    [attr.aria-label]="'Color: ' + color.nombre"
+                    class="w-8 h-8 rounded-full border-2 border-gray-200 cursor-pointer hover:scale-110 transition"
+                  ></div>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- Sizes -->
+          @if (prod.tallas.length > 0) {
+            <div class="mb-6">
+              <h3 class="text-sm font-medium text-gray-900 mb-2">Selecciona tu talla</h3>
+              <div class="flex flex-wrap gap-2">
+                @for (talla of prod.tallas; track talla.talla) {
+                  <button
+                    (click)="selectTalla(talla)"
+                    [class.bg-black]="selectedTalla() === talla.talla"
+                    [class.text-white]="selectedTalla() === talla.talla"
+                    [class.border-black]="selectedTalla() === talla.talla"
+                    [class.opacity-40]="talla.cantidad <= 0"
+                    [class.cursor-not-allowed]="talla.cantidad <= 0"
+                    [disabled]="talla.cantidad <= 0"
+                    [attr.aria-label]="'Talla ' + talla.talla + (talla.cantidad <= 0 ? ' - Agotada' : '')"
+                    class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium hover:border-black transition min-w-[52px]"
+                  >
+                    {{ talla.talla }}
+                  </button>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- Quantity -->
+          <div class="mb-6">
+            <h3 class="text-sm font-medium text-gray-900 mb-2">Cantidad</h3>
+            <div class="flex items-center border border-gray-300 rounded-lg w-fit">
+              <button
+                (click)="decrementCantidad()"
+                [disabled]="cantidad() <= 1"
+                class="px-4 py-2 text-gray-600 hover:text-gray-900 disabled:opacity-30 transition"
+                aria-label="Disminuir cantidad"
+              >
+                -
+              </button>
+              <span class="px-4 py-2 font-medium min-w-[40px] text-center">{{ cantidad() }}</span>
+              <button
+                (click)="incrementCantidad()"
+                class="px-4 py-2 text-gray-600 hover:text-gray-900 disabled:opacity-30 transition"
+                aria-label="Aumentar cantidad"
+              >
+                +
+              </button>
+            </div>
+          </div>
+
+          <!-- Add to Cart -->
+          <button
+            (click)="addToCart()"
+            [disabled]="!selectedTalla()"
+            [class.bg-green-600]="addedToCart()"
+            class="w-full sm:w-auto px-8 py-3 bg-black text-white rounded-lg font-medium hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition"
+          >
+            @if (addedToCart()) {
+              Agregado al carrito
+            } @else if (!selectedTalla()) {
+              Selecciona una talla
+            } @else {
+              Agregar al carrito
+            }
+          </button>
+
+          @if (!selectedTalla() && prod.tallas.length > 0) {
+            <p class="text-sm text-gray-500 mt-2">Selecciona una talla para agregar al carrito</p>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>
+
+<app-footer></app-footer>

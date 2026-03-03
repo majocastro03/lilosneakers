@@ -137,7 +137,7 @@
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
 
       @for (producto of productosConTallas(); track producto.id) {
-      <div class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition">
+      <a [routerLink]="['/producto', producto.id]" class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition block cursor-pointer">
         <!-- Imagen -->
         <div class="relative h-48 sm:h-56 bg-gray-50 flex items-center justify-center">
           <img
@@ -187,7 +187,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </a>
       }
 
       <!-- Skeleton -->
