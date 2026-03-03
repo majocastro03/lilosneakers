@@ -14,10 +14,10 @@ export interface Producto {
   categoria: string;
   categoria_id?: string;
   categoria_slug?: string;
-  mostrar_precio: boolean;
+  mostrar_precio?: boolean;
   colores: Color[];
   tallas: TallaStock[];
-  marca: Marca;
+  marca?: Marca;
   tallasDisponibles?: TallaStock[];     // t.cantidad > 0
   tallasPreview?: TallaStock[];         // primeras 3
   tallasExtraCount?: number;            // cuántas más hay

@@ -12,7 +12,7 @@ const getProductos = async (req, res) => {
       .from('productos')
       .select(`
         id, nombre, precio, descuento, imagen_url, descripcion, destacado, mostrar_precio,
-        categoria_id, marca_id, genero,
+        categoria_id, marca_id,
         categorias!left(nombre, slug),
         marcas!left(nombre, slug, imagen_url)
       `, { count: 'exact' });
@@ -33,9 +33,6 @@ const getProductos = async (req, res) => {
     }
     if (req.query.marca_id) {
       query = query.eq('marca_id', req.query.marca_id);
-    }
-    if (req.query.genero) {
-      query = query.eq('genero', req.query.genero);
     }
     if (req.query.destacado) {
       const isDestacado = req.query.destacado === 'true';
