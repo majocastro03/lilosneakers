@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(del /q \"C:\\\\Users\\\\maria\\\\.claude-worktrees\\\\lilosneakers\\\\gracious-roentgen\\\\frontend\\\\src\\\\app\\\\core\\\\services\\\\autenticacion\\\\auth-service.spec.ts\")",
-      "Bash(git status:*)",
-      "Bash(git add:*)"
-    ]
-  }
-}
