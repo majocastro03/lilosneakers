@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
@@ -18,6 +18,7 @@ export class AdminProductosComponent implements OnInit {
   private categoriaService = inject(CategoriaService);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
   productos: Producto[] = [];
   categorias: Categoria[] = [];
@@ -31,7 +32,7 @@ export class AdminProductosComponent implements OnInit {
 
   // Formulario
   form = {
-    id: null as number | null,
+    id: null as string | null,
     nombre: '',
     precio: 0,
     descuento: 0,
@@ -63,10 +64,12 @@ export class AdminProductosComponent implements OnInit {
     this.categoriaService.getCategorias().subscribe({
       next: (data) => {
         this.categorias = data;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Error al cargar categorías:', err);
         this.error = 'Error al cargar categorías';
+        this.cdr.detectChanges();
       }
     });
   }
@@ -79,11 +82,13 @@ export class AdminProductosComponent implements OnInit {
       next: (data: ProductosResponse) => {
         this.productos = data.productos;
         this.loading = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Error al cargar productos:', err);
         this.error = 'Error al cargar productos';
         this.loading = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -214,7 +219,7 @@ export class AdminProductosComponent implements OnInit {
     }
   }
 
-  eliminarProducto(id: number) {
+  eliminarProducto(id: string) {
     this.loading = true;
     
     this.productoService.eliminarProducto(id).subscribe({
