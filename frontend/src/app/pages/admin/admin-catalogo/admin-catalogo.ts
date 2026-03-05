@@ -1,8 +1,9 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ProductoService } from '../../../core/services/producto/producto-service';
+import { ModalService } from '../../../shared/modal/modal.service';
 import { CategoriaService } from '../../../core/services/categoria/categoria-service';
 import { FooterComponent } from '../../../shared/footer/footer';
 import { TableModule } from 'primeng/table';
@@ -45,6 +46,8 @@ export class AdminCatalogo implements OnInit {
   filtroCategoria = '';
   itemsPorPagina = 10;
   paginaActual = 1;
+
+  private modalService = inject(ModalService);
 
   constructor(
     private productoService: ProductoService,
@@ -119,8 +122,9 @@ export class AdminCatalogo implements OnInit {
     this.router.navigate(['/admin/editar', producto.id]);
   }
 
-  eliminarProducto(id: string) {
-    if (confirm('¿Estás seguro de eliminar este producto?')) {
+  async eliminarProducto(id: string) {
+    const ok = await this.modalService.confirm('¿Estas seguro de eliminar este producto?');
+    if (ok) {
       this.productoService.eliminarProducto(id).subscribe({
         next: () => {
           this.productos = this.productos.filter((p) => p.id !== id);

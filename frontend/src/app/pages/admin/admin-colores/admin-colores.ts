@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
+import { ModalService } from '../../../shared/modal/modal.service';
 
 @Component({
   selector: 'app-admin-colores',
@@ -13,6 +14,7 @@ import { RouterLink } from '@angular/router';
 })
 export class AdminColoresComponent implements OnInit {
   private http = inject(HttpClient);
+  private modalService = inject(ModalService);
   colores = signal<any[]>([]);
   showModal = signal(false);
   editingId = signal<string | null>(null);
@@ -34,8 +36,9 @@ export class AdminColoresComponent implements OnInit {
     });
   }
 
-  delete(id: string) {
-    if (!confirm('¿Eliminar este color?')) return;
+  async delete(id: string) {
+    const ok = await this.modalService.confirm('¿Eliminar este color?');
+    if (!ok) return;
     this.http.delete(`/api/colores/${id}`).subscribe({ next: () => { this.message.set('Eliminado'); this.load(); setTimeout(() => this.message.set(null), 2000); } });
   }
 }
