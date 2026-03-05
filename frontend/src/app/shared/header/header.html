@@ -1,55 +1,61 @@
-<header class="bg-white border-b border-gray-200">
+<header class="bg-white border-b border-gray-200 sticky top-0 z-50">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex items-center justify-between h-20">
+    <div class="flex items-center justify-between h-16">
 
       <!-- Logo -->
-      <a routerLink="/" class="flex flex-col -space-y-1" aria-label="LiloSneakers - Inicio">
-        <img src="/assets/logo.png" alt="LiloSneakers" class="h-8 w-auto" />
+      <a routerLink="/" class="flex items-center gap-3 shrink-0" aria-label="LiloSneakers - Inicio">
+        <img src="/assets/logo.png" alt="LiloSneakers" class="h-9 w-auto" />
+        <span class="hidden sm:block text-lg font-bold text-gray-900 tracking-tight">LILO SNEAKERS</span>
       </a>
 
       <!-- Navigation (Desktop) -->
-      <nav class="hidden lg:flex items-center space-x-8 absolute left-1/2 transform -translate-x-1/2" aria-label="Navegacion principal">
+      <nav class="hidden lg:flex items-center gap-8" aria-label="Navegacion principal">
         @for (link of navLinks; track link.path) {
           <a [routerLink]="link.path"
-             class="text-base text-gray-900 hover:text-gray-600 font-normal transition">
+             class="text-sm font-medium text-gray-700 hover:text-gray-900 transition">
             {{ link.label }}
           </a>
         }
       </nav>
 
       <!-- Right Section (Desktop) -->
-      <div class="hidden lg:flex items-center space-x-6">
+      <div class="hidden lg:flex items-center gap-5">
 
-        <!-- Search -->
-        <form (ngSubmit)="onSearch()" class="flex items-center relative">
-          <svg class="absolute left-0 w-5 h-5 text-gray-900 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-          </svg>
-          <input
-            type="text"
-            placeholder="Buscar"
-            [(ngModel)]="searchQuery"
-            name="search"
-            aria-label="Buscar productos"
-            class="pl-7 pr-4 py-1 border-b-2 border-gray-900 bg-transparent focus:outline-none w-40 text-gray-900 placeholder-gray-500"
-          />
-        </form>
+        <!-- Search Toggle -->
+        @if (isSearchOpen) {
+          <form (ngSubmit)="onSearch()" class="flex items-center gap-2">
+            <input
+              type="text"
+              placeholder="Buscar..."
+              [(ngModel)]="searchQuery"
+              name="search"
+              aria-label="Buscar productos"
+              class="w-44 px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              #searchInput
+            />
+            <button type="button" (click)="toggleSearch()" class="text-gray-500 hover:text-gray-900 transition" aria-label="Cerrar busqueda">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+          </form>
+        } @else {
+          <button (click)="toggleSearch()" class="text-gray-700 hover:text-gray-900 transition" aria-label="Buscar">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          </button>
+        }
 
-        <!-- User Button -->
+        <!-- User -->
         <button
           (click)="onLogin()"
-          class="flex items-center space-x-2 text-gray-900 hover:text-gray-600 transition"
+          class="text-gray-700 hover:text-gray-900 transition"
           [attr.aria-label]="authService.isAuthenticated() ? 'Mi cuenta' : 'Iniciar sesion'">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-          </svg>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
         </button>
 
-        <!-- Logout (visible when authenticated) -->
+        <!-- Logout -->
         @if (authService.isAuthenticated()) {
           <button
             (click)="onLogout()"
-            class="text-sm text-gray-600 hover:text-gray-900 transition"
+            class="text-sm text-gray-500 hover:text-gray-900 transition"
             aria-label="Cerrar sesion">
             Salir
           </button>
@@ -58,46 +64,43 @@
         <!-- Cart -->
         <button
           (click)="onCart()"
-          class="relative hover:opacity-70 transition bg-black text-white w-9 h-9 rounded flex items-center justify-center"
+          class="relative text-gray-700 hover:text-gray-900 transition"
           aria-label="Ver carrito de compras">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-          </svg>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
           @if (cartService.totalItems() > 0) {
-            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold">
+            <span class="absolute -top-2 -right-2 bg-primary-600 text-white text-[10px] rounded-full h-4 w-4 flex items-center justify-center font-bold">
               {{ cartService.totalItems() }}
             </span>
           }
         </button>
       </div>
 
-      <!-- Mobile: Cart + Menu -->
-      <div class="flex lg:hidden items-center space-x-4">
+      <!-- Mobile: Icons + Menu -->
+      <div class="flex lg:hidden items-center gap-4">
+        <!-- Mobile Cart -->
         <button
           (click)="onCart()"
-          class="relative hover:opacity-70 transition"
+          class="relative text-gray-700 hover:text-gray-900 transition"
           aria-label="Ver carrito">
-          <svg class="w-6 h-6 text-gray-900" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M16 6v2h2l2 12H4L6 8h2V6a4 4 0 118 0zm-2 0a2 2 0 10-4 0v2h4V6z"/>
-          </svg>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
           @if (cartService.totalItems() > 0) {
-            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold">
+            <span class="absolute -top-2 -right-2 bg-primary-600 text-white text-[10px] rounded-full h-4 w-4 flex items-center justify-center font-bold">
               {{ cartService.totalItems() }}
             </span>
           }
         </button>
 
+        <!-- Hamburger -->
         <button
           (click)="toggleMobileMenu()"
-          class="text-gray-900 hover:text-gray-600"
+          class="text-gray-700 hover:text-gray-900"
           [attr.aria-expanded]="isMobileMenuOpen"
           aria-label="Menu de navegacion">
-          <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" [class.hidden]="isMobileMenuOpen" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-          </svg>
-          <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" [class.hidden]="!isMobileMenuOpen" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-          </svg>
+          @if (!isMobileMenuOpen) {
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+          } @else {
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          }
         </button>
       </div>
     </div>
@@ -105,32 +108,30 @@
 
   <!-- Mobile Menu -->
   @if (isMobileMenuOpen) {
-    <div class="lg:hidden bg-white border-t border-gray-200">
-      <div class="max-w-7xl mx-auto px-4 py-4">
+    <div class="lg:hidden bg-white border-t border-gray-100">
+      <div class="max-w-7xl mx-auto px-4 py-4 space-y-4">
 
         <!-- Mobile Search -->
-        <form (ngSubmit)="onSearch()" class="mb-6">
-          <div class="flex items-center relative">
-            <svg class="absolute left-0 w-5 h-5 text-gray-900 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-            </svg>
+        <form (ngSubmit)="onSearch()">
+          <div class="relative">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
             <input
               type="text"
-              placeholder="Buscar"
+              placeholder="Buscar productos..."
               [(ngModel)]="searchQuery"
               name="mobileSearch"
               aria-label="Buscar productos"
-              class="pl-7 pr-4 py-2 border-b-2 border-gray-900 bg-transparent focus:outline-none w-full text-gray-900 placeholder-gray-500"
+              class="w-full pl-9 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
             />
           </div>
         </form>
 
         <!-- Mobile Nav -->
-        <nav class="flex flex-col space-y-4 mb-6" aria-label="Navegacion movil">
+        <nav class="flex flex-col" aria-label="Navegacion movil">
           @for (link of navLinks; track link.path) {
             <a [routerLink]="link.path"
                (click)="toggleMobileMenu()"
-               class="text-lg text-gray-900 hover:text-gray-600 font-normal">
+               class="py-3 text-base text-gray-900 hover:text-primary-600 font-medium border-b border-gray-50">
               {{ link.label }}
             </a>
           }
@@ -138,18 +139,16 @@
 
         <!-- Mobile Auth -->
         @if (authService.isAuthenticated()) {
-          <div class="flex items-center justify-between py-3 border-t border-gray-100">
+          <div class="flex items-center justify-between pt-2">
             <span class="text-sm text-gray-600">{{ authService.getCurrentUser()?.nombre }}</span>
-            <button (click)="onLogout()" class="text-sm text-red-600 hover:text-red-800">Cerrar sesion</button>
+            <button (click)="onLogout()" class="text-sm text-red-600 hover:text-red-800 font-medium">Cerrar sesion</button>
           </div>
         } @else {
           <button
             (click)="onLogin(); toggleMobileMenu()"
-            class="flex items-center space-x-3 text-gray-900 hover:text-gray-600 transition py-3">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-            </svg>
-            <span>Iniciar sesion</span>
+            class="flex items-center gap-3 text-gray-900 hover:text-primary-600 transition pt-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+            <span class="font-medium">Iniciar sesion</span>
           </button>
         }
       </div>

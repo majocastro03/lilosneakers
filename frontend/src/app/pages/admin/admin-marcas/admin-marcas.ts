@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
+import { ModalService } from '../../../shared/modal/modal.service';
 
 @Component({
   selector: 'app-admin-marcas',
@@ -13,6 +14,7 @@ import { RouterLink } from '@angular/router';
 })
 export class AdminMarcasComponent implements OnInit {
   private http = inject(HttpClient);
+  private modalService = inject(ModalService);
   marcas = signal<any[]>([]);
   loading = signal(true);
   showModal = signal(false);
@@ -44,8 +46,9 @@ export class AdminMarcasComponent implements OnInit {
     });
   }
 
-  delete(id: string) {
-    if (!confirm('¿Desactivar esta marca?')) return;
+  async delete(id: string) {
+    const ok = await this.modalService.confirm('¿Desactivar esta marca?');
+    if (!ok) return;
     this.http.delete(`/api/marcas/${id}`).subscribe({ next: () => { this.message.set('Marca desactivada'); this.load(); setTimeout(() => this.message.set(null), 2000); } });
   }
 }

@@ -1,16 +1,15 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router} from '@angular/router';
 import { CommonModule } from '@angular/common';
 
-import { HeaderComponent } from "../../shared/header/header";
-import { FooterComponent } from "../../shared/footer/footer";
 import { AuthService } from '../../core/services/auth.service';
+import { ModalService } from '../../shared/modal/modal.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, HeaderComponent, FooterComponent],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './login.html',
   styleUrls: ['./login.css'],
 })
@@ -18,6 +17,7 @@ export class Login implements OnInit {
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private authService = inject(AuthService);
+  private modalService = inject(ModalService);
 
   loginForm: FormGroup;
   hidePassword = true;
@@ -102,7 +102,7 @@ export class Login implements OnInit {
   }
 
   onForgotPassword(): void {
-    alert('Funcionalidad de recuperación de contraseña estará disponible próximamente.');
+    this.modalService.info('Funcionalidad de recuperacion de contrasena estara disponible proximamente.');
   }
 
   onRegister(): void {
