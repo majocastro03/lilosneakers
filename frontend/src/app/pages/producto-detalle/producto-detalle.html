@@ -22,7 +22,7 @@
     @if (error()) {
       <div class="text-center py-20">
         <p class="text-red-600 text-lg mb-4">{{ error() }}</p>
-        <button (click)="goBack()" class="px-6 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition">
+        <button (click)="goBack()" class="px-6 py-2 bg-primary-700 text-white rounded-lg hover:bg-primary-800 transition">
           Volver al catálogo
         </button>
       </div>
@@ -41,7 +41,7 @@
             (error)="$any($event.target).src='assets/placeholder-product.jpg'"
           />
           @if (prod.destacado) {
-            <span class="absolute top-4 left-4 bg-black text-white text-xs px-3 py-1 rounded">
+            <span class="absolute top-4 left-4 bg-primary-800 text-white text-xs px-3 py-1 rounded">
               Top Seller
             </span>
           }
@@ -104,14 +104,14 @@
                 @for (talla of prod.tallas; track talla.talla) {
                   <button
                     (click)="selectTalla(talla)"
-                    [class.bg-black]="selectedTalla() === talla.talla"
+                    [class.bg-primary-700]="selectedTalla() === talla.talla"
                     [class.text-white]="selectedTalla() === talla.talla"
-                    [class.border-black]="selectedTalla() === talla.talla"
+                    [class.border-primary-700]="selectedTalla() === talla.talla"
                     [class.opacity-40]="talla.cantidad <= 0"
                     [class.cursor-not-allowed]="talla.cantidad <= 0"
                     [disabled]="talla.cantidad <= 0"
                     [attr.aria-label]="'Talla ' + talla.talla + (talla.cantidad <= 0 ? ' - Agotada' : '')"
-                    class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium hover:border-black transition min-w-[52px]"
+                    class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium hover:border-primary-500 transition min-w-[52px]"
                   >
                     {{ talla.talla }}
                   </button>
@@ -148,7 +148,7 @@
             (click)="addToCart()"
             [disabled]="!selectedTalla()"
             [class.bg-green-600]="addedToCart()"
-            class="w-full sm:w-auto px-8 py-3 bg-black text-white rounded-lg font-medium hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition"
+            class="w-full sm:w-auto px-8 py-3 bg-primary-700 text-white rounded-lg font-medium hover:bg-primary-800 disabled:opacity-50 disabled:cursor-not-allowed transition"
           >
             @if (addedToCart()) {
               Agregado al carrito

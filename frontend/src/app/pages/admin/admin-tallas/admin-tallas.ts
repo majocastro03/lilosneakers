@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
+import { ModalService } from '../../../shared/modal/modal.service';
 
 @Component({
   selector: 'app-admin-tallas',
@@ -13,6 +14,7 @@ import { RouterLink } from '@angular/router';
 })
 export class AdminTallasComponent implements OnInit {
   private http = inject(HttpClient);
+  private modalService = inject(ModalService);
   tallas = signal<any[]>([]);
   showModal = signal(false);
   editingId = signal<string | null>(null);
@@ -34,8 +36,9 @@ export class AdminTallasComponent implements OnInit {
     });
   }
 
-  delete(id: string) {
-    if (!confirm('¿Eliminar esta talla?')) return;
+  async delete(id: string) {
+    const ok = await this.modalService.confirm('¿Eliminar esta talla?');
+    if (!ok) return;
     this.http.delete(`/api/tallas/${id}`).subscribe({ next: () => { this.message.set('Eliminada'); this.load(); setTimeout(() => this.message.set(null), 2000); } });
   }
 }

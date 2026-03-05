@@ -38,7 +38,7 @@ export class AdminOrdenesComponent implements OnInit {
   getEstadoColor(estado: string): string {
     const colors: Record<string, string> = {
       'pendiente': 'bg-yellow-100 text-yellow-800',
-      'confirmada': 'bg-blue-100 text-blue-800',
+      'confirmada': 'bg-primary-100 text-primary-800',
       'enviada': 'bg-purple-100 text-purple-800',
       'entregada': 'bg-green-100 text-green-800',
       'cancelada': 'bg-red-100 text-red-800'

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+import { ModalService } from '../../../shared/modal/modal.service';
 
 @Component({
   selector: 'app-admin-categorias',
@@ -14,6 +15,7 @@ import { AuthService } from '../../../core/services/auth.service';
 })
 export class AdminCategoriasComponent implements OnInit {
   private http = inject(HttpClient);
+  private modalService = inject(ModalService);
   authService = inject(AuthService);
 
   categorias = signal<any[]>([]);
@@ -61,10 +63,11 @@ export class AdminCategoriasComponent implements OnInit {
     });
   }
 
-  delete(id: string) {
-    if (!confirm('¿Eliminar esta categoría?')) return;
+  async delete(id: string) {
+    const ok = await this.modalService.confirm('¿Eliminar esta categoria?');
+    if (!ok) return;
     this.http.delete(`/api/categorias/${id}`).subscribe({
-      next: () => { this.message.set('Categoría eliminada'); this.loadCategorias(); setTimeout(() => this.message.set(null), 2000); },
+      next: () => { this.message.set('Categoria eliminada'); this.loadCategorias(); setTimeout(() => this.message.set(null), 2000); },
       error: (err) => this.message.set(err.error?.error || 'Error al eliminar')
     });
   }

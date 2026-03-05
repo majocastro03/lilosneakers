@@ -18,6 +18,7 @@ export class HeaderComponent {
   authService = inject(AuthService);
 
   isMobileMenuOpen = false;
+  isSearchOpen = false;
   searchQuery = '';
   navLinks = [
     { path: '/catalogo', label: 'Catalogo' },
@@ -52,6 +53,10 @@ export class HeaderComponent {
   onLogout(): void {
     this.authService.logout();
     this.isMobileMenuOpen = false;
+  }
+
+  toggleSearch(): void {
+    this.isSearchOpen = !this.isSearchOpen;
   }
 
   toggleMobileMenu(): void {

@@ -6,12 +6,12 @@
       <div class="flex justify-between items-center mb-4">
         <div class="text-sm text-gray-600">
           Sesión: <span class="font-medium">{{ currentUser?.nombre || currentUser?.username }}</span>
-          <span class="ml-2 px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-semibold">
+          <span class="ml-2 px-2 py-1 bg-primary-100 text-primary-800 rounded text-xs font-semibold">
             {{ currentUser?.tipo_usuario }}
           </span>
         </div>
         <div class="flex items-center gap-3">
-          <a routerLink="/" class="text-sm text-blue-600 hover:text-blue-800">Ver tienda</a>
+          <a routerLink="/" class="text-sm text-primary-600 hover:text-primary-800">Ver tienda</a>
           <button
             (click)="logout()"
             class="px-4 py-2 text-sm text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
@@ -22,28 +22,28 @@
       </div>
 
       <!-- Admin Nav -->
-      <nav class="flex flex-wrap gap-2 mb-6 border-b border-gray-200 pb-3">
-        <a routerLink="/admin/productos" routerLinkActive="bg-blue-600 text-white" [routerLinkActiveOptions]="{exact: true}"
+      <nav class="flex gap-2 mb-6 border-b border-gray-200 pb-3 overflow-x-auto scrollbar-hide sm:flex-wrap">
+        <a routerLink="/admin/productos" routerLinkActive="bg-primary-600 text-white" [routerLinkActiveOptions]="{exact: true}"
           class="px-4 py-2 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors">
           Productos
         </a>
-        <a routerLink="/admin/categorias" routerLinkActive="bg-blue-600 text-white"
+        <a routerLink="/admin/categorias" routerLinkActive="bg-primary-600 text-white"
           class="px-4 py-2 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors">
           Categorías
         </a>
-        <a routerLink="/admin/marcas" routerLinkActive="bg-blue-600 text-white"
+        <a routerLink="/admin/marcas" routerLinkActive="bg-primary-600 text-white"
           class="px-4 py-2 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors">
           Marcas
         </a>
-        <a routerLink="/admin/colores" routerLinkActive="bg-blue-600 text-white"
+        <a routerLink="/admin/colores" routerLinkActive="bg-primary-600 text-white"
           class="px-4 py-2 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors">
           Colores
         </a>
-        <a routerLink="/admin/tallas" routerLinkActive="bg-blue-600 text-white"
+        <a routerLink="/admin/tallas" routerLinkActive="bg-primary-600 text-white"
           class="px-4 py-2 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors">
           Tallas
         </a>
-        <a routerLink="/admin/ordenes" routerLinkActive="bg-blue-600 text-white"
+        <a routerLink="/admin/ordenes" routerLinkActive="bg-primary-600 text-white"
           class="px-4 py-2 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors">
           Órdenes
         </a>
@@ -57,7 +57,7 @@
         </div>
         <button
           (click)="abrirModalCrear()"
-          class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+          class="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium"
         >
           + Nuevo Producto
         </button>
@@ -75,7 +75,7 @@
 
     <!-- Loading -->
     <div *ngIf="loading && !showModal" class="text-center py-12">
-      <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
       <p class="mt-4 text-gray-600">Cargando...</p>
     </div>
 
@@ -128,7 +128,7 @@
 
               <!-- Categoría -->
               <td class="px-6 py-4 whitespace-nowrap">
-                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-primary-100 text-primary-800">
                   {{ producto.categoria }}
                 </span>
               </td>
@@ -168,7 +168,7 @@
               <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                 <button
                   (click)="abrirModalEditar(producto)"
-                  class="text-blue-600 hover:text-blue-900 mr-4"
+                  class="text-primary-600 hover:text-primary-800 mr-4"
                 >
                   Editar
                 </button>
@@ -226,7 +226,7 @@
           [(ngModel)]="form.nombre"
           name="nombre"
           required
-          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           placeholder="Ej: Nike Air Max 270"
         />
       </div>
@@ -243,7 +243,7 @@
             required
             min="0"
             step="0.01"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             placeholder="0.00"
           />
         </div>
@@ -258,7 +258,7 @@
             name="descuento"
             min="0"
             max="100"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             placeholder="0"
           />
         </div>
@@ -271,7 +271,7 @@
         <select
           [(ngModel)]="form.categoria_id"
           name="categoria_id"
-          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
         >
           <option [ngValue]="null">Sin categoría</option>
           <option *ngFor="let cat of categorias" [ngValue]="cat.id">
@@ -288,7 +288,7 @@
           [(ngModel)]="form.descripcion"
           name="descripcion"
           rows="4"
-          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           placeholder="Descripción del producto..."
         ></textarea>
       </div>
@@ -299,7 +299,7 @@
             type="checkbox"
             [(ngModel)]="form.destacado"
             name="destacado"
-            class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+            class="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
           />
           <span class="ml-2 text-sm font-medium text-gray-700">
             Producto destacado
@@ -315,7 +315,7 @@
           type="file"
           (change)="onImagenChange($event)"
           accept="image/*"
-          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
         />
         
         <div *ngIf="imagenPreview" class="mt-4">
@@ -338,7 +338,7 @@
         <button
           type="submit"
           [disabled]="loading"
-          class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {{ loading ? 'Guardando...' : (modoEdicion ? 'Actualizar' : 'Crear') }}
         </button>
