@@ -1,4 +1,3 @@
-// 👇 ahora usa CommonJS
 require('dotenv').config();
 const { createClient } = require('@supabase/supabase-js');
 
@@ -12,8 +11,8 @@ if (!supabaseUrl || !supabaseAnonKey || !supabaseServiceRoleKey) {
 
 const supabase = createClient(supabaseUrl, supabaseServiceRoleKey, {
   auth: {
-    autoRefreshToken: true,
-    persistSession: true,
+    autoRefreshToken: false,
+    persistSession: false,
     detectSessionInUrl: false,
   }
 });
