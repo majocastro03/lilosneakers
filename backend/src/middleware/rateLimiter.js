@@ -1,4 +1,3 @@
-// backend/src/middleware/rateLimiter.js
 const rateLimitStore = new Map();
 
 const CLEANUP_INTERVAL = 60 * 1000; // Clean up every minute

@@ -273,7 +273,7 @@ const deleteImage = async (imageUrl) => {
 const crearProducto = async (req, res) => {
   try {
     const {
-      nombre, precio, descuento = 0, descripcion, destacado = false, categoria_id
+      nombre, precio, descuento = 0, descripcion, destacado = false, categoria_id, marca_id
     } = req.body;
 
     let imagenUrl = null;
@@ -290,7 +290,8 @@ const crearProducto = async (req, res) => {
         imagen_url: imagenUrl,
         descripcion,
         destacado: destacado === 'true' || destacado === true,
-        categoria_id: categoria_id || null
+        categoria_id: categoria_id || null,
+        marca_id: marca_id || null
       }])
       .select()
       .single();
@@ -317,7 +318,7 @@ const actualizarProducto = async (req, res) => {
   try {
     const { id } = req.params;
     const {
-      nombre, precio, descuento = 0, descripcion, destacado = false, categoria_id
+      nombre, precio, descuento = 0, descripcion, destacado = false, categoria_id, marca_id
     } = req.body;
 
     const updateData = {
@@ -326,7 +327,8 @@ const actualizarProducto = async (req, res) => {
       descuento: parseFloat(descuento),
       descripcion,
       destacado: destacado === 'true' || destacado === true,
-      categoria_id: categoria_id || null
+      categoria_id: categoria_id || null,
+      marca_id: marca_id || null
     };
 
     if (req.file) {

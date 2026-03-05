@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-admin-ordenes',
@@ -13,6 +14,7 @@ import { RouterLink } from '@angular/router';
 })
 export class AdminOrdenesComponent implements OnInit {
   private http = inject(HttpClient);
+  private apiUrl = `${environment.apiUrl}/ordenes`;
   ordenes = signal<any[]>([]);
   loading = signal(true);
   message = signal<string | null>(null);
@@ -22,14 +24,14 @@ export class AdminOrdenesComponent implements OnInit {
 
   load() {
     this.loading.set(true);
-    this.http.get<any[]>('/api/ordenes').subscribe({
+    this.http.get<any[]>(this.apiUrl).subscribe({
       next: (data) => { this.ordenes.set(data); this.loading.set(false); },
       error: () => this.loading.set(false)
     });
   }
 
   cambiarEstado(id: string, estado: string) {
-    this.http.put(`/api/ordenes/${id}/estado`, { estado }).subscribe({
+    this.http.put(`${this.apiUrl}/${id}/estado`, { estado }).subscribe({
       next: () => { this.message.set('Estado actualizado'); this.load(); setTimeout(() => this.message.set(null), 2000); },
       error: (err) => this.message.set(err.error?.error || 'Error')
     });

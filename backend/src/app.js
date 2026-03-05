@@ -22,6 +22,15 @@ const { apiLimiter } = require('./middleware/rateLimiter');
 
 const app = express();
 
+// Ruta de salud (antes de CORS/helmet para que Render pueda hacer health checks)
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
 // Middlewares de seguridad
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" },
@@ -81,15 +90,6 @@ app.use('/api/tallas', tallasRoutes);
 app.use('/api/modificaciones', modificacionesRoutes);
 app.use('/api/carrito', carritoRoutes);
 app.use('/api/ordenes', ordenesRoutes);
-
-// Ruta de salud
-app.get('/health', (req, res) => {
-  res.json({
-    status: 'ok',
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
-  });
-});
 
 // Manejo de rutas no encontradas
 app.use((req, res) => {
