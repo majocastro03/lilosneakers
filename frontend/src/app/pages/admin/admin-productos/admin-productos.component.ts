@@ -1,15 +1,16 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { Router} from '@angular/router';
 import { ProductoService, Producto, ProductosResponse } from '../../../core/services/producto.service';
 import { CategoriaService, Categoria } from '../../../core/services/categoria.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { ModalService } from '../../../shared/modal/modal.service';
 
 @Component({
   selector: 'app-admin-productos',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, RouterLinkActive],
+  imports: [CommonModule, FormsModule],
   templateUrl: './admin-productos.component.html',
   styleUrl: './admin-productos.component.css'
 })
@@ -19,6 +20,7 @@ export class AdminProductosComponent implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
+  private modalService = inject(ModalService);
 
   productos: Producto[] = [];
   categorias: Categoria[] = [];
@@ -54,8 +56,9 @@ export class AdminProductosComponent implements OnInit {
     this.cargarProductos();
   }
 
-  logout() {
-    if (confirm('¿Estás seguro de cerrar sesión?')) {
+  async logout() {
+    const ok = await this.modalService.confirm('¿Estas seguro de cerrar sesion?');
+    if (ok) {
       this.authService.logout();
     }
   }
@@ -213,8 +216,9 @@ export class AdminProductosComponent implements OnInit {
     });
   }
 
-  confirmarEliminar(producto: Producto) {
-    if (confirm(`¿Estás seguro de eliminar "${producto.nombre}"?`)) {
+  async confirmarEliminar(producto: Producto) {
+    const ok = await this.modalService.confirm(`¿Estas seguro de eliminar "${producto.nombre}"?`);
+    if (ok) {
       this.eliminarProducto(producto.id);
     }
   }

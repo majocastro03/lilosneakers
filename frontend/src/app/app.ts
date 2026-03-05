@@ -1,10 +1,11 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { ModalComponent } from './shared/modal/modal';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, ModalComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
