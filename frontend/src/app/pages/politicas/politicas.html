@@ -5,43 +5,59 @@
     <h1 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-8">Políticas de la Tienda</h1>
 
     <div class="space-y-10 text-gray-600">
+
+      <!-- Métodos de Pago -->
       <section>
-        <h2 class="text-xl font-bold text-gray-900 mb-3">Métodos de Pago</h2>
-        <ul class="list-disc pl-5 space-y-2">
-          <li>Transferencia bancaria (Nequi, Daviplata, Bancolombia)</li>
-          <li>Pago contra entrega (según disponibilidad en tu zona)</li>
-          <li>Efectivo en punto de venta</li>
-        </ul>
+        <h2 class="text-xl font-bold text-gray-900 mb-4">Nuestros Medios de Pago</h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- Nequi -->
+          <div class="border border-gray-200 rounded-xl p-5">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center">
+                <span class="text-white font-bold text-sm">N</span>
+              </div>
+              <h3 class="font-bold text-gray-900 text-lg">Nequi</h3>
+            </div>
+            @for (numero of config.metodosPago.nequi; track numero) {
+              <p class="text-gray-700 font-medium text-lg">{{ numero }}</p>
+            }
+          </div>
+
+          <!-- Daviplata -->
+          <div class="border border-gray-200 rounded-xl p-5">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center">
+                <span class="text-white font-bold text-sm">D</span>
+              </div>
+              <h3 class="font-bold text-gray-900 text-lg">Daviplata</h3>
+            </div>
+            @for (numero of config.metodosPago.daviplata; track numero) {
+              <p class="text-gray-700 font-medium text-lg">{{ numero }}</p>
+            }
+          </div>
+
+          <!-- Efectivo -->
+          <div class="border border-gray-200 rounded-xl p-5 sm:col-span-2">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center">
+                <span class="text-white font-bold text-sm">$</span>
+              </div>
+              <h3 class="font-bold text-gray-900 text-lg">Pago en Efectivo</h3>
+            </div>
+            <p class="text-gray-700 font-medium">{{ config.metodosPago.efectivo }}</p>
+          </div>
+        </div>
       </section>
 
       <section>
         <h2 class="text-xl font-bold text-gray-900 mb-3">Envíos</h2>
         <ul class="list-disc pl-5 space-y-2">
           <li>Realizamos envíos a todo el país</li>
-          <li>El tiempo de entrega varía según la ciudad (2-5 días hábiles)</li>
           <li>El costo de envío se calcula según destino y será confirmado al momento de la compra</li>
-          <li>Recibirás un número de seguimiento una vez despachado tu pedido</li>
         </ul>
       </section>
 
-      <section>
-        <h2 class="text-xl font-bold text-gray-900 mb-3">Cambios y Devoluciones</h2>
-        <ul class="list-disc pl-5 space-y-2">
-          <li>Tienes 3 días hábiles después de recibir tu pedido para solicitar un cambio</li>
-          <li>El producto debe estar en su estado original, sin uso y con etiquetas</li>
-          <li>Los cambios están sujetos a disponibilidad de stock</li>
-          <li>El costo de envío del cambio corre por cuenta del comprador</li>
-          <li>No se realizan devoluciones de dinero, solo cambios por otro producto o talla</li>
-        </ul>
-      </section>
-
-      <section>
-        <h2 class="text-xl font-bold text-gray-900 mb-3">Garantía</h2>
-        <p>
-          Todos nuestros productos son 100% originales. Ofrecemos garantía por defectos de
-          fabricación por un período de 30 días a partir de la fecha de compra.
-        </p>
-      </section>
     </div>
   </div>
 </div>

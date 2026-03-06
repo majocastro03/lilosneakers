@@ -1,4 +1,5 @@
 const supabase = require('../config/supabaseCliente');
+const parseError = require('../utils/parseError');
 
 // Obtener todas las marcas activas
 const getMarcas = async (req, res) => {
@@ -13,7 +14,8 @@ const getMarcas = async (req, res) => {
     res.json(data);
   } catch (err) {
     console.error('Error en getMarcas:', err);
-    res.status(500).json({ error: 'Error al obtener marcas' });
+    const { status, message } = parseError(err, 'Error al obtener marcas');
+    res.status(status).json({ error: message });
   }
 };
 
@@ -33,7 +35,8 @@ const getMarcaById = async (req, res) => {
     res.json(data);
   } catch (err) {
     console.error('Error en getMarcaById:', err);
-    res.status(500).json({ error: 'Error al obtener la marca' });
+    const { status, message } = parseError(err, 'Error al obtener la marca');
+    res.status(status).json({ error: message });
   }
 };
 
@@ -56,7 +59,8 @@ const crearMarca = async (req, res) => {
     res.status(201).json(data);
   } catch (err) {
     console.error('Error en crearMarca:', err);
-    res.status(500).json({ error: 'Error al crear marca' });
+    const { status, message } = parseError(err, 'Error al crear marca');
+    res.status(status).json({ error: message });
   }
 };
 
@@ -86,7 +90,8 @@ const actualizarMarca = async (req, res) => {
     res.json(data);
   } catch (err) {
     console.error('Error en actualizarMarca:', err);
-    res.status(500).json({ error: 'Error al actualizar marca' });
+    const { status, message } = parseError(err, 'Error al actualizar marca');
+    res.status(status).json({ error: message });
   }
 };
 
@@ -104,7 +109,8 @@ const eliminarMarca = async (req, res) => {
     res.json({ message: 'Marca desactivada correctamente' });
   } catch (err) {
     console.error('Error en eliminar marca:', err);
-    res.status(500).json({ error: 'Error al eliminar marca' });
+    const { status, message } = parseError(err, 'Error al eliminar marca');
+    res.status(status).json({ error: message });
   }
 };
 

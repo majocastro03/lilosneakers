@@ -4,11 +4,13 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 export interface Color {
+  id: string;
   nombre: string;
   codigo_hex: string;
 }
 
 export interface Talla {
+  id: string;
   talla: string;
   cantidad: number;
 }
@@ -22,13 +24,16 @@ export interface Producto {
   imagen_url: string;
   descripcion: string;
   destacado: boolean;
+  activo: boolean;
   categoria: string;
   categoria_id?: string;
   categoria_slug?: string;
   mostrar_precio?: boolean;
+  marca_id?: string;
   marca?: any;
   colores: Color[];
   tallas: Talla[];
+  imagenes?: { id: string; imagen_url: string; orden: number }[];
 }
 
 export interface ProductosResponse {
@@ -45,6 +50,7 @@ export interface FiltrosProducto {
   categoria_id?: string; // UUID
   destacado?: boolean;
   q?: string;
+  incluir_inactivos?: boolean;
 }
 
 @Injectable({
@@ -62,6 +68,7 @@ export class ProductoService {
     if (filtros.categoria_id) params = params.set('categoria_id', filtros.categoria_id); // Ya es string (UUID)
     if (filtros.destacado !== undefined) params = params.set('destacado', filtros.destacado.toString());
     if (filtros.q) params = params.set('q', filtros.q);
+    if (filtros.incluir_inactivos) params = params.set('incluir_inactivos', 'true');
 
     return this.http.get<ProductosResponse>(this.apiUrl, { params });
   }

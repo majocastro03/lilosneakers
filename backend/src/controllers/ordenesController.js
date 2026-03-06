@@ -1,4 +1,5 @@
 const supabase = require('../config/supabaseCliente');
+const parseError = require('../utils/parseError');
 
 // POST /api/ordenes - Create a new order
 const crearOrden = async (req, res) => {
@@ -117,7 +118,8 @@ const crearOrden = async (req, res) => {
 
   } catch (err) {
     console.error('Error en crearOrden:', err);
-    res.status(500).json({ error: 'Error al crear la orden' });
+    const { status, message } = parseError(err, 'Error al crear la orden');
+    res.status(status).json({ error: message });
   }
 };
 
@@ -146,7 +148,8 @@ const getOrdenes = async (req, res) => {
     res.json(ordenes || []);
   } catch (err) {
     console.error('Error en getOrdenes:', err);
-    res.status(500).json({ error: 'Error al obtener órdenes' });
+    const { status, message } = parseError(err, 'Error al obtener órdenes');
+    res.status(status).json({ error: message });
   }
 };
 
@@ -194,7 +197,8 @@ const getOrdenById = async (req, res) => {
 
   } catch (err) {
     console.error('Error en getOrdenById:', err);
-    res.status(500).json({ error: 'Error al obtener la orden' });
+    const { status, message } = parseError(err, 'Error al obtener la orden');
+    res.status(status).json({ error: message });
   }
 };
 
@@ -223,7 +227,8 @@ const actualizarEstadoOrden = async (req, res) => {
 
   } catch (err) {
     console.error('Error en actualizarEstadoOrden:', err);
-    res.status(500).json({ error: 'Error al actualizar el estado de la orden' });
+    const { status, message } = parseError(err, 'Error al actualizar el estado de la orden');
+    res.status(status).json({ error: message });
   }
 };
 

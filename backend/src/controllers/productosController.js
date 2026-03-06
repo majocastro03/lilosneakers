@@ -1,5 +1,6 @@
 const supabase = require('../config/supabaseCliente');
 const crypto = require('crypto');
+const parseError = require('../utils/parseError');
 
 // GET /api/productos
 const getProductos = async (req, res) => {
@@ -11,11 +12,16 @@ const getProductos = async (req, res) => {
     let query = supabase
       .from('productos')
       .select(`
-        id, nombre, precio, descuento, imagen_url, descripcion, destacado, mostrar_precio,
+        id, nombre, precio, descuento, imagen_url, descripcion, destacado, mostrar_precio, activo,
         categoria_id, marca_id,
         categorias!left(nombre, slug),
         marcas!left(nombre, slug, imagen_url)
       `, { count: 'exact' });
+
+    // By default, only show active products (storefront). Admin passes incluir_inactivos=true
+    if (req.query.incluir_inactivos !== 'true') {
+      query = query.eq('activo', true);
+    }
 
     // Ordenamiento
     const orderBy = req.query.orderBy;
@@ -105,24 +111,30 @@ const getProductos = async (req, res) => {
       });
     }
 
-    const [coloresRes, tallasRes] = await Promise.all([
+    const [coloresRes, tallasRes, imagenesRes] = await Promise.all([
       supabase
         .from('producto_colores')
-        .select('producto_id, colores(nombre, codigo_hex)')
+        .select('producto_id, color_id, colores(id, nombre, codigo_hex)')
         .in('producto_id', ids),
       supabase
         .from('producto_tallas')
-        .select('producto_id, cantidad, tallas(id, valor)')
+        .select('producto_id, cantidad, tallas(id, valor, valor_us, valor_eur, valor_cm, genero)')
+        .in('producto_id', ids),
+      supabase
+        .from('producto_imagenes')
+        .select('id, producto_id, imagen_url, orden')
         .in('producto_id', ids)
+        .order('orden', { ascending: true })
     ]);
 
     if (coloresRes.error) throw coloresRes.error;
     if (tallasRes.error) throw tallasRes.error;
+    if (imagenesRes.error) throw imagenesRes.error;
 
     const coloresMap = {};
     coloresRes.data.forEach(pc => {
       if (!coloresMap[pc.producto_id]) coloresMap[pc.producto_id] = [];
-      coloresMap[pc.producto_id].push(pc.colores);
+      coloresMap[pc.producto_id].push({ id: pc.colores.id, nombre: pc.colores.nombre, codigo_hex: pc.colores.codigo_hex });
     });
 
     const tallasMap = {};
@@ -131,8 +143,18 @@ const getProductos = async (req, res) => {
       tallasMap[pt.producto_id].push({
         id: pt.tallas.id,
         talla: pt.tallas.valor,
+        valor_us: pt.tallas.valor_us,
+        valor_eur: pt.tallas.valor_eur,
+        valor_cm: pt.tallas.valor_cm,
+        genero: pt.tallas.genero,
         cantidad: pt.cantidad
       });
+    });
+
+    const imagenesMap = {};
+    imagenesRes.data.forEach(pi => {
+      if (!imagenesMap[pi.producto_id]) imagenesMap[pi.producto_id] = [];
+      imagenesMap[pi.producto_id].push({ id: pi.id, imagen_url: pi.imagen_url, orden: pi.orden });
     });
 
     const productosFormateados = filteredProductos.map(p => ({
@@ -145,12 +167,15 @@ const getProductos = async (req, res) => {
       descripcion: p.descripcion,
       destacado: p.destacado,
       mostrar_precio: p.mostrar_precio,
+      activo: p.activo ?? true,
       categoria: p.categorias?.nombre || 'Sin categoría',
       categoria_slug: p.categorias?.slug || null,
       categoria_id: p.categoria_id,
+      marca_id: p.marca_id,
       marca: p.marcas || null,
       colores: coloresMap[p.id] || [],
-      tallas: tallasMap[p.id] || []
+      tallas: tallasMap[p.id] || [],
+      imagenes: imagenesMap[p.id] || []
     }));
 
     const finalTotal = (req.query.color_id || req.query.talla_id) ? filteredProductos.length : count;
@@ -165,7 +190,8 @@ const getProductos = async (req, res) => {
 
   } catch (err) {
     console.error('Error en getProductos:', err);
-    res.status(500).json({ error: 'Error al obtener productos' });
+    const { status, message } = parseError(err, 'Error al obtener productos');
+    res.status(status).json({ error: message });
   }
 };
 
@@ -177,8 +203,8 @@ const getProductoById = async (req, res) => {
     const { data: producto, error } = await supabase
       .from('productos')
       .select(`
-        id, nombre, precio, descuento, imagen_url, descripcion, destacado, mostrar_precio,
-        categoria_id,
+        id, nombre, precio, descuento, imagen_url, descripcion, destacado, mostrar_precio, activo,
+        categoria_id, marca_id,
         categorias!left(nombre, slug),
         marcas!left(nombre, slug, imagen_url)
       `)
@@ -189,19 +215,25 @@ const getProductoById = async (req, res) => {
       return res.status(404).json({ error: 'Producto no encontrado' });
     }
 
-    const [coloresRes, tallasRes] = await Promise.all([
+    const [coloresRes, tallasRes, imagenesRes] = await Promise.all([
       supabase
         .from('producto_colores')
-        .select('colores(nombre, codigo_hex)')
+        .select('color_id, colores(id, nombre, codigo_hex)')
         .eq('producto_id', id),
       supabase
         .from('producto_tallas')
-        .select('cantidad, tallas(id, valor)')
+        .select('cantidad, tallas(id, valor, valor_us, valor_eur, valor_cm, genero)')
+        .eq('producto_id', id),
+      supabase
+        .from('producto_imagenes')
+        .select('id, imagen_url, orden')
         .eq('producto_id', id)
+        .order('orden', { ascending: true })
     ]);
 
     if (coloresRes.error) throw coloresRes.error;
     if (tallasRes.error) throw tallasRes.error;
+    if (imagenesRes.error) throw imagenesRes.error;
 
     const productoFormateado = {
       id: producto.id,
@@ -213,23 +245,31 @@ const getProductoById = async (req, res) => {
       descripcion: producto.descripcion,
       destacado: producto.destacado,
       mostrar_precio: producto.mostrar_precio,
+      activo: producto.activo ?? true,
       categoria: producto.categorias?.nombre || 'Sin categoría',
       categoria_slug: producto.categorias?.slug || null,
       categoria_id: producto.categoria_id,
+      marca_id: producto.marca_id,
       marca: producto.marcas || null,
-      colores: coloresRes.data.map(pc => pc.colores),
+      colores: coloresRes.data.map(pc => ({ id: pc.colores.id, nombre: pc.colores.nombre, codigo_hex: pc.colores.codigo_hex })),
       tallas: tallasRes.data.map(pt => ({
         id: pt.tallas.id,
         talla: pt.tallas.valor,
+        valor_us: pt.tallas.valor_us,
+        valor_eur: pt.tallas.valor_eur,
+        valor_cm: pt.tallas.valor_cm,
+        genero: pt.tallas.genero,
         cantidad: pt.cantidad
-      }))
+      })),
+      imagenes: imagenesRes.data.map(pi => ({ id: pi.id, imagen_url: pi.imagen_url, orden: pi.orden }))
     };
 
     res.json(productoFormateado);
 
   } catch (err) {
     console.error('Error en getProductoById:', err);
-    res.status(500).json({ error: 'Error al obtener el producto' });
+    const { status, message } = parseError(err, 'Error al obtener el producto');
+    res.status(status).json({ error: message });
   }
 };
 
@@ -273,7 +313,7 @@ const deleteImage = async (imageUrl) => {
 const crearProducto = async (req, res) => {
   try {
     const {
-      nombre, precio, descuento = 0, descripcion, destacado = false, categoria_id
+      nombre, precio, descuento = 0, descripcion, destacado = false, categoria_id, marca_id, activo = true
     } = req.body;
 
     let imagenUrl = null;
@@ -290,7 +330,9 @@ const crearProducto = async (req, res) => {
         imagen_url: imagenUrl,
         descripcion,
         destacado: destacado === 'true' || destacado === true,
-        categoria_id: categoria_id || null
+        activo: activo === 'true' || activo === true,
+        categoria_id: categoria_id || null,
+        marca_id: marca_id || null
       }])
       .select()
       .single();
@@ -308,7 +350,8 @@ const crearProducto = async (req, res) => {
 
   } catch (err) {
     console.error('Error en crearProducto:', err);
-    res.status(500).json({ error: 'Error al crear el producto' });
+    const { status, message } = parseError(err, 'Error al crear el producto');
+    res.status(status).json({ error: message });
   }
 };
 
@@ -317,7 +360,7 @@ const actualizarProducto = async (req, res) => {
   try {
     const { id } = req.params;
     const {
-      nombre, precio, descuento = 0, descripcion, destacado = false, categoria_id
+      nombre, precio, descuento = 0, descripcion, destacado = false, categoria_id, marca_id, activo = true
     } = req.body;
 
     const updateData = {
@@ -326,7 +369,9 @@ const actualizarProducto = async (req, res) => {
       descuento: parseFloat(descuento),
       descripcion,
       destacado: destacado === 'true' || destacado === true,
-      categoria_id: categoria_id || null
+      activo: activo === 'true' || activo === true,
+      categoria_id: categoria_id || null,
+      marca_id: marca_id || null
     };
 
     if (req.file) {
@@ -357,7 +402,8 @@ const actualizarProducto = async (req, res) => {
 
   } catch (err) {
     console.error('Error en actualizarProducto:', err);
-    res.status(500).json({ error: 'Error al actualizar el producto' });
+    const { status, message } = parseError(err, 'Error al actualizar el producto');
+    res.status(status).json({ error: message });
   }
 };
 
@@ -388,7 +434,8 @@ const eliminarProducto = async (req, res) => {
 
   } catch (err) {
     console.error('Error en eliminarProducto:', err);
-    res.status(500).json({ error: 'Error al eliminar el producto' });
+    const { status, message } = parseError(err, 'Error al eliminar el producto');
+    res.status(status).json({ error: message });
   }
 };
 

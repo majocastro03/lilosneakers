@@ -110,7 +110,7 @@ npm run dev
 ```bash
 cd frontend
 npm install
-ng serve
+npx ng serve
 ```
 
 ## 🚀 Deploy

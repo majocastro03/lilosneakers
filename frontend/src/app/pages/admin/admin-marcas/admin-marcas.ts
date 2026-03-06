@@ -1,14 +1,12 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { RouterLink } from '@angular/router';
 import { ModalService } from '../../../shared/modal/modal.service';
 
 @Component({
   selector: 'app-admin-marcas',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [FormsModule],
   templateUrl: './admin-marcas.html',
   styleUrl: './admin-marcas.css'
 })
@@ -18,6 +16,13 @@ export class AdminMarcasComponent implements OnInit {
   marcas = signal<any[]>([]);
   loading = signal(true);
   showModal = signal(false);
+  filtroNombre = '';
+
+  get marcasFiltradas() {
+    return this.marcas().filter(m =>
+      !this.filtroNombre || m.nombre.toLowerCase().includes(this.filtroNombre.toLowerCase())
+    );
+  }
   editingId = signal<string | null>(null);
   form = { nombre: '', slug: '', descripcion: '' };
   message = signal<string | null>(null);
@@ -41,14 +46,17 @@ export class AdminMarcasComponent implements OnInit {
     const id = this.editingId();
     const obs = id ? this.http.put(`/api/marcas/${id}`, this.form) : this.http.post('/api/marcas', this.form);
     obs.subscribe({
-      next: () => { this.showModal.set(false); this.message.set('Guardado'); this.load(); setTimeout(() => this.message.set(null), 2000); },
-      error: (err) => this.message.set(err.error?.error || 'Error')
+      next: () => { this.showModal.set(false); this.load(); this.modalService.success(this.editingId() ? 'Marca actualizada' : 'Marca creada'); },
+      error: (err) => this.modalService.error(err.error?.error || 'Error al guardar')
     });
   }
 
   async delete(id: string) {
     const ok = await this.modalService.confirm('¿Desactivar esta marca?');
     if (!ok) return;
-    this.http.delete(`/api/marcas/${id}`).subscribe({ next: () => { this.message.set('Marca desactivada'); this.load(); setTimeout(() => this.message.set(null), 2000); } });
+    this.http.delete(`/api/marcas/${id}`).subscribe({
+      next: () => { this.load(); this.modalService.success('Marca desactivada'); },
+      error: (err) => this.modalService.error(err.error?.error || 'Error al desactivar')
+    });
   }
 }

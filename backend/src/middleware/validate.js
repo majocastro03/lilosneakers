@@ -1,5 +1,3 @@
-// backend/src/middleware/validate.js
-
 const sanitizeString = (str) => {
   if (typeof str !== 'string') return str;
   return str.replace(/[<>]/g, '').trim();
@@ -30,6 +28,14 @@ const validateProducto = (req, res, next) => {
     const descuentoNum = parseFloat(descuento);
     if (isNaN(descuentoNum) || descuentoNum < 0 || descuentoNum > 100) {
       return res.status(400).json({ error: 'El descuento debe ser entre 0 y 100' });
+    }
+  }
+
+  // Validate activo (optional boolean)
+  if (req.body.activo !== undefined && req.body.activo !== null) {
+    const val = req.body.activo;
+    if (val !== true && val !== false && val !== 'true' && val !== 'false') {
+      return res.status(400).json({ error: 'El campo activo debe ser un booleano' });
     }
   }
 
