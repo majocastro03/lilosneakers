@@ -18,7 +18,7 @@ export const SITE_CONFIG = {
     },
   ],
   horario: {
-    dias: 'Lunes a Sábado',
-    horas: '8:00 AM - 6:00 PM',
+    dias: 'Lunes a Viernes',
+    horas: '8:30a.m a 12:00p.m - 2:00p.m a 4:00p.m',
   },
 };
