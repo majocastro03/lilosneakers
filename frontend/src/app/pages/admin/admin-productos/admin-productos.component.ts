@@ -43,6 +43,7 @@ export class AdminProductosComponent implements OnInit {
   filtroCategoria = '';
   filtroMarca = '';
   filtroEstado = '';
+  filtroActivo = '';
 
   // Mobile
   showMobileFilters = false;
@@ -58,6 +59,8 @@ export class AdminProductosComponent implements OnInit {
       if (this.filtroMarca && p.marca?.nombre !== this.filtroMarca) return false;
       if (this.filtroEstado === 'destacado' && !p.destacado) return false;
       if (this.filtroEstado === 'normal' && p.destacado) return false;
+      if (this.filtroActivo === 'activo' && !p.activo) return false;
+      if (this.filtroActivo === 'inactivo' && p.activo) return false;
       return true;
     });
 
@@ -70,6 +73,11 @@ export class AdminProductosComponent implements OnInit {
     }
 
     return filtered;
+  }
+
+  get tallasFiltradas(): any[] {
+    if (!this.filtroGeneroTalla) return this.allTallas;
+    return this.allTallas.filter((t: any) => t.genero === this.filtroGeneroTalla);
   }
 
   toggleSort(column: string) {
@@ -96,6 +104,7 @@ export class AdminProductosComponent implements OnInit {
     descuento: 0,
     descripcion: '',
     destacado: false,
+    activo: true,
     categoria_id: '' as string,
     marca_id: '' as string,
     imagen: null as File | null
@@ -107,6 +116,7 @@ export class AdminProductosComponent implements OnInit {
 
   selectedColorIds: string[] = [];
   selectedTallaIds: string[] = [];
+  filtroGeneroTalla = '';
   imagenPreview: string | null = null;
 
   // Multiple images
@@ -144,7 +154,7 @@ export class AdminProductosComponent implements OnInit {
     this.loading = true;
     this.error = null;
 
-    this.productoService.getProductos({ limit: 1000 }).subscribe({
+    this.productoService.getProductos({ limit: 1000, incluir_inactivos: true }).subscribe({
       next: (data: ProductosResponse) => {
         this.productos = data.productos;
         this.loading = false;
@@ -247,6 +257,7 @@ export class AdminProductosComponent implements OnInit {
       descuento: producto.descuento,
       descripcion: producto.descripcion || '',
       destacado: producto.destacado,
+      activo: producto.activo ?? true,
       categoria_id: categoriaEncontrada?.id || '',
       marca_id: producto.marca_id || '',
       imagen: null
@@ -276,6 +287,7 @@ export class AdminProductosComponent implements OnInit {
       descuento: 0,
       descripcion: '',
       destacado: false,
+      activo: true,
       categoria_id: '',
       marca_id: '',
       imagen: null
@@ -284,6 +296,7 @@ export class AdminProductosComponent implements OnInit {
     this.descuentoDisplay = '';
     this.selectedColorIds = [];
     this.selectedTallaIds = [];
+    this.filtroGeneroTalla = '';
     this.imagenPreview = null;
     this.existingImages = [];
     this.newImageFiles = [];
@@ -383,6 +396,7 @@ export class AdminProductosComponent implements OnInit {
     formData.append('descuento', this.form.descuento.toString());
     formData.append('descripcion', this.form.descripcion);
     formData.append('destacado', this.form.destacado.toString());
+    formData.append('activo', this.form.activo.toString());
     formData.append('categoria_id', this.form.categoria_id);
     if (this.form.marca_id) {
       formData.append('marca_id', this.form.marca_id);
@@ -489,6 +503,28 @@ export class AdminProductosComponent implements OnInit {
     } else {
       finalize();
     }
+  }
+
+  toggleActivo(producto: Producto) {
+    const nuevoEstado = !producto.activo;
+    const formData = new FormData();
+    formData.append('nombre', producto.nombre);
+    formData.append('precio', producto.precio.toString());
+    formData.append('descuento', producto.descuento.toString());
+    formData.append('descripcion', producto.descripcion || '');
+    formData.append('destacado', producto.destacado.toString());
+    formData.append('activo', nuevoEstado.toString());
+    formData.append('categoria_id', producto.categoria_id || '');
+    if (producto.marca_id) formData.append('marca_id', producto.marca_id);
+
+    this.productoService.actualizarProducto(producto.id, formData).subscribe({
+      next: () => {
+        producto.activo = nuevoEstado;
+        this.modalService.success(nuevoEstado ? 'Producto activado' : 'Producto desactivado');
+        this.cdr.markForCheck();
+      },
+      error: (err) => this.modalService.error(err.error?.error || 'Error al cambiar estado')
+    });
   }
 
   async confirmarEliminar(producto: Producto) {

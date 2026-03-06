@@ -27,6 +27,7 @@ export class ProductoDetalleComponent implements OnInit {
   selectedTallaId = signal<string | null>(null);
   cantidad = signal(1);
   addedToCart = signal(false);
+  selectedImage = signal<string | null>(null);
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
@@ -38,6 +39,7 @@ export class ProductoDetalleComponent implements OnInit {
     this.productoService.getProductoById(id).subscribe({
       next: (producto) => {
         this.producto.set(producto);
+        this.selectedImage.set(producto.imagen_url);
         this.loading.set(false);
       },
       error: () => {

@@ -21,10 +21,17 @@ export class HeaderComponent {
   isSearchOpen = false;
   searchQuery = '';
   navLinks = [
-    { path: '/catalogo', label: 'Catalogo' },
-    { path: '/nosotros', label: 'Nosotros' },
-    { path: '/contacto', label: 'Contacto' }
+    { path: '/catalogo', label: 'Catalogo', icon: 'catalog' },
+    { path: '/nosotros', label: 'Nosotros', icon: 'about' },
+    { path: '/contacto', label: 'Contacto', icon: 'contact' }
   ];
+
+  get userInitials(): string {
+    const user = this.authService.getCurrentUser();
+    if (!user) return '';
+    const nombre = user.nombre || user.username || '';
+    return nombre.split(' ').map((w: string) => w[0]).join('').toUpperCase().slice(0, 2);
+  }
 
   onLogin(): void {
     if (this.authService.isAuthenticated()) {

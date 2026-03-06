@@ -31,6 +31,14 @@ const validateProducto = (req, res, next) => {
     }
   }
 
+  // Validate activo (optional boolean)
+  if (req.body.activo !== undefined && req.body.activo !== null) {
+    const val = req.body.activo;
+    if (val !== true && val !== false && val !== 'true' && val !== 'false') {
+      return res.status(400).json({ error: 'El campo activo debe ser un booleano' });
+    }
+  }
+
   // Sanitize strings
   req.body.nombre = sanitizeString(nombre);
   if (req.body.descripcion) {

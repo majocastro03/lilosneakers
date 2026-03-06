@@ -12,11 +12,16 @@ const getProductos = async (req, res) => {
     let query = supabase
       .from('productos')
       .select(`
-        id, nombre, precio, descuento, imagen_url, descripcion, destacado, mostrar_precio,
+        id, nombre, precio, descuento, imagen_url, descripcion, destacado, mostrar_precio, activo,
         categoria_id, marca_id,
         categorias!left(nombre, slug),
         marcas!left(nombre, slug, imagen_url)
       `, { count: 'exact' });
+
+    // By default, only show active products (storefront). Admin passes incluir_inactivos=true
+    if (req.query.incluir_inactivos !== 'true') {
+      query = query.eq('activo', true);
+    }
 
     // Ordenamiento
     const orderBy = req.query.orderBy;
@@ -162,6 +167,7 @@ const getProductos = async (req, res) => {
       descripcion: p.descripcion,
       destacado: p.destacado,
       mostrar_precio: p.mostrar_precio,
+      activo: p.activo ?? true,
       categoria: p.categorias?.nombre || 'Sin categoría',
       categoria_slug: p.categorias?.slug || null,
       categoria_id: p.categoria_id,
@@ -197,7 +203,7 @@ const getProductoById = async (req, res) => {
     const { data: producto, error } = await supabase
       .from('productos')
       .select(`
-        id, nombre, precio, descuento, imagen_url, descripcion, destacado, mostrar_precio,
+        id, nombre, precio, descuento, imagen_url, descripcion, destacado, mostrar_precio, activo,
         categoria_id, marca_id,
         categorias!left(nombre, slug),
         marcas!left(nombre, slug, imagen_url)
@@ -239,6 +245,7 @@ const getProductoById = async (req, res) => {
       descripcion: producto.descripcion,
       destacado: producto.destacado,
       mostrar_precio: producto.mostrar_precio,
+      activo: producto.activo ?? true,
       categoria: producto.categorias?.nombre || 'Sin categoría',
       categoria_slug: producto.categorias?.slug || null,
       categoria_id: producto.categoria_id,
@@ -306,7 +313,7 @@ const deleteImage = async (imageUrl) => {
 const crearProducto = async (req, res) => {
   try {
     const {
-      nombre, precio, descuento = 0, descripcion, destacado = false, categoria_id, marca_id
+      nombre, precio, descuento = 0, descripcion, destacado = false, categoria_id, marca_id, activo = true
     } = req.body;
 
     let imagenUrl = null;
@@ -323,6 +330,7 @@ const crearProducto = async (req, res) => {
         imagen_url: imagenUrl,
         descripcion,
         destacado: destacado === 'true' || destacado === true,
+        activo: activo === 'true' || activo === true,
         categoria_id: categoria_id || null,
         marca_id: marca_id || null
       }])
@@ -352,7 +360,7 @@ const actualizarProducto = async (req, res) => {
   try {
     const { id } = req.params;
     const {
-      nombre, precio, descuento = 0, descripcion, destacado = false, categoria_id, marca_id
+      nombre, precio, descuento = 0, descripcion, destacado = false, categoria_id, marca_id, activo = true
     } = req.body;
 
     const updateData = {
@@ -361,6 +369,7 @@ const actualizarProducto = async (req, res) => {
       descuento: parseFloat(descuento),
       descripcion,
       destacado: destacado === 'true' || destacado === true,
+      activo: activo === 'true' || activo === true,
       categoria_id: categoria_id || null,
       marca_id: marca_id || null
     };
