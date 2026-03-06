@@ -1,10 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-<<<<<<< HEAD
 import { Router, RouterLink } from '@angular/router';
-=======
-import { Router} from '@angular/router';
->>>>>>> origin/main
 import { CommonModule } from '@angular/common';
 
 import { AuthService } from '../../core/services/auth.service';
@@ -13,11 +9,7 @@ import { ModalService } from '../../shared/modal/modal.service';
 @Component({
   selector: 'app-login',
   standalone: true,
-<<<<<<< HEAD
   imports: [CommonModule, ReactiveFormsModule, RouterLink],
-=======
-  imports: [CommonModule, ReactiveFormsModule],
->>>>>>> origin/main
   templateUrl: './login.html',
   styleUrls: ['./login.css'],
 })

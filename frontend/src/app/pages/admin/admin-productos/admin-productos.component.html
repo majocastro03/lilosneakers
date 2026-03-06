@@ -1,76 +1,9 @@
-<<<<<<< HEAD
 <div>
   <!-- Title -->
   <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
     <div>
       <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Productos</h1>
       <p class="text-sm text-gray-500 mt-1">Gestiona tu catálogo de productos</p>
-=======
-<div class="min-h-screen bg-gray-50 py-8">
-  <div class="container mx-auto px-4">
-    <!-- Header -->
-    <div class="mb-8">
-      <!-- User info y logout -->
-      <div class="flex justify-between items-center mb-4">
-        <div class="text-sm text-gray-600">
-          Sesión: <span class="font-medium">{{ currentUser?.nombre || currentUser?.username }}</span>
-          <span class="ml-2 px-2 py-1 bg-primary-100 text-primary-800 rounded text-xs font-semibold">
-            {{ currentUser?.tipo_usuario }}
-          </span>
-        </div>
-        <div class="flex items-center gap-3">
-          <a routerLink="/" class="text-sm text-primary-600 hover:text-primary-800">Ver tienda</a>
-          <button
-            (click)="logout()"
-            class="px-4 py-2 text-sm text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
-          >
-            Cerrar Sesión
-          </button>
-        </div>
-      </div>
-
-      <!-- Admin Nav -->
-      <nav class="flex gap-2 mb-6 border-b border-gray-200 pb-3 overflow-x-auto scrollbar-hide sm:flex-wrap">
-        <a routerLink="/admin/productos" routerLinkActive="bg-primary-600 text-white" [routerLinkActiveOptions]="{exact: true}"
-          class="px-4 py-2 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors">
-          Productos
-        </a>
-        <a routerLink="/admin/categorias" routerLinkActive="bg-primary-600 text-white"
-          class="px-4 py-2 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors">
-          Categorías
-        </a>
-        <a routerLink="/admin/marcas" routerLinkActive="bg-primary-600 text-white"
-          class="px-4 py-2 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors">
-          Marcas
-        </a>
-        <a routerLink="/admin/colores" routerLinkActive="bg-primary-600 text-white"
-          class="px-4 py-2 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors">
-          Colores
-        </a>
-        <a routerLink="/admin/tallas" routerLinkActive="bg-primary-600 text-white"
-          class="px-4 py-2 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors">
-          Tallas
-        </a>
-        <a routerLink="/admin/ordenes" routerLinkActive="bg-primary-600 text-white"
-          class="px-4 py-2 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors">
-          Órdenes
-        </a>
-      </nav>
-
-      <!-- Title -->
-      <div class="flex justify-between items-center">
-        <div>
-          <h1 class="text-4xl font-bold text-gray-900 mb-2">Administrar Productos</h1>
-          <p class="text-gray-600">CRUD completo de productos</p>
-        </div>
-        <button
-          (click)="abrirModalCrear()"
-          class="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium"
-        >
-          + Nuevo Producto
-        </button>
-      </div>
->>>>>>> origin/main
     </div>
     <button
       (click)="abrirModalCrear()"
@@ -93,24 +26,9 @@
     </div>
   }
 
-<<<<<<< HEAD
   <!-- Desktop table -->
   @if (!loading) {
     <div class="bg-white rounded-lg shadow-sm overflow-hidden hidden sm:block">
-=======
-    <div *ngIf="error" class="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
-      <p class="text-red-800">✗ {{ error }}</p>
-    </div>
-
-    <!-- Loading -->
-    <div *ngIf="loading && !showModal" class="text-center py-12">
-      <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-      <p class="mt-4 text-gray-600">Cargando...</p>
-    </div>
-
-    <!-- Tabla de productos -->
-    <div *ngIf="!loading" class="bg-white rounded-lg shadow-md overflow-hidden">
->>>>>>> origin/main
       <div class="overflow-x-auto">
         <table class="w-full text-sm">
           <thead class="bg-gray-50">
@@ -161,7 +79,6 @@
               <th class="px-4 py-2"></th>
             </tr>
           </thead>
-<<<<<<< HEAD
           <tbody class="divide-y divide-gray-100">
             @for (producto of productosFiltrados; track producto.id) {
               <tr class="hover:bg-gray-50" [class.opacity-50]="!producto.activo">
@@ -236,87 +153,6 @@
                 <td colspan="8" class="px-4 py-12 text-center text-gray-400 text-sm">No hay productos creados aún</td>
               </tr>
             }
-=======
-          <tbody class="bg-white divide-y divide-gray-200">
-            <tr *ngFor="let producto of productos" class="hover:bg-gray-50">
-              <!-- Imagen -->
-              <td class="px-6 py-4 whitespace-nowrap">
-                <img
-                  [src]="producto.imagen_url || 'assets/placeholder-product.jpg'"
-                  [alt]="producto.nombre"
-                  class="h-16 w-16 rounded-lg object-cover"
-                  (error)="$any($event.target).src='assets/placeholder-product.jpg'"
-                />
-              </td>
-
-              <!-- Nombre -->
-              <td class="px-6 py-4">
-                <div class="text-sm font-medium text-gray-900">{{ producto.nombre }}</div>
-                <div class="text-sm text-gray-500 max-w-xs truncate">{{ producto.descripcion }}</div>
-              </td>
-
-              <!-- Categoría -->
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-primary-100 text-primary-800">
-                  {{ producto.categoria }}
-                </span>
-              </td>
-
-              <!-- Precio -->
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                ${{ producto.precio | number:'1.0-0' }}
-              </td>
-
-              <!-- Descuento -->
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span
-                  *ngIf="producto.descuento > 0"
-                  class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800"
-                >
-                  -{{ producto.descuento }}%
-                </span>
-                <span *ngIf="producto.descuento === 0" class="text-gray-400 text-sm">
-                  Sin descuento
-                </span>
-              </td>
-
-              <!-- Destacado -->
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span
-                  *ngIf="producto.destacado"
-                  class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800"
-                >
-                  ⭐ Destacado
-                </span>
-                <span *ngIf="!producto.destacado" class="text-gray-400 text-sm">
-                  No
-                </span>
-              </td>
-
-              <!-- Acciones -->
-              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                <button
-                  (click)="abrirModalEditar(producto)"
-                  class="text-primary-600 hover:text-primary-800 mr-4"
-                >
-                  Editar
-                </button>
-                <button
-                  (click)="confirmarEliminar(producto)"
-                  class="text-red-600 hover:text-red-900"
-                >
-                  Eliminar
-                </button>
-              </td>
-            </tr>
-
-            <!-- Sin productos -->
-            <tr *ngIf="productos.length === 0">
-              <td colspan="7" class="px-6 py-12 text-center text-gray-500">
-                No hay productos creados aún
-              </td>
-            </tr>
->>>>>>> origin/main
           </tbody>
         </table>
       </div>
@@ -366,7 +202,6 @@
       }
     </div>
 
-<<<<<<< HEAD
     <!-- Mobile cards -->
     <div class="sm:hidden space-y-3">
       @for (producto of productosFiltrados; track producto.id) {
@@ -420,137 +255,6 @@
       }
     </div>
   }
-=======
-    <form (submit)="guardarProducto(); $event.preventDefault()" class="p-6">
-      <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700 mb-2">
-          Nombre del producto *
-        </label>
-        <input
-          type="text"
-          [(ngModel)]="form.nombre"
-          name="nombre"
-          required
-          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          placeholder="Ej: Nike Air Max 270"
-        />
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">
-            Precio *
-          </label>
-          <input
-            type="number"
-            [(ngModel)]="form.precio"
-            name="precio"
-            required
-            min="0"
-            step="0.01"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            placeholder="0.00"
-          />
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">
-            Descuento (%)
-          </label>
-          <input
-            type="number"
-            [(ngModel)]="form.descuento"
-            name="descuento"
-            min="0"
-            max="100"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            placeholder="0"
-          />
-        </div>
-      </div>
-
-      <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700 mb-2">
-          Categoría
-        </label>
-        <select
-          [(ngModel)]="form.categoria_id"
-          name="categoria_id"
-          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-        >
-          <option [ngValue]="null">Sin categoría</option>
-          <option *ngFor="let cat of categorias" [ngValue]="cat.id">
-            {{ cat.nombre }}
-          </option>
-        </select>
-      </div>
-
-      <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700 mb-2">
-          Descripción
-        </label>
-        <textarea
-          [(ngModel)]="form.descripcion"
-          name="descripcion"
-          rows="4"
-          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          placeholder="Descripción del producto..."
-        ></textarea>
-      </div>
-
-      <div class="mb-4">
-        <label class="flex items-center cursor-pointer">
-          <input
-            type="checkbox"
-            [(ngModel)]="form.destacado"
-            name="destacado"
-            class="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
-          />
-          <span class="ml-2 text-sm font-medium text-gray-700">
-            Producto destacado
-          </span>
-        </label>
-      </div>
-
-      <div class="mb-4">
-        <label class="block text-sm font-medium text-gray-700 mb-2">
-          Imagen del producto
-        </label>
-        <input
-          type="file"
-          (change)="onImagenChange($event)"
-          accept="image/*"
-          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-        />
-        
-        <div *ngIf="imagenPreview" class="mt-4">
-          <img
-            [src]="imagenPreview"
-            alt="Preview"
-            class="h-48 w-48 object-cover rounded-lg border border-gray-300"
-          />
-        </div>
-      </div>
-
-      <div class="flex justify-end gap-4 mt-6 pt-4 border-t">
-        <button
-          type="button"
-          (click)="cerrarModal()"
-          class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-        >
-          Cancelar
-        </button>
-        <button
-          type="submit"
-          [disabled]="loading"
-          class="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {{ loading ? 'Guardando...' : (modoEdicion ? 'Actualizar' : 'Crear') }}
-        </button>
-      </div>
-    </form>
-  </div>
->>>>>>> origin/main
 </div>
 
 <!-- Modal Crear/Editar -->

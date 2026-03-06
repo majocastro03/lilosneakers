@@ -20,7 +20,6 @@ module.exports = {
     extend: {
       colors: {
         primary: {
-<<<<<<< HEAD
           50:  '#f2f8f4',
           100: '#ecf6dc',
           200: '#c2e0cd',
@@ -36,19 +35,6 @@ module.exports = {
         sage: {
           DEFAULT: '#8a9482',
           light: '#ecf6dc',
-=======
-          50:  '#f0f9fc',
-          100: '#d9eff7',
-          200: '#b8e1f0',
-          300: '#87cce5',
-          400: '#4fb0d3',
-          500: '#2596be',
-          600: '#1e7a9f',
-          700: '#1a6381',
-          800: '#1b536b',
-          900: '#1c465a',
-          950: '#112d3c',
->>>>>>> origin/main
         },
       },
     },
