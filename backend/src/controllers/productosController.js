@@ -40,6 +40,9 @@ const getProductos = async (req, res) => {
     if (req.query.marca_id) {
       query = query.eq('marca_id', req.query.marca_id);
     }
+    if (req.query.marca_id) {
+      query = query.eq('marca_id', req.query.marca_id);
+    }
     if (req.query.destacado) {
       const isDestacado = req.query.destacado === 'true';
       query = query.eq('destacado', isDestacado);
@@ -50,6 +53,13 @@ const getProductos = async (req, res) => {
         query = query.or(`nombre.ilike.%${q}%,descripcion.ilike.%${q}%`);
       }
     }
+    if (req.query.precio_min) {
+      query = query.gte('precio', parseFloat(req.query.precio_min));
+    }
+    if (req.query.precio_max) {
+      query = query.lte('precio', parseFloat(req.query.precio_max));
+    }
+
     if (req.query.precio_min) {
       query = query.gte('precio', parseFloat(req.query.precio_min));
     }
@@ -142,6 +152,7 @@ const getProductos = async (req, res) => {
       if (!tallasMap[pt.producto_id]) tallasMap[pt.producto_id] = [];
       tallasMap[pt.producto_id].push({
         id: pt.tallas.id,
+        id: pt.tallas.id,
         talla: pt.tallas.valor,
         valor_us: pt.tallas.valor_us,
         valor_eur: pt.tallas.valor_eur,
@@ -180,11 +191,15 @@ const getProductos = async (req, res) => {
 
     const finalTotal = (req.query.color_id || req.query.talla_id) ? filteredProductos.length : count;
 
+    const finalTotal = (req.query.color_id || req.query.talla_id) ? filteredProductos.length : count;
+
     res.json({
       productos: productosFormateados,
       total: finalTotal,
+      total: finalTotal,
       page,
       limit,
+      totalPages: Math.ceil(finalTotal / limit)
       totalPages: Math.ceil(finalTotal / limit)
     });
 
@@ -211,6 +226,9 @@ const getProductoById = async (req, res) => {
       .eq('id', id)
       .single();
 
+    if (error || !producto) {
+      return res.status(404).json({ error: 'Producto no encontrado' });
+    }
     if (error || !producto) {
       return res.status(404).json({ error: 'Producto no encontrado' });
     }
@@ -248,11 +266,13 @@ const getProductoById = async (req, res) => {
       activo: producto.activo ?? true,
       categoria: producto.categorias?.nombre || 'Sin categoría',
       categoria_slug: producto.categorias?.slug || null,
+      categoria_slug: producto.categorias?.slug || null,
       categoria_id: producto.categoria_id,
       marca_id: producto.marca_id,
       marca: producto.marcas || null,
       colores: coloresRes.data.map(pc => ({ id: pc.colores.id, nombre: pc.colores.nombre, codigo_hex: pc.colores.codigo_hex })),
       tallas: tallasRes.data.map(pt => ({
+        id: pt.tallas.id,
         id: pt.tallas.id,
         talla: pt.tallas.valor,
         valor_us: pt.tallas.valor_us,
@@ -321,6 +341,9 @@ const crearProducto = async (req, res) => {
       imagenUrl = await uploadImage(req.file);
     }
 
+      imagenUrl = await uploadImage(req.file);
+    }
+
     const { data: producto, error: productoError } = await supabase
       .from('productos')
       .insert([{
@@ -337,6 +360,7 @@ const crearProducto = async (req, res) => {
       .select()
       .single();
 
+    if (productoError) throw productoError;
     if (productoError) throw productoError;
 
     res.status(201).json({
@@ -387,6 +411,18 @@ const actualizarProducto = async (req, res) => {
       }
 
       updateData.imagen_url = await uploadImage(req.file);
+      // Delete old image
+      const { data: existing } = await supabase
+        .from('productos')
+        .select('imagen_url')
+        .eq('id', id)
+        .single();
+
+      if (existing?.imagen_url) {
+        await deleteImage(existing.imagen_url);
+      }
+
+      updateData.imagen_url = await uploadImage(req.file);
     }
 
     const { data: producto, error } = await supabase
@@ -398,6 +434,7 @@ const actualizarProducto = async (req, res) => {
 
     if (error) throw error;
 
+    res.json({ message: 'Producto actualizado con éxito', producto });
     res.json({ message: 'Producto actualizado con éxito', producto });
 
   } catch (err) {
@@ -411,6 +448,17 @@ const actualizarProducto = async (req, res) => {
 const eliminarProducto = async (req, res) => {
   try {
     const { id } = req.params;
+
+    // Delete image from storage
+    const { data: existing } = await supabase
+      .from('productos')
+      .select('imagen_url')
+      .eq('id', id)
+      .single();
+
+    if (existing?.imagen_url) {
+      await deleteImage(existing.imagen_url);
+    }
 
     // Delete image from storage
     const { data: existing } = await supabase

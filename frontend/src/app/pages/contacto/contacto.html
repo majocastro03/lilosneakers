@@ -9,6 +9,7 @@
     </p>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+<<<<<<< HEAD
       @for (wa of config.whatsapp; track wa.number) {
         <div class="bg-gray-50 rounded-xl p-6">
           <h3 class="font-bold text-gray-900 mb-2">WhatsApp</h3>
@@ -24,6 +25,30 @@
         <h3 class="font-bold text-gray-900 mb-2">Instagram</h3>
         <p class="text-gray-600">{{ config.instagram.handle }}</p>
         <a [href]="config.instagram.url" target="_blank" rel="noopener noreferrer"
+=======
+      <div class="bg-gray-50 rounded-xl p-6">
+        <h3 class="font-bold text-gray-900 mb-2">WhatsApp / Teléfono</h3>
+        <p class="text-gray-600">{{ contactNumber }}</p>
+        <a href="https://wa.me/573209390843" target="_blank" rel="noopener noreferrer"
+           class="inline-block mt-3 px-4 py-2 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 transition">
+          Escribir por WhatsApp
+        </a>
+      </div>
+
+      <div class="bg-gray-50 rounded-xl p-6">
+        <h3 class="font-bold text-gray-900 mb-2">Email</h3>
+        <p class="text-gray-600">{{ email }}</p>
+        <a href="mailto:{{ email }}"
+           class="inline-block mt-3 px-4 py-2 bg-primary-700 text-white rounded-lg text-sm hover:bg-primary-800 transition">
+          Enviar email
+        </a>
+      </div>
+
+      <div class="bg-gray-50 rounded-xl p-6">
+        <h3 class="font-bold text-gray-900 mb-2">Instagram</h3>
+        <p class="text-gray-600">&#64;lilosneakers__</p>
+        <a [href]="instagram" target="_blank" rel="noopener noreferrer"
+>>>>>>> origin/main
            class="inline-block mt-3 px-4 py-2 bg-purple-600 text-white rounded-lg text-sm hover:bg-purple-700 transition">
           Seguir en Instagram
         </a>
@@ -31,8 +56,13 @@
 
       <div class="bg-gray-50 rounded-xl p-6">
         <h3 class="font-bold text-gray-900 mb-2">Horario de Atención</h3>
+<<<<<<< HEAD
         <p class="text-gray-600">{{ config.horario.dias }}</p>
         <p class="text-gray-600">{{ config.horario.horas }}</p>
+=======
+        <p class="text-gray-600">Lunes a Sábado</p>
+        <p class="text-gray-600">8:00 AM - 6:00 PM</p>
+>>>>>>> origin/main
       </div>
     </div>
   </div>
