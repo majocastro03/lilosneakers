@@ -54,17 +54,15 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Permitir requests sin origin (apps móviles, curl) solo en desarrollo
+    // Permitir requests sin origin (health checks, apps móviles, curl, Postman)
     if (!origin) {
-      if (process.env.NODE_ENV === 'production') {
-        return callback(new Error('Not allowed by CORS'));
-      }
       return callback(null, true);
     }
 
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
+      console.warn(`CORS bloqueado para origin: ${origin}`);
       callback(new Error('Not allowed by CORS'));
     }
   },
