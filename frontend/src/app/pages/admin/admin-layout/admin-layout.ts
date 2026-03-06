@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, HostListener } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { ModalService } from '../../../shared/modal/modal.service';
@@ -14,6 +14,11 @@ export class AdminLayoutComponent {
   private modalService = inject(ModalService);
 
   sidebarOpen = signal(false);
+  showUserMenu = signal(false);
+
+  toggleUserMenu() {
+    this.showUserMenu.update(v => !v);
+  }
 
   get currentUser() {
     return this.authService.getCurrentUser();

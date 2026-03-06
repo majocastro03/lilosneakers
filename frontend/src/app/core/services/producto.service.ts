@@ -24,6 +24,7 @@ export interface Producto {
   imagen_url: string;
   descripcion: string;
   destacado: boolean;
+  activo: boolean;
   categoria: string;
   categoria_id?: string;
   categoria_slug?: string;
@@ -49,6 +50,7 @@ export interface FiltrosProducto {
   categoria_id?: string; // UUID
   destacado?: boolean;
   q?: string;
+  incluir_inactivos?: boolean;
 }
 
 @Injectable({
@@ -66,6 +68,7 @@ export class ProductoService {
     if (filtros.categoria_id) params = params.set('categoria_id', filtros.categoria_id); // Ya es string (UUID)
     if (filtros.destacado !== undefined) params = params.set('destacado', filtros.destacado.toString());
     if (filtros.q) params = params.set('q', filtros.q);
+    if (filtros.incluir_inactivos) params = params.set('incluir_inactivos', 'true');
 
     return this.http.get<ProductosResponse>(this.apiUrl, { params });
   }
