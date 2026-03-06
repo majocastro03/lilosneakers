@@ -1,32 +1,96 @@
-<div class="p-6">
-  <div class="flex justify-between items-center mb-6">
+<div>
+  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
     <div>
       <h1 class="text-2xl font-bold text-gray-900">Marcas</h1>
-      <nav class="text-sm text-gray-500 mt-1"><a routerLink="/admin/productos" class="hover:underline">Admin</a> / Marcas</nav>
+      <p class="text-sm text-gray-500 mt-1">Gestiona las marcas de productos</p>
     </div>
-    <button (click)="openCreate()" class="px-4 py-2 bg-primary-700 text-white rounded-lg hover:bg-gray-800 text-sm">+ Nueva Marca</button>
+    <button (click)="openCreate()" class="px-4 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 text-sm font-medium self-start sm:self-auto">
+      + Nueva Marca
+    </button>
   </div>
-  @if (message()) { <div class="bg-primary-50 border border-primary-200 text-primary-700 px-4 py-2 rounded mb-4 text-sm">{{ message() }}</div> }
-  <div class="bg-white rounded-lg shadow overflow-x-auto">
+
+  @if (message()) {
+    <div class="bg-primary-50 border border-primary-200 text-primary-700 px-4 py-2 rounded-lg mb-4 text-sm">{{ message() }}</div>
+  }
+
+  <!-- Desktop table -->
+  <div class="bg-white rounded-lg shadow-sm overflow-hidden hidden sm:block">
     <table class="w-full text-sm">
-      <thead class="bg-gray-50"><tr><th class="px-4 py-3 text-left">Nombre</th><th class="px-4 py-3 text-left">Slug</th><th class="px-4 py-3 text-right">Acciones</th></tr></thead>
-      <tbody>
-        @for (item of marcas(); track item.id) {
-          <tr class="border-t"><td class="px-4 py-3">{{ item.nombre }}</td><td class="px-4 py-3 text-gray-500">{{ item.slug }}</td><td class="px-4 py-3 text-right space-x-2"><button (click)="openEdit(item)" class="text-primary-600 hover:underline text-sm">Editar</button><button (click)="delete(item.id)" class="text-red-600 hover:underline text-sm">Desactivar</button></td></tr>
+      <thead class="bg-gray-50">
+        <tr class="border-b">
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Slug</th>
+          <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Acciones</th>
+        </tr>
+        <tr class="border-b bg-gray-50">
+          <th class="px-4 py-2" colspan="2">
+            <input type="text" [(ngModel)]="filtroNombre" placeholder="Buscar por nombre..." class="w-full px-2 py-1 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-primary-500 focus:border-transparent" />
+          </th>
+          <th class="px-4 py-2"></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        @for (item of marcasFiltradas; track item.id) {
+          <tr class="hover:bg-gray-50">
+            <td class="px-4 py-3 font-medium text-gray-900">{{ item.nombre }}</td>
+            <td class="px-4 py-3 text-gray-500">{{ item.slug }}</td>
+            <td class="px-4 py-3 text-right space-x-2">
+              <button (click)="openEdit(item)" class="text-primary-600 hover:text-primary-800 text-xs font-medium">Editar</button>
+              <button (click)="delete(item.id)" class="text-red-600 hover:text-red-800 text-xs font-medium">Desactivar</button>
+            </td>
+          </tr>
+        }
+        @if (marcasFiltradas.length === 0) {
+          <tr><td colspan="3" class="px-4 py-8 text-center text-gray-400 text-sm">No hay marcas</td></tr>
         }
       </tbody>
     </table>
   </div>
-  @if (showModal()) {
-    <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div class="bg-white rounded-lg p-6 w-full max-w-md">
-        <h2 class="text-lg font-bold mb-4">{{ editingId() ? 'Editar' : 'Nueva' }} Marca</h2>
-        <div class="space-y-3">
-          <div><label class="block text-sm font-medium mb-1">Nombre</label><input [(ngModel)]="form.nombre" (input)="generateSlug()" class="w-full px-3 py-2 border rounded-lg text-sm" /></div>
-          <div><label class="block text-sm font-medium mb-1">Slug</label><input [(ngModel)]="form.slug" class="w-full px-3 py-2 border rounded-lg text-sm" /></div>
-          <div><label class="block text-sm font-medium mb-1">Descripción</label><textarea [(ngModel)]="form.descripcion" class="w-full px-3 py-2 border rounded-lg text-sm" rows="2"></textarea></div>
+
+  <!-- Mobile cards -->
+  <div class="sm:hidden space-y-3">
+    @for (item of marcasFiltradas; track item.id) {
+      <div class="bg-white rounded-lg shadow-sm p-4">
+        <div class="flex justify-between items-start">
+          <div>
+            <h3 class="font-medium text-gray-900 text-sm">{{ item.nombre }}</h3>
+            <p class="text-xs text-gray-400 mt-0.5">{{ item.slug }}</p>
+          </div>
+          <div class="flex gap-3">
+            <button (click)="openEdit(item)" class="text-primary-600 text-xs font-medium">Editar</button>
+            <button (click)="delete(item.id)" class="text-red-600 text-xs font-medium">Desactivar</button>
+          </div>
         </div>
-        <div class="flex justify-end gap-3 mt-4"><button (click)="showModal.set(false)" class="px-4 py-2 border rounded-lg text-sm">Cancelar</button><button (click)="save()" class="px-4 py-2 bg-primary-700 text-white rounded-lg text-sm">Guardar</button></div>
+      </div>
+    }
+    @if (marcasFiltradas.length === 0) {
+      <div class="bg-white rounded-lg shadow-sm p-8 text-center text-gray-400 text-sm">No hay marcas</div>
+    }
+  </div>
+
+  <!-- Modal -->
+  @if (showModal()) {
+    <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-lg p-5 w-full max-w-md">
+        <h2 class="text-lg font-bold text-gray-900 mb-4">{{ editingId() ? 'Editar' : 'Nueva' }} Marca</h2>
+        <div class="space-y-3">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+            <input [(ngModel)]="form.nombre" (input)="generateSlug()" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Slug</label>
+            <input [(ngModel)]="form.slug" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+            <textarea [(ngModel)]="form.descripcion" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"></textarea>
+          </div>
+        </div>
+        <div class="flex justify-end gap-3 mt-5">
+          <button (click)="showModal.set(false)" class="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">Cancelar</button>
+          <button (click)="save()" class="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm hover:bg-primary-700">Guardar</button>
+        </div>
       </div>
     </div>
   }

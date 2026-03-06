@@ -1,0 +1,24 @@
+export const SITE_CONFIG = {
+  name: 'Lilo Sneakers',
+  shortName: 'LS',
+  slogan: 'Tu tienda de confianza para las mejores zapatillas deportivas, urbanas y formales.',
+  location: 'San Gil, Santander - Colombia',
+  instagram: {
+    url: 'https://www.instagram.com/lilosneakers__/',
+    handle: '@lilosneakers',
+  },
+  whatsapp: [
+    {
+      number: '310-868-5946',
+      url: 'https://api.whatsapp.com/send?phone=573108685946&text=Hola%2C%20soy%20%0A%0AMe%20gustar%C3%ADa%20preguntarte%20por%20estos%20tennis',
+    },
+    {
+      number: '320-939-0843',
+      url: 'https://api.whatsapp.com/send?phone=573209390843&text=%C2%A1Hola!%20Bienvenido%20a%20LiloSneakers%2C%20%C2%BFEn%20que%20te%20podemos%20colaborar%3F%20',
+    },
+  ],
+  horario: {
+    dias: 'Lunes a Sábado',
+    horas: '8:00 AM - 6:00 PM',
+  },
+};

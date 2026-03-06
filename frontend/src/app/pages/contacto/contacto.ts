@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { HeaderComponent } from '../../shared/header/header';
 import { FooterComponent } from '../../shared/footer/footer';
+import { SITE_CONFIG } from '../../core/config/site.config';
 
 @Component({
   selector: 'app-contacto',
@@ -10,7 +11,5 @@ import { FooterComponent } from '../../shared/footer/footer';
   styleUrl: './contacto.css'
 })
 export class ContactoComponent {
-  contactNumber = '320-939-0843';
-  email = 'lilosneakers@gmail.com';
-  instagram = 'https://www.instagram.com/lilosneakers__/';
+  config = SITE_CONFIG;
 }

@@ -1,15 +1,13 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { RouterLink } from '@angular/router';
 import { ModalService } from '../../../shared/modal/modal.service';
 import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-admin-colores',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [FormsModule],
   templateUrl: './admin-colores.html',
   styleUrl: './admin-colores.css'
 })
@@ -19,6 +17,13 @@ export class AdminColoresComponent implements OnInit {
   private apiUrl = `${environment.apiUrl}/colores`;
   colores = signal<any[]>([]);
   showModal = signal(false);
+  filtroNombre = '';
+
+  get coloresFiltrados() {
+    return this.colores().filter(c =>
+      !this.filtroNombre || c.nombre.toLowerCase().includes(this.filtroNombre.toLowerCase())
+    );
+  }
   editingId = signal<string | null>(null);
   form = { nombre: '', codigo_hex: '#000000' };
   message = signal<string | null>(null);
@@ -33,14 +38,17 @@ export class AdminColoresComponent implements OnInit {
     const id = this.editingId();
     const obs = id ? this.http.put(`${this.apiUrl}/${id}`, this.form) : this.http.post(this.apiUrl, this.form);
     obs.subscribe({
-      next: () => { this.showModal.set(false); this.message.set('Guardado'); this.load(); setTimeout(() => this.message.set(null), 2000); },
-      error: (err) => this.message.set(err.error?.error || 'Error')
+      next: () => { this.showModal.set(false); this.load(); this.modalService.success(this.editingId() ? 'Color actualizado' : 'Color creado'); },
+      error: (err) => this.modalService.error(err.error?.error || 'Error al guardar')
     });
   }
 
   async delete(id: string) {
     const ok = await this.modalService.confirm('¿Eliminar este color?');
     if (!ok) return;
-    this.http.delete(`${this.apiUrl}/${id}`).subscribe({ next: () => { this.message.set('Eliminado'); this.load(); setTimeout(() => this.message.set(null), 2000); } });
+    this.http.delete(`${this.apiUrl}/${id}`).subscribe({
+      next: () => { this.load(); this.modalService.success('Color eliminado'); },
+      error: (err) => this.modalService.error(err.error?.error || 'Error al eliminar')
+    });
   }
 }

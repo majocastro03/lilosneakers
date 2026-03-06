@@ -1,4 +1,5 @@
 const supabase = require('../config/supabaseCliente');
+const parseError = require('../utils/parseError');
 
 // Obtener todas las categorías
 const getCategorias = async (req, res) => {
@@ -12,7 +13,8 @@ const getCategorias = async (req, res) => {
     res.json(data);
   } catch (err) {
     console.error('Error en getCategorias:', err);
-    res.status(500).json({ error: 'Error al obtener categorías' });
+    const { status, message } = parseError(err, 'Error al obtener categorías');
+    res.status(status).json({ error: message });
   }
 };
 
@@ -32,7 +34,8 @@ const getCategoriaById = async (req, res) => {
     res.json(data);
   } catch (err) {
     console.error('Error en getCategoriaById:', err);
-    res.status(500).json({ error: 'Error al obtener la categoría' });
+    const { status, message } = parseError(err, 'Error al obtener la categoría');
+    res.status(status).json({ error: message });
   }
 };
 
@@ -54,7 +57,8 @@ const createCategoria = async (req, res) => {
     res.status(201).json(data);
   } catch (err) {
     console.error('Error en createCategoria:', err);
-    res.status(500).json({ error: 'Error al crear la categoría' });
+    const { status, message } = parseError(err, 'Error al crear la categoría');
+    res.status(status).json({ error: message });
   }
 };
 
@@ -77,7 +81,8 @@ const updateCategoria = async (req, res) => {
     res.json(data);
   } catch (err) {
     console.error('Error en updateCategoria:', err);
-    res.status(500).json({ error: 'Error al actualizar la categoría' });
+    const { status, message } = parseError(err, 'Error al actualizar la categoría');
+    res.status(status).json({ error: message });
   }
 };
 
@@ -95,7 +100,8 @@ const deleteCategoria = async (req, res) => {
     res.json({ message: 'Categoría eliminada correctamente' });
   } catch (err) {
     console.error('Error en deleteCategoria:', err);
-    res.status(500).json({ error: 'Error al eliminar la categoría' });
+    const { status, message } = parseError(err, 'Error al eliminar la categoría');
+    res.status(status).json({ error: message });
   }
 };
 
