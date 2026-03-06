@@ -2,6 +2,7 @@ import { Injectable, inject, signal, computed, PLATFORM_ID } from '@angular/core
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface CartItem {
   producto_id: string;
@@ -107,6 +108,6 @@ export class CartService {
       talla_id: item.talla_id,
       cantidad: item.cantidad
     }));
-    return this.http.post('/api/carrito/validar', { items: cartItems });
+    return this.http.post(`${environment.apiUrl}/carrito/validar`, { items: cartItems });
   }
 }
