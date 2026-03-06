@@ -2,6 +2,7 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ModalService } from '../../../shared/modal/modal.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-admin-categorias',
@@ -13,6 +14,7 @@ import { ModalService } from '../../../shared/modal/modal.service';
 export class AdminCategoriasComponent implements OnInit {
   private http = inject(HttpClient);
   private modalService = inject(ModalService);
+  private apiUrl = `${environment.apiUrl}/categorias`;
 
   categorias = signal<any[]>([]);
   loading = signal(true);
@@ -32,7 +34,7 @@ export class AdminCategoriasComponent implements OnInit {
 
   loadCategorias() {
     this.loading.set(true);
-    this.http.get<any[]>('/api/categorias').subscribe({
+    this.http.get<any[]>(this.apiUrl).subscribe({
       next: (data) => { this.categorias.set(data); this.loading.set(false); },
       error: () => this.loading.set(false)
     });
@@ -57,8 +59,8 @@ export class AdminCategoriasComponent implements OnInit {
   save() {
     const id = this.editingId();
     const obs = id
-      ? this.http.put(`/api/categorias/${id}`, this.form)
-      : this.http.post('/api/categorias', this.form);
+      ? this.http.put(`${this.apiUrl}/${id}`, this.form)
+      : this.http.post(this.apiUrl, this.form);
 
     obs.subscribe({
       next: () => { this.showModal.set(false); this.loadCategorias(); this.modalService.success(id ? 'Categoría actualizada' : 'Categoría creada'); },
@@ -69,7 +71,7 @@ export class AdminCategoriasComponent implements OnInit {
   async delete(id: string) {
     const ok = await this.modalService.confirm('¿Eliminar esta categoría?');
     if (!ok) return;
-    this.http.delete(`/api/categorias/${id}`).subscribe({
+    this.http.delete(`${this.apiUrl}/${id}`).subscribe({
       next: () => { this.loadCategorias(); this.modalService.success('Categoría eliminada'); },
       error: (err) => this.modalService.error(err.error?.error || 'Error al eliminar')
     });
