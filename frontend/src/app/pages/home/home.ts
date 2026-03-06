@@ -1,5 +1,6 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+<<<<<<< HEAD
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { HeaderComponent } from '../../shared/header/header';
@@ -11,16 +12,28 @@ import { MarcaService } from '../../core/services/marca/marca-service';
 import { Producto } from '../../core/interfaces/producto';
 import { Categoria } from '../../core/interfaces/categoria';
 import { Marca } from '../../core/interfaces/marca';
+=======
+import { RouterLink } from '@angular/router';
+import { HeaderComponent } from '../../shared/header/header';
+import { FooterComponent } from '../../shared/footer/footer';
+import { ProductoService } from '../../core/services/producto/producto-service';
+import { Producto } from '../../core/interfaces/producto';
+>>>>>>> origin/main
 
 @Component({
   selector: 'app-home',
   standalone: true,
+<<<<<<< HEAD
   imports: [HeaderComponent, FooterComponent, ProductCardComponent, CommonModule, FormsModule, RouterLink],
+=======
+  imports: [HeaderComponent, FooterComponent, CommonModule, RouterLink],
+>>>>>>> origin/main
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
 export class Home implements OnInit {
   private productoService = inject(ProductoService);
+<<<<<<< HEAD
   private categoriaService = inject(CategoriaService);
   private marcaService = inject(MarcaService);
 
@@ -103,4 +116,21 @@ export class Home implements OnInit {
       this.cargarProductos();
     }, 400);
   }
+=======
+
+  productosDestacados = signal<Producto[]>([]);
+  loading = signal(true);
+
+  ngOnInit() {
+    this.productoService.getProductos({ limit: 4, destacado: true }).subscribe({
+      next: (res) => {
+        this.productosDestacados.set(res.productos);
+        this.loading.set(false);
+      },
+      error: () => {
+        this.loading.set(false);
+      }
+    });
+  }
+>>>>>>> origin/main
 }

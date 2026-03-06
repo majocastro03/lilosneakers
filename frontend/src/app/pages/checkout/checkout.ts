@@ -7,7 +7,10 @@ import { HeaderComponent } from '../../shared/header/header';
 import { FooterComponent } from '../../shared/footer/footer';
 import { CartService } from '../../core/services/cart.service';
 import { AuthService } from '../../core/services/auth.service';
+<<<<<<< HEAD
 import { environment } from '../../../environments/environment';
+=======
+>>>>>>> origin/main
 
 @Component({
   selector: 'app-checkout',
@@ -62,7 +65,11 @@ export class CheckoutComponent {
       ...this.checkoutForm.value
     };
 
+<<<<<<< HEAD
     this.http.post<any>(`${environment.apiUrl}/ordenes`, orderData).subscribe({
+=======
+    this.http.post<any>('/api/ordenes', orderData).subscribe({
+>>>>>>> origin/main
       next: (response) => {
         this.loading.set(false);
         this.orderSuccess.set(true);
