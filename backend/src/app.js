@@ -19,12 +19,6 @@ const ordenesRoutes = require('./routes/ordenesRoutes');
 // Importar middleware
 const errorHandler = require('./middleware/errorHandler');
 const { apiLimiter } = require('./middleware/rateLimiter');
-const carritoRoutes = require('./routes/carritoRoutes');
-const ordenesRoutes = require('./routes/ordenesRoutes');
-
-// Importar middleware
-const errorHandler = require('./middleware/errorHandler');
-const { apiLimiter } = require('./middleware/rateLimiter');
 
 const app = express();
 
@@ -49,15 +43,6 @@ app.use(helmet({
       connectSrc: ["'self'", process.env.SUPABASE_URL || ''].filter(Boolean),
     }
   }
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:", "https:", "blob:"],
-      connectSrc: ["'self'", process.env.SUPABASE_URL || ''].filter(Boolean),
-    }
-  }
 }));
 
 // CORS - Permitir múltiples orígenes
@@ -65,20 +50,10 @@ const allowedOrigins = [
   'http://localhost:4200',
   'https://lilosneakers.netlify.app',
   process.env.FRONTEND_URL
-  'https://lilosneakers.netlify.app',
-  process.env.FRONTEND_URL
 ].filter(Boolean);
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Permitir requests sin origin (apps móviles, curl) solo en desarrollo
-    if (!origin) {
-      if (process.env.NODE_ENV === 'production') {
-        return callback(new Error('Not allowed by CORS'));
-      }
-      return callback(null, true);
-    }
-
     // Permitir requests sin origin (apps móviles, curl) solo en desarrollo
     if (!origin) {
       if (process.env.NODE_ENV === 'production') {
@@ -96,11 +71,7 @@ app.use(cors({
   credentials: true
 }));
 
-
 app.use(express.json({ limit: '10mb' }));
-
-// Rate limiting global para API
-app.use('/api', apiLimiter);
 
 // Rate limiting global para API
 app.use('/api', apiLimiter);
@@ -124,9 +95,6 @@ app.use('/api/ordenes', ordenesRoutes);
 app.use((req, res) => {
   res.status(404).json({ error: 'Ruta no encontrada' });
 });
-
-// Middleware global de errores (DEBE ir al final)
-app.use(errorHandler);
 
 // Middleware global de errores (DEBE ir al final)
 app.use(errorHandler);

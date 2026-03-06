@@ -21,8 +21,6 @@ const {
 const upload = require('../middleware/upload');
 const { authMiddleware, adminMiddleware } = require('../middleware/auth');
 const { validateProducto } = require('../middleware/validate');
-const { authMiddleware, adminMiddleware } = require('../middleware/auth');
-const { validateProducto } = require('../middleware/validate');
 
 // Rutas públicas
 // Rutas públicas

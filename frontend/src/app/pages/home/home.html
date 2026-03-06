@@ -1,7 +1,6 @@
 <app-header></app-header>
 
 <!-- Hero Section -->
-<<<<<<< HEAD
 <section class="relative w-full overflow-hidden" style="min-height: calc(100vh - 64px);">
   <div class="absolute inset-0">
     <img
@@ -130,151 +129,8 @@
       <div class="text-center py-10">
         <p class="text-gray-500 text-sm">No se encontraron productos con los filtros seleccionados</p>
       </div>
-=======
-<section class="bg-gray-950 w-full" style="min-height: calc(100vh - 64px);">
-  <div class="flex flex-col items-center justify-center w-full px-6 sm:px-12" style="min-height: calc(100vh - 64px);">
-
-    <!-- Texto centrado -->
-    <div class="max-w-2xl mx-auto text-center pt-16 sm:pt-20">
-      <p class="text-primary-500 font-semibold text-sm uppercase tracking-widest mb-4">Nueva Coleccion 2025</p>
-      <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
-        Estilo que se siente en cada paso
-      </h1>
-      <p class="text-gray-400 text-base sm:text-lg max-w-lg mx-auto mb-8">
-        Descubre las zapatillas que definen tu estilo. Las mejores marcas, los mejores precios, entrega a todo Colombia.
-      </p>
-      <div class="flex flex-col sm:flex-row gap-4 justify-center">
-        <a routerLink="/catalogo"
-          class="inline-flex items-center justify-center px-8 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition font-medium text-base">
-          Ver catalogo
-          <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-          </svg>
-        </a>
-        <a routerLink="/contacto"
-          class="inline-flex items-center justify-center px-8 py-3 border border-gray-600 text-gray-300 rounded-lg hover:border-white hover:text-white transition font-medium text-base">
-          Contactanos
-        </a>
-      </div>
-    </div>
-
-    <!-- Imagen debajo del texto -->
-    <div class="flex-1 w-full flex items-end justify-center pt-8 pb-0 overflow-hidden">
-      @if (productosDestacados().length > 0) {
-        <img
-          [src]="productosDestacados()[0].imagen_url"
-          [alt]="productosDestacados()[0].nombre"
-          class="max-h-[350px] sm:max-h-[420px] w-auto object-contain drop-shadow-2xl"
-          loading="eager"
-        />
-      } @else {
-        <img
-          src="/assets/fondo.jpg"
-          alt="LiloSneakers"
-          class="max-h-[350px] sm:max-h-[420px] w-auto object-contain drop-shadow-2xl opacity-80"
-          loading="eager"
-        />
-      }
-    </div>
-  </div>
-</section>
-
-<!-- Featured Products -->
-<section class="py-16 bg-white">
-  <div class="container mx-auto px-4">
-    <div class="text-center mb-10">
-      <h2 class="text-3xl font-bold text-gray-900 mb-2">Productos Destacados</h2>
-      <p class="text-gray-600">Los más buscados por nuestros clientes</p>
-    </div>
-
-    @if (loading()) {
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-6">
-        @for (_ of [1,2,3,4]; track $index) {
-          <div class="animate-pulse">
-            <div class="bg-gray-200 rounded-xl h-48 sm:h-56 mb-3"></div>
-            <div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-            <div class="h-5 bg-gray-200 rounded w-1/2"></div>
-          </div>
-        }
-      </div>
-    } @else if (productosDestacados().length > 0) {
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-6">
-        @for (producto of productosDestacados(); track producto.id) {
-          <a [routerLink]="['/producto', producto.id]"
-             class="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition block">
-            <div class="relative h-48 sm:h-56 bg-gray-50 flex items-center justify-center">
-              <img
-                [src]="producto.imagen_url || 'assets/placeholder-product.jpg'"
-                [alt]="producto.nombre"
-                class="h-full w-full object-contain p-3 group-hover:scale-105 transition-transform duration-300"
-                loading="lazy"
-              />
-              @if (producto.descuento > 0) {
-                <span class="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded font-bold">
-                  -{{ producto.descuento }}%
-                </span>
-              }
-            </div>
-            <div class="p-3 sm:p-4">
-              <h3 class="font-medium text-gray-900 text-sm sm:text-base truncate">{{ producto.nombre }}</h3>
-              <div class="mt-1">
-                @if (producto.descuento > 0) {
-                  <span class="text-xs line-through text-gray-400 mr-2">${{ producto.precio }}</span>
-                }
-                <span class="text-base sm:text-lg font-bold text-gray-900">${{ producto.precio_final }}</span>
-              </div>
-            </div>
-          </a>
-        }
-      </div>
-
-      <div class="text-center mt-10">
-        <a routerLink="/catalogo"
-           class="inline-block px-8 py-3 bg-primary-700 text-white rounded-lg hover:bg-primary-800 transition font-medium">
-          Ver todos los productos
-        </a>
-      </div>
->>>>>>> origin/main
     }
   </div>
 </section>
 
-<<<<<<< HEAD
-=======
-<!-- Features -->
-<section class="py-16 bg-gray-50">
-  <div class="container mx-auto px-4">
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-4xl mx-auto">
-      <div class="text-center">
-        <div class="w-14 h-14 bg-primary-700 rounded-full flex items-center justify-center mx-auto mb-4">
-          <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-          </svg>
-        </div>
-        <h3 class="font-bold text-gray-900 mb-1">100% Originales</h3>
-        <p class="text-sm text-gray-600">Todos nuestros productos son auténticos</p>
-      </div>
-      <div class="text-center">
-        <div class="w-14 h-14 bg-primary-700 rounded-full flex items-center justify-center mx-auto mb-4">
-          <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-          </svg>
-        </div>
-        <h3 class="font-bold text-gray-900 mb-1">Envío Nacional</h3>
-        <p class="text-sm text-gray-600">Llegamos a todo el país</p>
-      </div>
-      <div class="text-center">
-        <div class="w-14 h-14 bg-primary-700 rounded-full flex items-center justify-center mx-auto mb-4">
-          <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
-          </svg>
-        </div>
-        <h3 class="font-bold text-gray-900 mb-1">Atención Personalizada</h3>
-        <p class="text-sm text-gray-600">Te asesoramos en tu compra</p>
-      </div>
-    </div>
-  </div>
-</section>
-
->>>>>>> origin/main
 <app-footer></app-footer>

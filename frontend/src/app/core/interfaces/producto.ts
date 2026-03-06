@@ -18,10 +18,7 @@ export interface Producto {
   colores: Color[];
   tallas: TallaStock[];
   marca?: Marca;
-<<<<<<< HEAD
   imagenes?: { id: string; imagen_url: string; orden: number }[];
-=======
->>>>>>> origin/main
   tallasDisponibles?: TallaStock[];     // t.cantidad > 0
   tallasPreview?: TallaStock[];         // primeras 3
   tallasExtraCount?: number;            // cuántas más hay

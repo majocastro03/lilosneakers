@@ -1,7 +1,6 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-<<<<<<< HEAD
 import { HttpClient } from '@angular/common/http';
 import { forkJoin } from 'rxjs';
 import { ProductoService, Producto, ProductosResponse } from '../../../core/services/producto.service';
@@ -12,13 +11,6 @@ import { TallaService } from '../../../core/services/talla/talla-service';
 import { Marca } from '../../../core/interfaces/marca';
 import { ModalService } from '../../../shared/modal/modal.service';
 import { environment } from '../../../../environments/environment';
-=======
-import { Router} from '@angular/router';
-import { ProductoService, Producto, ProductosResponse } from '../../../core/services/producto.service';
-import { CategoriaService, Categoria } from '../../../core/services/categoria.service';
-import { AuthService } from '../../../core/services/auth.service';
-import { ModalService } from '../../../shared/modal/modal.service';
->>>>>>> origin/main
 
 @Component({
   selector: 'app-admin-productos',
@@ -30,15 +22,10 @@ import { ModalService } from '../../../shared/modal/modal.service';
 export class AdminProductosComponent implements OnInit {
   private productoService = inject(ProductoService);
   private categoriaService = inject(CategoriaService);
-<<<<<<< HEAD
   private marcaService = inject(MarcaService);
   private coloresService = inject(ColoresService);
   private tallaService = inject(TallaService);
   private http = inject(HttpClient);
-=======
-  private authService = inject(AuthService);
-  private router = inject(Router);
->>>>>>> origin/main
   private cdr = inject(ChangeDetectorRef);
   private modalService = inject(ModalService);
 
@@ -117,13 +104,9 @@ export class AdminProductosComponent implements OnInit {
     descuento: 0,
     descripcion: '',
     destacado: false,
-<<<<<<< HEAD
     activo: true,
     categoria_id: '' as string,
     marca_id: '' as string,
-=======
-    categoria_id: '' as string,
->>>>>>> origin/main
     imagen: null as File | null
   };
 
@@ -146,7 +129,6 @@ export class AdminProductosComponent implements OnInit {
     this.cargarProductos();
   }
 
-<<<<<<< HEAD
   cargarDatos() {
     forkJoin({
       categorias: this.categoriaService.getCategorias(),
@@ -164,25 +146,6 @@ export class AdminProductosComponent implements OnInit {
       error: (err) => {
         console.error('Error al cargar datos:', err);
         this.cdr.markForCheck();
-=======
-  async logout() {
-    const ok = await this.modalService.confirm('¿Estas seguro de cerrar sesion?');
-    if (ok) {
-      this.authService.logout();
-    }
-  }
-
-  cargarCategorias() {
-    this.categoriaService.getCategorias().subscribe({
-      next: (data) => {
-        this.categorias = data;
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.error('Error al cargar categorías:', err);
-        this.error = 'Error al cargar categorías';
-        this.cdr.detectChanges();
->>>>>>> origin/main
       }
     });
   }
@@ -195,21 +158,13 @@ export class AdminProductosComponent implements OnInit {
       next: (data: ProductosResponse) => {
         this.productos = data.productos;
         this.loading = false;
-<<<<<<< HEAD
         this.cdr.markForCheck();
-=======
-        this.cdr.detectChanges();
->>>>>>> origin/main
       },
       error: (err) => {
         console.error('Error al cargar productos:', err);
         this.error = 'Error al cargar productos';
         this.loading = false;
-<<<<<<< HEAD
         this.cdr.markForCheck();
-=======
-        this.cdr.detectChanges();
->>>>>>> origin/main
       }
     });
   }
@@ -292,16 +247,9 @@ export class AdminProductosComponent implements OnInit {
 
   abrirModalEditar(producto: Producto) {
     this.modoEdicion = true;
-<<<<<<< HEAD
 
     const categoriaEncontrada = this.categorias.find(c => c.nombre === producto.categoria);
 
-=======
-    
-    // Buscar el UUID de la categoría basándose en el nombre
-    const categoriaEncontrada = this.categorias.find(c => c.nombre === producto.categoria);
-    
->>>>>>> origin/main
     this.form = {
       id: producto.id,
       nombre: producto.nombre,
@@ -309,13 +257,9 @@ export class AdminProductosComponent implements OnInit {
       descuento: producto.descuento,
       descripcion: producto.descripcion || '',
       destacado: producto.destacado,
-<<<<<<< HEAD
       activo: producto.activo ?? true,
       categoria_id: categoriaEncontrada?.id || '',
       marca_id: producto.marca_id || '',
-=======
-      categoria_id: categoriaEncontrada?.id || '',
->>>>>>> origin/main
       imagen: null
     };
 
@@ -343,13 +287,9 @@ export class AdminProductosComponent implements OnInit {
       descuento: 0,
       descripcion: '',
       destacado: false,
-<<<<<<< HEAD
       activo: true,
       categoria_id: '',
       marca_id: '',
-=======
-      categoria_id: '',
->>>>>>> origin/main
       imagen: null
     };
     this.precioDisplay = '';
@@ -437,34 +377,17 @@ export class AdminProductosComponent implements OnInit {
   guardarProducto() {
     // Validaciones
     if (!this.form.nombre || !this.form.precio) {
-<<<<<<< HEAD
       this.modalService.error('Nombre y precio son requeridos');
-=======
-      this.error = 'Nombre y precio son requeridos';
-      setTimeout(() => this.error = null, 3000);
->>>>>>> origin/main
       return;
     }
 
     if (!this.form.categoria_id) {
-<<<<<<< HEAD
       this.modalService.error('Categoría es requerida');
       return;
     }
 
     if (!this.modoEdicion && !this.form.imagen) {
       this.modalService.error('La imagen es requerida para crear un producto');
-=======
-      this.error = 'Categoría es requerida';
-      setTimeout(() => this.error = null, 3000);
-      return;
-    }
-
-    // Validación de imagen para crear nuevo producto
-    if (!this.modoEdicion && !this.form.imagen) {
-      this.error = 'La imagen es requerida para crear un producto';
-      setTimeout(() => this.error = null, 3000);
->>>>>>> origin/main
       return;
     }
 
@@ -474,17 +397,12 @@ export class AdminProductosComponent implements OnInit {
     formData.append('descuento', this.form.descuento.toString());
     formData.append('descripcion', this.form.descripcion);
     formData.append('destacado', this.form.destacado.toString());
-<<<<<<< HEAD
     formData.append('activo', this.form.activo.toString());
     formData.append('categoria_id', this.form.categoria_id);
     if (this.form.marca_id) {
       formData.append('marca_id', this.form.marca_id);
     }
 
-=======
-    formData.append('categoria_id', this.form.categoria_id);
-    
->>>>>>> origin/main
     if (this.form.imagen) {
       formData.append('imagen', this.form.imagen);
     }
@@ -513,19 +431,12 @@ export class AdminProductosComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error al guardar producto:', err);
-<<<<<<< HEAD
         this.loading = false;
         this.modalService.error(err.error?.error || 'Error al guardar el producto');
-=======
-        this.error = err.error?.error || 'Error al guardar el producto';
-        this.loading = false;
-        setTimeout(() => this.error = null, 5000);
->>>>>>> origin/main
       }
     });
   }
 
-<<<<<<< HEAD
   private guardarAsociaciones(productoId: string, isEditing: boolean) {
     const apiUrl = `${environment.apiUrl}/productos/${productoId}`;
 
@@ -619,10 +530,6 @@ export class AdminProductosComponent implements OnInit {
 
   async confirmarEliminar(producto: Producto) {
     const ok = await this.modalService.confirm(`¿Estás seguro de eliminar "${producto.nombre}"?`);
-=======
-  async confirmarEliminar(producto: Producto) {
-    const ok = await this.modalService.confirm(`¿Estas seguro de eliminar "${producto.nombre}"?`);
->>>>>>> origin/main
     if (ok) {
       this.eliminarProducto(producto.id);
     }
@@ -638,7 +545,6 @@ export class AdminProductosComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error al eliminar producto:', err);
-<<<<<<< HEAD
         this.loading = false;
         this.modalService.error(err.error?.error || 'Error al eliminar el producto');
       }
@@ -665,11 +571,6 @@ export class AdminProductosComponent implements OnInit {
         this.cargarProductos();
         this.loading = false;
         this.modalService.error('Producto guardado, pero hubo un error al subir algunas imágenes');
-=======
-        this.error = err.error?.error || 'Error al eliminar el producto';
-        this.loading = false;
-        setTimeout(() => this.error = null, 5000);
->>>>>>> origin/main
       }
     });
   }

@@ -29,10 +29,7 @@ export interface Producto {
   categoria_id?: string;
   categoria_slug?: string;
   mostrar_precio?: boolean;
-<<<<<<< HEAD
   marca_id?: string;
-=======
->>>>>>> origin/main
   marca?: any;
   colores: Color[];
   tallas: Talla[];
