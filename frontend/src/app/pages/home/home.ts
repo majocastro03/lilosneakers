@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -19,7 +19,7 @@ import { Marca } from '../../core/interfaces/marca';
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
-export class Home implements OnInit {
+export class Home implements OnInit, OnDestroy {
   private productoService = inject(ProductoService);
   private categoriaService = inject(CategoriaService);
   private marcaService = inject(MarcaService);
@@ -36,7 +36,7 @@ export class Home implements OnInit {
   ordenarPor = signal<string>('destacados');
   searchQuery = signal<string>('');
 
-  private searchTimeout: any;
+  private searchTimeout: ReturnType<typeof setTimeout> | undefined;
 
   ngOnInit() {
     this.categoriaService.getCategorias().subscribe({
@@ -102,5 +102,9 @@ export class Home implements OnInit {
       this.searchQuery.set(value);
       this.cargarProductos();
     }, 400);
+  }
+
+  ngOnDestroy() {
+    clearTimeout(this.searchTimeout);
   }
 }

@@ -30,7 +30,13 @@ export class HeaderComponent {
     const user = this.authService.getCurrentUser();
     if (!user) return '';
     const nombre = user.nombre || user.username || '';
-    return nombre.split(' ').map((w: string) => w[0]).join('').toUpperCase().slice(0, 2);
+    return nombre
+      .split(' ')
+      .filter(Boolean)
+      .map((w: string) => w.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
   }
 
   onLogin(): void {

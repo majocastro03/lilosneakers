@@ -1,4 +1,4 @@
-import { Component, inject, signal, HostListener } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { ModalService } from '../../../shared/modal/modal.service';
@@ -28,7 +28,13 @@ export class AdminLayoutComponent {
     const user = this.currentUser;
     if (!user) return '?';
     const nombre = user.nombre || user.username || '';
-    return nombre.split(' ').map((w: string) => w[0]).join('').toUpperCase().slice(0, 2);
+    return nombre
+      .split(' ')
+      .filter(Boolean)
+      .map((w: string) => w.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
   }
 
   toggleSidebar() {

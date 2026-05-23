@@ -2,8 +2,7 @@ const rateLimitStore = new Map();
 
 const CLEANUP_INTERVAL = 60 * 1000; // Clean up every minute
 
-// Periodic cleanup of expired entries
-setInterval(() => {
+const cleanupInterval = setInterval(() => {
   const now = Date.now();
   for (const [key, value] of rateLimitStore) {
     if (now - value.firstRequest > value.windowMs) {
@@ -11,6 +10,12 @@ setInterval(() => {
     }
   }
 }, CLEANUP_INTERVAL);
+
+// .unref() permite que el proceso de Node termine aunque el interval siga programado.
+// Sin esto, el event loop quedaría vivo en tests y el server no podría hacer shutdown limpio.
+cleanupInterval.unref();
+
+const stopCleanup = () => clearInterval(cleanupInterval);
 
 const createRateLimiter = ({ windowMs = 15 * 60 * 1000, maxRequests = 100, message = 'Demasiadas solicitudes, intenta más tarde' } = {}) => {
   return (req, res, next) => {
@@ -59,4 +64,4 @@ const apiLimiter = createRateLimiter({
   message: 'Demasiadas solicitudes a la API. Intenta más tarde'
 });
 
-module.exports = { createRateLimiter, loginLimiter, registerLimiter, apiLimiter };
+module.exports = { createRateLimiter, loginLimiter, registerLimiter, apiLimiter, stopCleanup };

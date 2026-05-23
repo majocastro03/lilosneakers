@@ -23,7 +23,6 @@ const { authMiddleware, adminMiddleware } = require('../middleware/auth');
 const { validateProducto } = require('../middleware/validate');
 
 // Rutas públicas
-// Rutas públicas
 router.get('/', getProductos);
 router.get('/:id', getProductoById);
 

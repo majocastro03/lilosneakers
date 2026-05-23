@@ -54,8 +54,20 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Permitir requests sin origin (health checks, apps móviles, curl, Postman)
+    // Origin 'null' (string) llega de iframes sandbox, data:/file: URIs y redirects opacos.
+    // Con credentials:true hay que bloquearlo explícitamente.
+    if (origin === 'null') {
+      console.warn('CORS bloqueado: origin opaco (null)');
+      return callback(new Error('Not allowed by CORS'));
+    }
+
+    // Sin Origin header: curl, Postman, server-to-server. En producción exigimos origin
+    // para que /api/* no quede expuesto fuera de un navegador autorizado.
     if (!origin) {
+      if (process.env.NODE_ENV === 'production') {
+        console.warn('CORS bloqueado: request sin origin en producción');
+        return callback(new Error('Origin required'));
+      }
       return callback(null, true);
     }
 

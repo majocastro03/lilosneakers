@@ -6,13 +6,6 @@ import { ProductoService } from '../../../core/services/producto/producto-servic
 import { ModalService } from '../../../shared/modal/modal.service';
 import { CategoriaService } from '../../../core/services/categoria/categoria-service';
 import { FooterComponent } from '../../../shared/footer/footer';
-import { TableModule } from 'primeng/table';
-import { InputTextModule } from 'primeng/inputtext';
-import { ButtonModule } from 'primeng/button';
-import { PaginatorModule } from 'primeng/paginator';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
-import { RippleModule } from 'primeng/ripple';
 import { NgxPaginationModule } from 'ngx-pagination';
 
 @Component({
@@ -22,14 +15,7 @@ import { NgxPaginationModule } from 'ngx-pagination';
     CommonModule,
     FormsModule,
     NgxPaginationModule,
-    FooterComponent,
-    TableModule,
-    InputTextModule,
-    ButtonModule,
-    PaginatorModule,
-    IconFieldModule,
-    InputIconModule,
-    RippleModule
+    FooterComponent
   ],
   templateUrl: './admin-catalogo.html',
   styleUrls: ['./admin-catalogo.css'],
