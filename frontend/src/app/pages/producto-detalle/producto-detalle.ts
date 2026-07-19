@@ -25,6 +25,8 @@ export class ProductoDetalleComponent implements OnInit {
   error = signal<string | null>(null);
   selectedTalla = signal<string | null>(null);
   selectedTallaId = signal<string | null>(null);
+  selectedTallaGenero = signal<string | null>(null);
+  selectedColor = signal<string | null>(null);
   cantidad = signal(1);
   addedToCart = signal(false);
   selectedImage = signal<string | null>(null);
@@ -53,6 +55,18 @@ export class ProductoDetalleComponent implements OnInit {
     if (talla.cantidad <= 0) return;
     this.selectedTalla.set(talla.talla);
     this.selectedTallaId.set(talla.id);
+    this.selectedTallaGenero.set(talla.genero ?? null);
+    this.cantidad.set(1);
+  }
+
+  selectColor(nombre: string) {
+    this.selectedColor.set(nombre);
+  }
+
+  generoLabel(genero?: string | null): string {
+    if (genero === 'mujer') return 'Dama';
+    if (genero === 'hombre') return 'Caballero';
+    return '';
   }
 
   incrementCantidad() {
@@ -72,11 +86,18 @@ export class ProductoDetalleComponent implements OnInit {
   addToCart() {
     const prod = this.producto();
     if (!prod || !this.selectedTallaId()) return;
+    if (prod.colores.length > 0 && !this.selectedColor()) return;
+
+    const genero = this.generoLabel(this.selectedTallaGenero());
+    const tallaValor = genero
+      ? `${this.selectedTalla()} (${genero})`
+      : this.selectedTalla()!;
 
     this.cartService.addItem({
       producto_id: prod.id,
       talla_id: this.selectedTallaId()!,
-      talla_valor: this.selectedTalla()!,
+      talla_valor: tallaValor,
+      color_nombre: this.selectedColor() ?? undefined,
       cantidad: this.cantidad(),
       nombre: prod.nombre,
       precio: prod.precio_final,
