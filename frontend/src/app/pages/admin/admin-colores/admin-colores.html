@@ -1,52 +1,60 @@
 <div>
+  <!-- Título -->
   <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
     <div>
-      <h1 class="text-2xl font-bold text-gray-900">Colores</h1>
-      <p class="text-sm text-gray-500 mt-1">Gestiona los colores disponibles</p>
+      <h1 class="text-title-sm font-semibold text-gray-900">Colores</h1>
+      <p class="text-theme-sm text-gray-500 mt-1">Gestiona los colores disponibles</p>
     </div>
-    <button (click)="openCreate()" class="px-4 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 text-sm font-medium self-start sm:self-auto">
-      + Nuevo Color
+    <button type="button" (click)="openCreate()"
+      class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-brand-500 text-white rounded-lg hover:bg-brand-600 transition-colors text-theme-sm font-medium shadow-theme-xs self-start sm:self-auto">
+      <svg class="w-4 h-4" viewBox="0 0 20 20" fill="none">
+        <path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Nuevo Color
     </button>
   </div>
 
   @if (message()) {
-    <div class="bg-primary-50 border border-primary-200 text-primary-700 px-4 py-2 rounded-lg mb-4 text-sm">{{ message() }}</div>
+    <div class="bg-brand-50 border border-brand-200 text-brand-700 px-4 py-2 rounded-lg mb-4 text-theme-sm">{{ message() }}</div>
   }
 
-  <!-- Desktop table -->
-  <div class="bg-white rounded-lg shadow-sm overflow-hidden hidden sm:block">
-    <table class="w-full text-sm">
-      <thead class="bg-gray-50">
-        <tr class="border-b">
-          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Color</th>
-          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
-          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hex</th>
-          <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Acciones</th>
+  <!-- Tabla desktop -->
+  <div class="hidden sm:block overflow-hidden rounded-xl border border-gray-200 bg-white shadow-theme-xs">
+    <table class="min-w-full">
+      <thead class="border-b border-gray-100 bg-gray-50">
+        <tr>
+          <th class="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs uppercase">Color</th>
+          <th class="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs uppercase">Nombre</th>
+          <th class="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs uppercase">Hex</th>
+          <th class="px-5 py-3 font-medium text-gray-500 text-end text-theme-xs uppercase">Acciones</th>
         </tr>
-        <tr class="border-b bg-gray-50">
-          <th class="px-4 py-2"></th>
-          <th class="px-4 py-2" colspan="2">
-            <input type="text" [(ngModel)]="filtroNombre" placeholder="Buscar por nombre..." class="w-full px-2 py-1 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-primary-500 focus:border-transparent" />
+        <tr class="border-b border-gray-100 bg-white">
+          <th class="px-5 py-2"></th>
+          <th class="px-5 py-2" colspan="2">
+            <input type="text" [(ngModel)]="filtroNombre" placeholder="Buscar por nombre..."
+              class="w-full px-2.5 py-1.5 border border-gray-200 rounded-md text-theme-xs bg-white text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400" />
           </th>
-          <th class="px-4 py-2"></th>
+          <th class="px-5 py-2"></th>
         </tr>
       </thead>
       <tbody class="divide-y divide-gray-100">
         @for (item of coloresFiltrados; track item.id) {
-          <tr class="hover:bg-gray-50">
-            <td class="px-4 py-3">
-              <div [style.background-color]="item.codigo_hex" class="w-8 h-8 rounded-full border border-gray-200"></div>
+          <tr class="hover:bg-gray-50 transition-colors">
+            <td class="px-5 py-4">
+              <div [style.background-color]="item.codigo_hex" class="w-9 h-9 rounded-full border border-gray-200 shadow-theme-xs"></div>
             </td>
-            <td class="px-4 py-3 font-medium text-gray-900">{{ item.nombre }}</td>
-            <td class="px-4 py-3 text-gray-500 font-mono text-xs">{{ item.codigo_hex }}</td>
-            <td class="px-4 py-3 text-right space-x-2">
-              <button (click)="openEdit(item)" class="text-primary-600 hover:text-primary-800 text-xs font-medium">Editar</button>
-              <button (click)="delete(item.id)" class="text-red-600 hover:text-red-800 text-xs font-medium">Eliminar</button>
+            <td class="px-5 py-4 font-medium text-gray-800 text-theme-sm">{{ item.nombre }}</td>
+            <td class="px-5 py-4 text-gray-500 font-mono text-theme-xs">{{ item.codigo_hex }}</td>
+            <td class="px-5 py-4 text-end">
+              <div class="inline-flex items-center gap-3">
+                <button type="button" (click)="openEdit(item)" class="text-brand-600 hover:text-brand-700 text-theme-xs font-medium">Editar</button>
+                <button type="button" (click)="delete(item.id)" class="text-error-600 hover:text-error-700 text-theme-xs font-medium">Eliminar</button>
+              </div>
             </td>
           </tr>
         }
         @if (coloresFiltrados.length === 0) {
-          <tr><td colspan="4" class="px-4 py-8 text-center text-gray-400 text-sm">No hay colores</td></tr>
+          <tr><td colspan="4" class="px-5 py-12 text-center text-gray-400 text-theme-sm">No hay colores</td></tr>
         }
       </tbody>
     </table>
@@ -55,46 +63,58 @@
   <!-- Mobile cards -->
   <div class="sm:hidden space-y-3">
     @for (item of coloresFiltrados; track item.id) {
-      <div class="bg-white rounded-lg shadow-sm p-4">
+      <div class="bg-white rounded-xl border border-gray-200 shadow-theme-xs p-4">
         <div class="flex items-center gap-3">
-          <div [style.background-color]="item.codigo_hex" class="w-10 h-10 rounded-full border border-gray-200 shrink-0"></div>
+          <div [style.background-color]="item.codigo_hex" class="w-10 h-10 rounded-full border border-gray-200 shadow-theme-xs shrink-0"></div>
           <div class="flex-1 min-w-0">
-            <h3 class="font-medium text-gray-900 text-sm">{{ item.nombre }}</h3>
-            <p class="text-xs text-gray-400 font-mono">{{ item.codigo_hex }}</p>
+            <h3 class="font-medium text-gray-800 text-theme-sm truncate">{{ item.nombre }}</h3>
+            <p class="text-theme-xs text-gray-400 font-mono">{{ item.codigo_hex }}</p>
           </div>
           <div class="flex gap-3 shrink-0">
-            <button (click)="openEdit(item)" class="text-primary-600 text-xs font-medium">Editar</button>
-            <button (click)="delete(item.id)" class="text-red-600 text-xs font-medium">Eliminar</button>
+            <button type="button" (click)="openEdit(item)" class="text-brand-600 text-theme-xs font-medium">Editar</button>
+            <button type="button" (click)="delete(item.id)" class="text-error-600 text-theme-xs font-medium">Eliminar</button>
           </div>
         </div>
       </div>
     }
     @if (coloresFiltrados.length === 0) {
-      <div class="bg-white rounded-lg shadow-sm p-8 text-center text-gray-400 text-sm">No hay colores</div>
+      <div class="bg-white rounded-xl border border-gray-200 shadow-theme-xs p-8 text-center text-gray-400 text-theme-sm">No hay colores</div>
     }
   </div>
 
   <!-- Modal -->
   @if (showModal()) {
-    <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div class="bg-white rounded-lg p-5 w-full max-w-md">
-        <h2 class="text-lg font-bold text-gray-900 mb-4">{{ editingId() ? 'Editar' : 'Nuevo' }} Color</h2>
-        <div class="space-y-3">
+    <div class="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50 p-4" (click)="showModal.set(false)">
+      <div class="bg-white rounded-2xl shadow-theme-xl w-full max-w-md" (click)="$event.stopPropagation()">
+        <div class="border-b border-gray-100 px-6 py-4 flex justify-between items-center">
+          <h2 class="text-lg font-semibold text-gray-800">{{ editingId() ? 'Editar' : 'Nuevo' }} Color</h2>
+          <button type="button" (click)="showModal.set(false)" class="flex items-center justify-center w-9 h-9 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg" aria-label="Cerrar">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+        <div class="p-6 space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
-            <input [(ngModel)]="form.nombre" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent" />
+            <label class="block text-theme-sm font-medium text-gray-700 mb-1.5">Nombre</label>
+            <input [(ngModel)]="form.nombre"
+              class="w-full h-11 px-3.5 border border-gray-200 rounded-lg text-theme-sm bg-white text-gray-800 placeholder:text-gray-400 shadow-theme-xs focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400" />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Color</label>
+            <label class="block text-theme-sm font-medium text-gray-700 mb-1.5">Color</label>
             <div class="flex gap-2">
-              <input type="color" [(ngModel)]="form.codigo_hex" class="w-12 h-10 border rounded cursor-pointer" />
-              <input [(ngModel)]="form.codigo_hex" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent" />
+              <input type="color" [(ngModel)]="form.codigo_hex"
+                class="w-14 h-11 border border-gray-200 rounded-lg cursor-pointer shadow-theme-xs" />
+              <input [(ngModel)]="form.codigo_hex"
+                class="flex-1 h-11 px-3.5 border border-gray-200 rounded-lg text-theme-sm font-mono bg-white text-gray-800 shadow-theme-xs focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400" />
             </div>
           </div>
         </div>
-        <div class="flex justify-end gap-3 mt-5">
-          <button (click)="showModal.set(false)" class="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50">Cancelar</button>
-          <button (click)="save()" class="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm hover:bg-primary-700">Guardar</button>
+        <div class="flex justify-end gap-3 px-6 py-4 border-t border-gray-100">
+          <button type="button" (click)="showModal.set(false)"
+            class="px-4 py-2.5 border border-gray-200 rounded-lg text-theme-sm font-medium text-gray-700 hover:bg-gray-50 shadow-theme-xs transition-colors">Cancelar</button>
+          <button type="button" (click)="save()"
+            class="px-4 py-2.5 bg-brand-500 text-white rounded-lg text-theme-sm font-medium hover:bg-brand-600 shadow-theme-xs transition-colors">Guardar</button>
         </div>
       </div>
     </div>

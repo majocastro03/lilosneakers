@@ -1,142 +1,205 @@
-<div class="min-h-screen bg-gray-100 flex">
-  <!-- Mobile sidebar backdrop -->
-  @if (sidebarOpen()) {
-    <div class="fixed inset-0 bg-black/50 z-40 lg:hidden" (click)="closeSidebar()"></div>
+<div class="min-h-screen bg-gray-50 font-outfit xl:flex">
+  <!-- Mobile backdrop -->
+  @if (sidebar.isMobileOpen()) {
+    <div class="fixed inset-0 bg-gray-900/50 z-40 xl:hidden" (click)="closeMobile()"></div>
   }
 
   <!-- Sidebar -->
   <aside
-    class="fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 text-white transform transition-transform duration-200 ease-in-out lg:translate-x-0 lg:static lg:z-auto"
-    [class.-translate-x-full]="!sidebarOpen()"
-    [class.translate-x-0]="sidebarOpen()"
+    class="fixed flex flex-col top-0 left-0 px-5 bg-white text-gray-900 h-screen z-50 border-r border-gray-200 transition-all duration-300 ease-in-out xl:translate-x-0"
+    [ngClass]="{
+      'w-[290px]': sidebarOpen,
+      'w-[90px]': !sidebarOpen,
+      'translate-x-0': sidebar.isMobileOpen(),
+      '-translate-x-full': !sidebar.isMobileOpen()
+    }"
+    (mouseenter)="onSidebarMouseEnter()"
+    (mouseleave)="onSidebarMouseLeave()"
   >
-    <!-- Sidebar header -->
-    <div class="flex items-center gap-3 px-5 py-5 border-b border-gray-800">
-      <img src="/assets/logo.png" alt="Lilo Sneakers" class="w-9 h-9 rounded-full object-cover" />
-      <div>
-        <h1 class="text-sm font-bold tracking-wide">LILO SNEAKERS</h1>
-        <p class="text-[10px] text-gray-400">Panel de Administración</p>
-      </div>
-      <!-- Close button (mobile) -->
-      <button (click)="closeSidebar()" class="ml-auto lg:hidden text-gray-400 hover:text-white">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+    <!-- Logo -->
+    <div
+      class="py-6 flex items-center gap-3"
+      [class.xl:justify-center]="!sidebarOpen"
+      [class.justify-start]="sidebarOpen"
+    >
+      <a routerLink="/admin/productos" class="flex items-center gap-3">
+        <img src="/assets/logo.png" alt="Lilo Sneakers" class="w-10 h-10 rounded-full object-cover shrink-0" />
+        @if (sidebarOpen) {
+          <div class="leading-tight">
+            <p class="text-sm font-bold text-gray-900 tracking-wide">LILO SNEAKERS</p>
+            <p class="text-[10px] text-gray-500">Panel de Administración</p>
+          </div>
+        }
+      </a>
+      <!-- Close (mobile only) -->
+      <button
+        type="button"
+        (click)="closeMobile()"
+        class="ml-auto xl:hidden text-gray-400 hover:text-gray-700"
+        [class.hidden]="!sidebar.isMobileOpen()"
+        aria-label="Cerrar menú"
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor" d="M6 18L18 6M6 6l12 12"/>
         </svg>
       </button>
     </div>
 
-    <!-- Navigation -->
-    <nav class="px-3 py-4 space-y-1">
-      <a routerLink="/admin/productos" routerLinkActive="bg-primary-600 text-white"
-         [routerLinkActiveOptions]="{exact: true}"
-         (click)="closeSidebar()"
-         class="flex items-center gap-3 px-3 py-2.5 text-sm text-gray-300 rounded-lg hover:bg-gray-800 hover:text-white transition-colors">
-        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-        </svg>
-        Productos
-      </a>
+    <!-- Nav -->
+    <div class="flex flex-col flex-1 overflow-y-auto no-scrollbar">
+      <nav class="flex flex-col gap-1 mb-6">
+        <h2
+          class="mb-4 text-xs uppercase flex leading-[20px] text-gray-400"
+          [class.xl:justify-center]="!sidebarOpen"
+          [class.justify-start]="sidebarOpen"
+        >
+          @if (sidebarOpen) { Menú }
+          @else {
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <circle cx="6" cy="12" r="1.5" fill="currentColor"/>
+              <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+              <circle cx="18" cy="12" r="1.5" fill="currentColor"/>
+            </svg>
+          }
+        </h2>
 
-      <a routerLink="/admin/categorias" routerLinkActive="bg-primary-600 text-white"
-         (click)="closeSidebar()"
-         class="flex items-center gap-3 px-3 py-2.5 text-sm text-gray-300 rounded-lg hover:bg-gray-800 hover:text-white transition-colors">
-        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
-        </svg>
-        Categorías
-      </a>
+        <ul class="flex flex-col gap-1">
+          @for (item of navItems; track item.path) {
+            <li>
+              <a
+                [routerLink]="item.path"
+                (click)="closeMobile()"
+                class="menu-item group"
+                [class.menu-item-active]="isActive(item.path)"
+                [class.menu-item-inactive]="!isActive(item.path)"
+                [class.xl:justify-center]="!sidebarOpen"
+                [class.xl:justify-start]="sidebarOpen"
+              >
+                <span
+                  class="menu-item-icon-size"
+                  [class.menu-item-icon-active]="isActive(item.path)"
+                  [class.menu-item-icon-inactive]="!isActive(item.path)"
+                  [innerHTML]="item.icon | safeHtml"
+                ></span>
+                @if (sidebarOpen) {
+                  <span class="menu-item-text">{{ item.name }}</span>
+                }
+              </a>
+            </li>
+          }
+        </ul>
+      </nav>
 
-      <a routerLink="/admin/marcas" routerLinkActive="bg-primary-600 text-white"
-         (click)="closeSidebar()"
-         class="flex items-center gap-3 px-3 py-2.5 text-sm text-gray-300 rounded-lg hover:bg-gray-800 hover:text-white transition-colors">
-        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
-        </svg>
-        Marcas
-      </a>
-
-      <a routerLink="/admin/colores" routerLinkActive="bg-primary-600 text-white"
-         (click)="closeSidebar()"
-         class="flex items-center gap-3 px-3 py-2.5 text-sm text-gray-300 rounded-lg hover:bg-gray-800 hover:text-white transition-colors">
-        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
-        </svg>
-        Colores
-      </a>
-
-      <a routerLink="/admin/tallas" routerLinkActive="bg-primary-600 text-white"
-         (click)="closeSidebar()"
-         class="flex items-center gap-3 px-3 py-2.5 text-sm text-gray-300 rounded-lg hover:bg-gray-800 hover:text-white transition-colors">
-        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/>
-        </svg>
-        Tallas
-      </a>
-
-      <a routerLink="/admin/ordenes" routerLinkActive="bg-primary-600 text-white"
-         (click)="closeSidebar()"
-         class="flex items-center gap-3 px-3 py-2.5 text-sm text-gray-300 rounded-lg hover:bg-gray-800 hover:text-white transition-colors">
-        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
-        </svg>
-        Órdenes
-      </a>
-    </nav>
-
-    <!-- Sidebar footer -->
-    <div class="absolute bottom-0 left-0 right-0 px-3 py-4 border-t border-gray-800 space-y-1">
-      <a routerLink="/" class="flex items-center gap-3 px-3 py-2.5 text-sm text-gray-400 rounded-lg hover:bg-gray-800 hover:text-white transition-colors">
-        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-        </svg>
-        Ver tienda
-      </a>
-      <button (click)="logout()" class="flex items-center gap-3 px-3 py-2.5 text-sm text-red-400 rounded-lg hover:bg-gray-800 hover:text-red-300 transition-colors w-full">
-        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-        </svg>
-        Cerrar sesión
-      </button>
+      <!-- Footer del sidebar -->
+      <div class="mt-auto py-4 border-t border-gray-200 flex flex-col gap-1">
+        <a
+          routerLink="/"
+          (click)="closeMobile()"
+          class="menu-item menu-item-inactive group"
+          [class.xl:justify-center]="!sidebarOpen"
+          [class.xl:justify-start]="sidebarOpen"
+        >
+          <span class="menu-item-icon-size menu-item-icon-inactive">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          @if (sidebarOpen) { <span class="menu-item-text">Ver tienda</span> }
+        </a>
+        <button
+          type="button"
+          (click)="logout()"
+          class="menu-item w-full text-error-600 hover:bg-error-50 group"
+          [class.xl:justify-center]="!sidebarOpen"
+          [class.xl:justify-start]="sidebarOpen"
+        >
+          <span class="menu-item-icon-size text-error-500">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          @if (sidebarOpen) { <span class="menu-item-text">Cerrar sesión</span> }
+        </button>
+      </div>
     </div>
   </aside>
 
-  <!-- Main content area -->
-  <div class="flex-1 flex flex-col min-h-screen lg:ml-0">
-    <!-- Top bar -->
-    <header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-30">
-      <div class="flex items-center justify-between px-4 py-3">
-        <!-- Left: hamburger + title -->
+  <!-- Main column -->
+  <div
+    class="flex-1 flex flex-col min-h-screen transition-all duration-300 ease-in-out"
+    [ngClass]="{
+      'xl:ml-[290px]': sidebar.isExpanded() || sidebar.isHovered(),
+      'xl:ml-[90px]': !sidebar.isExpanded() && !sidebar.isHovered()
+    }"
+  >
+    <!-- Header -->
+    <header class="sticky top-0 flex w-full bg-white border-b border-gray-200 z-30">
+      <div class="flex items-center justify-between w-full gap-2 px-4 py-3 sm:px-6 lg:py-4">
+        <!-- Toggle + título -->
         <div class="flex items-center gap-3">
-          <button (click)="toggleSidebar()" class="lg:hidden text-gray-600 hover:text-gray-900">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-            </svg>
+          <button
+            type="button"
+            (click)="toggleSidebar()"
+            class="flex items-center justify-center w-10 h-10 text-gray-500 border border-gray-200 rounded-lg hover:bg-gray-50"
+            aria-label="Toggle Sidebar"
+          >
+            @if (sidebar.isMobileOpen()) {
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            } @else {
+              <svg width="18" height="14" viewBox="0 0 16 12" fill="none">
+                <path fill-rule="evenodd" clip-rule="evenodd"
+                  d="M0.583 1A.75.75 0 011.333.25h13.334a.75.75 0 010 1.5H1.333A.75.75 0 01.583 1zm0 10A.75.75 0 011.333 10.25h13.334a.75.75 0 010 1.5H1.333A.75.75 0 01.583 11zM1.333 5.25a.75.75 0 100 1.5H8a.75.75 0 100-1.5H1.333z"
+                  fill="currentColor"/>
+              </svg>
+            }
           </button>
-          <h2 class="text-lg font-semibold text-gray-800 hidden sm:block">Panel de Administración</h2>
+          <h2 class="text-base font-semibold text-gray-800 hidden sm:block">Panel de Administración</h2>
         </div>
 
-        <!-- Right: user avatar with dropdown -->
-        <div class="relative">
-          <button (click)="toggleUserMenu()" class="flex items-center gap-2.5 cursor-pointer">
-            <div class="w-9 h-9 rounded-full bg-red-500 flex items-center justify-center text-white text-sm font-bold">
+        <!-- User menu -->
+        <div #userMenuContainer class="relative">
+          <button
+            type="button"
+            (click)="toggleUserMenu($event)"
+            class="flex items-center gap-2.5 cursor-pointer rounded-lg px-1.5 py-1.5 hover:bg-gray-50"
+          >
+            <div class="w-9 h-9 rounded-full bg-brand-500 flex items-center justify-center text-white text-sm font-bold">
               {{ userInitials }}
             </div>
-            <span class="text-sm font-medium text-gray-700 hidden sm:block">{{ currentUser?.nombre || currentUser?.username }}</span>
+            <span class="text-sm font-medium text-gray-700 hidden sm:block">
+              {{ currentUser?.nombre || currentUser?.username }}
+            </span>
+            <svg class="w-4 h-4 text-gray-500 hidden sm:block" viewBox="0 0 20 20" fill="none">
+              <path d="M4.79 7.396L10 12.604l5.21-5.208" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
           </button>
 
           @if (showUserMenu()) {
-            <div class="fixed inset-0 z-40" (click)="showUserMenu.set(false)"></div>
-            <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
-              <div class="px-4 py-2 border-b border-gray-100">
+            <div class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-theme-lg border border-gray-200 py-1 z-50">
+              <div class="px-4 py-2.5 border-b border-gray-100">
                 <p class="text-sm font-medium text-gray-900">{{ currentUser?.nombre }}</p>
-                <p class="text-xs text-gray-500">{{ currentUser?.email }}</p>
+                <p class="text-xs text-gray-500 truncate">{{ currentUser?.email }}</p>
               </div>
-              <a routerLink="/" (click)="showUserMenu.set(false)" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+              <a
+                routerLink="/"
+                (click)="showUserMenu.set(false)"
+                class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                </svg>
                 Ver tienda
               </a>
-              <button (click)="showUserMenu.set(false); logout()" class="flex items-center gap-2 w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+              <button
+                type="button"
+                (click)="logout()"
+                class="flex items-center gap-2 w-full px-4 py-2 text-sm text-error-600 hover:bg-error-50"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                </svg>
                 Cerrar sesión
               </button>
             </div>

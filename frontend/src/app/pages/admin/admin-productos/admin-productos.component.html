@@ -1,156 +1,169 @@
 <div>
-  <!-- Title -->
+  <!-- Título -->
   <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
     <div>
-      <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">Productos</h1>
-      <p class="text-sm text-gray-500 mt-1">Gestiona tu catálogo de productos</p>
+      <h1 class="text-title-sm font-semibold text-gray-900">Productos</h1>
+      <p class="text-theme-sm text-gray-500 mt-1">Gestiona tu catálogo de productos</p>
     </div>
     <button
+      type="button"
       (click)="abrirModalCrear()"
-      class="px-4 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium self-start sm:self-auto"
+      class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-brand-500 text-white rounded-lg hover:bg-brand-600 transition-colors text-theme-sm font-medium shadow-theme-xs self-start sm:self-auto"
     >
-      + Nuevo Producto
+      <svg class="w-4 h-4" viewBox="0 0 20 20" fill="none">
+        <path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Nuevo Producto
     </button>
   </div>
 
   <!-- Mensajes -->
   @if (error) {
-    <div class="mb-4 bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-800">{{ error }}</div>
+    <div class="mb-4 bg-error-50 border border-error-200 rounded-lg p-3 text-theme-sm text-error-700">{{ error }}</div>
   }
 
   <!-- Loading -->
   @if (loading && !showModal) {
     <div class="text-center py-12">
-      <div class="inline-block animate-spin rounded-full h-10 w-10 border-b-2 border-primary-600"></div>
-      <p class="mt-3 text-sm text-gray-500">Cargando productos...</p>
+      <div class="inline-block animate-spin rounded-full h-10 w-10 border-2 border-gray-200 border-t-brand-500"></div>
+      <p class="mt-3 text-theme-sm text-gray-500">Cargando productos...</p>
     </div>
   }
 
-  <!-- Desktop table -->
+  <!-- Tabla desktop -->
   @if (!loading) {
-    <div class="bg-white rounded-lg shadow-sm overflow-hidden hidden sm:block">
+    <div class="hidden sm:block overflow-hidden rounded-xl border border-gray-200 bg-white shadow-theme-xs">
       <div class="overflow-x-auto">
-        <table class="w-full text-sm">
-          <thead class="bg-gray-50">
-            <tr class="border-b">
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Producto</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Categoría</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Marca</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer select-none hover:text-gray-700" (click)="toggleSort('precio')">
-                Precio <span class="text-[10px]">{{ getSortIcon('precio') }}</span>
+        <table class="min-w-full">
+          <thead class="border-b border-gray-100 bg-gray-50">
+            <tr>
+              <th class="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs uppercase">Producto</th>
+              <th class="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs uppercase">Categoría</th>
+              <th class="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs uppercase">Marca</th>
+              <th class="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs uppercase cursor-pointer select-none hover:text-gray-700" (click)="toggleSort('precio')">
+                <span class="inline-flex items-center gap-1">Precio <span>{{ getSortIcon('precio') }}</span></span>
               </th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer select-none hover:text-gray-700" (click)="toggleSort('descuento')">
-                Descuento <span class="text-[10px]">{{ getSortIcon('descuento') }}</span>
+              <th class="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs uppercase cursor-pointer select-none hover:text-gray-700" (click)="toggleSort('descuento')">
+                <span class="inline-flex items-center gap-1">Descuento <span>{{ getSortIcon('descuento') }}</span></span>
               </th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tallas</th>
-              <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
-              <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Acciones</th>
+              <th class="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs uppercase">Tallas</th>
+              <th class="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs uppercase">Estado</th>
+              <th class="px-5 py-3 font-medium text-gray-500 text-end text-theme-xs uppercase">Acciones</th>
             </tr>
-            <tr class="border-b bg-gray-50">
-              <th class="px-4 py-2">
-                <input type="text" [(ngModel)]="filtroNombre" placeholder="Buscar..." class="w-full px-2 py-1 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-primary-500 focus:border-transparent" />
+            <tr class="border-b border-gray-100 bg-white">
+              <th class="px-5 py-2">
+                <input type="text" [(ngModel)]="filtroNombre" placeholder="Buscar..."
+                  class="w-full px-2.5 py-1.5 border border-gray-200 rounded-md text-theme-xs bg-white text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400" />
               </th>
-              <th class="px-4 py-2">
-                <select [(ngModel)]="filtroCategoria" class="w-full px-2 py-1 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-primary-500 focus:border-transparent">
+              <th class="px-5 py-2">
+                <select [(ngModel)]="filtroCategoria"
+                  class="w-full px-2.5 py-1.5 border border-gray-200 rounded-md text-theme-xs bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400">
                   <option value="">Todas</option>
                   @for (cat of categorias; track cat.id) {
                     <option [value]="cat.nombre">{{ cat.nombre }}</option>
                   }
                 </select>
               </th>
-              <th class="px-4 py-2">
-                <select [(ngModel)]="filtroMarca" class="w-full px-2 py-1 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-primary-500 focus:border-transparent">
+              <th class="px-5 py-2">
+                <select [(ngModel)]="filtroMarca"
+                  class="w-full px-2.5 py-1.5 border border-gray-200 rounded-md text-theme-xs bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400">
                   <option value="">Todas</option>
                   @for (marca of marcas; track marca.id) {
                     <option [value]="marca.nombre">{{ marca.nombre }}</option>
                   }
                 </select>
               </th>
-              <th class="px-4 py-2"></th>
-              <th class="px-4 py-2"></th>
-              <th class="px-4 py-2"></th>
-              <th class="px-4 py-2">
-                <select [(ngModel)]="filtroActivo" class="w-full px-2 py-1 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-primary-500 focus:border-transparent">
+              <th class="px-5 py-2"></th>
+              <th class="px-5 py-2"></th>
+              <th class="px-5 py-2"></th>
+              <th class="px-5 py-2">
+                <select [(ngModel)]="filtroActivo"
+                  class="w-full px-2.5 py-1.5 border border-gray-200 rounded-md text-theme-xs bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400">
                   <option value="">Todos</option>
                   <option value="activo">Activo</option>
                   <option value="inactivo">Inactivo</option>
                 </select>
               </th>
-              <th class="px-4 py-2"></th>
+              <th class="px-5 py-2"></th>
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-100">
             @for (producto of productosFiltrados; track producto.id) {
-              <tr class="hover:bg-gray-50" [class.opacity-50]="!producto.activo">
-                <td class="px-4 py-3">
+              <tr class="hover:bg-gray-50 transition-colors" [class.opacity-50]="!producto.activo">
+                <td class="px-5 py-4">
                   <div class="flex items-center gap-3">
-                    <img
-                      [src]="producto.imagen_url || 'assets/placeholder-product.jpg'"
-                      [alt]="producto.nombre"
-                      class="h-10 w-10 rounded-lg object-cover shrink-0"
-                      (error)="$any($event.target).src='assets/placeholder-product.jpg'"
-                    />
+                    <div class="w-10 h-10 overflow-hidden rounded-lg shrink-0 bg-gray-100">
+                      <img
+                        [src]="producto.imagen_url || 'assets/placeholder-product.jpg'"
+                        [alt]="producto.nombre"
+                        class="h-full w-full object-cover"
+                        (error)="$any($event.target).src='assets/placeholder-product.jpg'"
+                      />
+                    </div>
                     <div class="min-w-0">
-                      <div class="font-medium text-gray-900 truncate">{{ producto.nombre }}</div>
-                      <div class="text-xs text-gray-400 truncate max-w-[200px]">{{ producto.descripcion }}</div>
+                      <span class="block font-medium text-gray-800 text-theme-sm truncate">{{ producto.nombre }}</span>
+                      <span class="block text-gray-500 text-theme-xs truncate max-w-[220px]">{{ producto.descripcion }}</span>
                     </div>
                   </div>
                 </td>
-                <td class="px-4 py-3">
-                  <span class="px-2 py-0.5 text-xs font-medium rounded-full bg-primary-50 text-primary-700">
+                <td class="px-5 py-4">
+                  <span class="inline-flex items-center px-2.5 py-0.5 text-theme-xs font-medium rounded-full bg-brand-50 text-brand-600">
                     {{ producto.categoria }}
                   </span>
                 </td>
-                <td class="px-4 py-3">
+                <td class="px-5 py-4 text-theme-sm text-gray-700">
                   @if (producto.marca?.nombre) {
-                    <span class="text-xs text-gray-700">{{ producto.marca.nombre }}</span>
+                    {{ producto.marca.nombre }}
                   } @else {
-                    <span class="text-gray-400 text-xs">—</span>
+                    <span class="text-gray-400">—</span>
                   }
                 </td>
-                <td class="px-4 py-3 font-medium text-gray-900">${{ producto.precio | number:'1.0-0' }}</td>
-                <td class="px-4 py-3">
+                <td class="px-5 py-4 font-medium text-gray-800 text-theme-sm">${{ producto.precio | number:'1.0-0' }}</td>
+                <td class="px-5 py-4">
                   @if (producto.descuento > 0) {
-                    <span class="px-2 py-0.5 text-xs font-medium rounded-full bg-red-50 text-red-700">-{{ producto.descuento }}%</span>
+                    <span class="inline-flex items-center px-2.5 py-0.5 text-theme-xs font-medium rounded-full bg-error-50 text-error-600">-{{ producto.descuento }}%</span>
                   } @else {
-                    <span class="text-gray-400 text-xs">—</span>
+                    <span class="text-gray-400 text-theme-xs">—</span>
                   }
                 </td>
-                <td class="px-4 py-3">
+                <td class="px-5 py-4">
                   @if (producto.tallas && producto.tallas.length > 0) {
                     <div class="flex flex-wrap gap-1">
                       @for (talla of producto.tallas; track talla.id) {
-                        <span class="px-1.5 py-0.5 text-[10px] font-medium rounded bg-gray-100 text-gray-700">{{ talla.talla }}</span>
+                        <span class="px-1.5 py-0.5 text-theme-xs font-medium rounded bg-gray-100 text-gray-700">{{ talla.talla }}</span>
                       }
                     </div>
                   } @else {
-                    <span class="text-gray-400 text-xs">—</span>
+                    <span class="text-gray-400 text-theme-xs">—</span>
                   }
                 </td>
-                <td class="px-4 py-3">
+                <td class="px-5 py-4">
                   <div class="flex flex-col gap-1">
                     @if (producto.activo) {
-                      <span class="px-2 py-0.5 text-xs font-medium rounded-full bg-green-50 text-green-700 w-fit">Activo</span>
+                      <span class="inline-flex items-center px-2.5 py-0.5 text-theme-xs font-medium rounded-full bg-success-50 text-success-700 w-fit">Activo</span>
                     } @else {
-                      <span class="px-2 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-gray-500 w-fit">Inactivo</span>
+                      <span class="inline-flex items-center px-2.5 py-0.5 text-theme-xs font-medium rounded-full bg-gray-100 text-gray-500 w-fit">Inactivo</span>
                     }
                     @if (producto.destacado) {
-                      <span class="px-2 py-0.5 text-xs font-medium rounded-full bg-yellow-50 text-yellow-700 w-fit">Destacado</span>
+                      <span class="inline-flex items-center px-2.5 py-0.5 text-theme-xs font-medium rounded-full bg-warning-50 text-warning-700 w-fit">Destacado</span>
                     }
                   </div>
                 </td>
-                <td class="px-4 py-3 text-right space-x-1">
-                  <button (click)="abrirModalEditar(producto)" class="text-primary-600 hover:text-primary-800 text-xs font-medium">Editar</button>
-                  <button (click)="toggleActivo(producto)" class="text-xs font-medium" [class]="producto.activo ? 'text-orange-600 hover:text-orange-800' : 'text-green-600 hover:text-green-800'">
-                    {{ producto.activo ? 'Desactivar' : 'Activar' }}
-                  </button>
-                  <button (click)="confirmarEliminar(producto)" class="text-red-600 hover:text-red-800 text-xs font-medium">Eliminar</button>
+                <td class="px-5 py-4 text-end">
+                  <div class="inline-flex items-center gap-3">
+                    <button type="button" (click)="abrirModalEditar(producto)" class="text-brand-600 hover:text-brand-700 text-theme-xs font-medium">Editar</button>
+                    <button type="button" (click)="toggleActivo(producto)" class="text-theme-xs font-medium"
+                      [class]="producto.activo ? 'text-warning-600 hover:text-warning-700' : 'text-success-600 hover:text-success-700'">
+                      {{ producto.activo ? 'Desactivar' : 'Activar' }}
+                    </button>
+                    <button type="button" (click)="confirmarEliminar(producto)" class="text-error-600 hover:text-error-700 text-theme-xs font-medium">Eliminar</button>
+                  </div>
                 </td>
               </tr>
             }
             @if (productosFiltrados.length === 0) {
               <tr>
-                <td colspan="8" class="px-4 py-12 text-center text-gray-400 text-sm">No hay productos creados aún</td>
+                <td colspan="8" class="px-5 py-12 text-center text-gray-400 text-theme-sm">No hay productos creados aún</td>
               </tr>
             }
           </tbody>
@@ -158,17 +171,17 @@
       </div>
     </div>
 
-    <!-- Mobile search & filters -->
+    <!-- Mobile búsqueda y filtros -->
     <div class="sm:hidden mb-4 space-y-2">
       <div class="relative">
         <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
         </svg>
         <input type="text" [(ngModel)]="filtroNombre" placeholder="Buscar producto..."
-          class="w-full pl-10 pr-10 py-2.5 bg-white border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent" />
+          class="w-full pl-10 pr-10 py-2.5 bg-white border border-gray-200 rounded-lg text-theme-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400" />
         <button type="button" (click)="showMobileFilters = !showMobileFilters"
           class="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100"
-          [class.text-primary-600]="filtroCategoria || filtroMarca || filtroEstado || filtroActivo">
+          [class.text-brand-600]="filtroCategoria || filtroMarca || filtroEstado || filtroActivo">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
           </svg>
@@ -176,24 +189,24 @@
       </div>
       @if (showMobileFilters) {
         <div class="grid grid-cols-2 gap-2">
-          <select [(ngModel)]="filtroCategoria" class="px-2 py-2 bg-white border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+          <select [(ngModel)]="filtroCategoria" class="px-2 py-2 bg-white border border-gray-200 rounded-lg text-theme-xs focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400">
             <option value="">Categoría</option>
             @for (cat of categorias; track cat.id) {
               <option [value]="cat.nombre">{{ cat.nombre }}</option>
             }
           </select>
-          <select [(ngModel)]="filtroMarca" class="px-2 py-2 bg-white border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+          <select [(ngModel)]="filtroMarca" class="px-2 py-2 bg-white border border-gray-200 rounded-lg text-theme-xs focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400">
             <option value="">Marca</option>
             @for (marca of marcas; track marca.id) {
               <option [value]="marca.nombre">{{ marca.nombre }}</option>
             }
           </select>
-          <select [(ngModel)]="filtroEstado" class="px-2 py-2 bg-white border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+          <select [(ngModel)]="filtroEstado" class="px-2 py-2 bg-white border border-gray-200 rounded-lg text-theme-xs focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400">
             <option value="">Destacado</option>
             <option value="destacado">Destacado</option>
             <option value="normal">Normal</option>
           </select>
-          <select [(ngModel)]="filtroActivo" class="px-2 py-2 bg-white border border-gray-300 rounded-lg text-xs focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+          <select [(ngModel)]="filtroActivo" class="px-2 py-2 bg-white border border-gray-200 rounded-lg text-theme-xs focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400">
             <option value="">Disponibilidad</option>
             <option value="activo">Activo</option>
             <option value="inactivo">Inactivo</option>
@@ -205,53 +218,56 @@
     <!-- Mobile cards -->
     <div class="sm:hidden space-y-3">
       @for (producto of productosFiltrados; track producto.id) {
-        <div class="bg-white rounded-lg shadow-sm p-4" [class.opacity-50]="!producto.activo">
+        <div class="bg-white rounded-xl border border-gray-200 shadow-theme-xs p-4" [class.opacity-50]="!producto.activo">
           <div class="flex items-start gap-3">
-            <img
-              [src]="producto.imagen_url || 'assets/placeholder-product.jpg'"
-              [alt]="producto.nombre"
-              class="h-16 w-16 rounded-lg object-cover shrink-0"
-              (error)="$any($event.target).src='assets/placeholder-product.jpg'"
-            />
+            <div class="h-16 w-16 overflow-hidden rounded-lg shrink-0 bg-gray-100">
+              <img
+                [src]="producto.imagen_url || 'assets/placeholder-product.jpg'"
+                [alt]="producto.nombre"
+                class="h-full w-full object-cover"
+                (error)="$any($event.target).src='assets/placeholder-product.jpg'"
+              />
+            </div>
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-2">
-                <h3 class="font-medium text-gray-900 text-sm truncate">{{ producto.nombre }}</h3>
+                <h3 class="font-medium text-gray-800 text-theme-sm truncate">{{ producto.nombre }}</h3>
                 @if (!producto.activo) {
-                  <span class="px-1.5 py-0.5 text-[10px] font-medium rounded bg-gray-100 text-gray-500 shrink-0">Inactivo</span>
+                  <span class="px-1.5 py-0.5 text-theme-xs font-medium rounded bg-gray-100 text-gray-500 shrink-0">Inactivo</span>
                 }
               </div>
-              <span class="inline-block mt-1 px-2 py-0.5 text-[10px] font-medium rounded-full bg-primary-50 text-primary-700">
+              <span class="inline-flex mt-1 px-2 py-0.5 text-theme-xs font-medium rounded-full bg-brand-50 text-brand-600">
                 {{ producto.categoria }}
               </span>
               <div class="flex items-center gap-2 mt-2">
-                <span class="font-bold text-gray-900 text-sm">${{ producto.precio | number:'1.0-0' }}</span>
+                <span class="font-semibold text-gray-800 text-theme-sm">${{ producto.precio | number:'1.0-0' }}</span>
                 @if (producto.descuento > 0) {
-                  <span class="px-1.5 py-0.5 text-[10px] font-medium rounded bg-red-50 text-red-700">-{{ producto.descuento }}%</span>
+                  <span class="px-1.5 py-0.5 text-theme-xs font-medium rounded bg-error-50 text-error-600">-{{ producto.descuento }}%</span>
                 }
                 @if (producto.destacado) {
-                  <span class="px-1.5 py-0.5 text-[10px] font-medium rounded bg-yellow-50 text-yellow-700">Destacado</span>
+                  <span class="px-1.5 py-0.5 text-theme-xs font-medium rounded bg-warning-50 text-warning-700">Destacado</span>
                 }
               </div>
               @if (producto.tallas && producto.tallas.length > 0) {
                 <div class="flex flex-wrap gap-1 mt-1">
                   @for (talla of producto.tallas; track talla.id) {
-                    <span class="px-1 py-0.5 text-[10px] rounded bg-gray-100 text-gray-600">{{ talla.talla }}</span>
+                    <span class="px-1 py-0.5 text-theme-xs rounded bg-gray-100 text-gray-600">{{ talla.talla }}</span>
                   }
                 </div>
               }
             </div>
           </div>
           <div class="flex justify-end gap-3 mt-3 pt-3 border-t border-gray-100">
-            <button (click)="abrirModalEditar(producto)" class="text-primary-600 text-xs font-medium">Editar</button>
-            <button (click)="toggleActivo(producto)" class="text-xs font-medium" [class]="producto.activo ? 'text-orange-600' : 'text-green-600'">
+            <button type="button" (click)="abrirModalEditar(producto)" class="text-brand-600 text-theme-xs font-medium">Editar</button>
+            <button type="button" (click)="toggleActivo(producto)" class="text-theme-xs font-medium"
+              [class]="producto.activo ? 'text-warning-600' : 'text-success-600'">
               {{ producto.activo ? 'Desactivar' : 'Activar' }}
             </button>
-            <button (click)="confirmarEliminar(producto)" class="text-red-600 text-xs font-medium">Eliminar</button>
+            <button type="button" (click)="confirmarEliminar(producto)" class="text-error-600 text-theme-xs font-medium">Eliminar</button>
           </div>
         </div>
       }
       @if (productosFiltrados.length === 0) {
-        <div class="bg-white rounded-lg shadow-sm p-8 text-center text-gray-400 text-sm">No hay productos creados aún</div>
+        <div class="bg-white rounded-xl border border-gray-200 shadow-theme-xs p-8 text-center text-gray-400 text-theme-sm">No hay productos creados aún</div>
       }
     </div>
   }
@@ -259,42 +275,47 @@
 
 <!-- Modal Crear/Editar -->
 @if (showModal) {
-  <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" (click)="cerrarModal()">
-    <div class="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto" (click)="$event.stopPropagation()">
-      <div class="border-b px-5 py-4 flex justify-between items-center sticky top-0 bg-white z-10">
-        <h2 class="text-lg font-bold text-gray-900">
+  <div class="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50 p-4" (click)="cerrarModal()">
+    <div class="bg-white rounded-2xl shadow-theme-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto" (click)="$event.stopPropagation()">
+      <!-- Modal header -->
+      <div class="border-b border-gray-100 px-6 py-4 flex justify-between items-center sticky top-0 bg-white z-10 rounded-t-2xl">
+        <h2 class="text-lg font-semibold text-gray-800">
           {{ modoEdicion ? 'Editar Producto' : 'Nuevo Producto' }}
         </h2>
-        <button (click)="cerrarModal()" class="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
+        <button type="button" (click)="cerrarModal()" class="flex items-center justify-center w-9 h-9 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg" aria-label="Cerrar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" stroke="currentColor" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
       </div>
 
-      <form (submit)="guardarProducto(); $event.preventDefault()" class="p-5 space-y-4">
+      <form (submit)="guardarProducto(); $event.preventDefault()" class="p-6 space-y-5">
         <!-- Nombre -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Nombre del producto *</label>
+          <label class="block text-theme-sm font-medium text-gray-700 mb-1.5">Nombre del producto *</label>
           <input type="text" [(ngModel)]="form.nombre" name="nombre" required
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            class="w-full h-11 px-3.5 border border-gray-200 rounded-lg text-theme-sm bg-white text-gray-800 placeholder:text-gray-400 shadow-theme-xs focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400"
             placeholder="Ej: Nike Air Max 270" />
         </div>
 
         <!-- Precio y Descuento -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Precio *</label>
+            <label class="block text-theme-sm font-medium text-gray-700 mb-1.5">Precio *</label>
             <div class="relative">
-              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-500 text-sm font-medium">$</span>
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-500 text-theme-sm font-medium">$</span>
               <input type="text" [value]="precioDisplay" (input)="onPrecioInput($event)" (focus)="onPrecioFocus($event)" (blur)="onPrecioBlur()" name="precio" inputmode="numeric"
-                class="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                class="w-full h-11 pl-8 pr-3 border border-gray-200 rounded-lg text-theme-sm bg-white text-gray-800 placeholder:text-gray-400 shadow-theme-xs focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400"
                 placeholder="150.000" />
             </div>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Descuento</label>
+            <label class="block text-theme-sm font-medium text-gray-700 mb-1.5">Descuento</label>
             <div class="relative">
               <input type="text" [value]="descuentoDisplay" (input)="onDescuentoInput($event)" (focus)="onDescuentoFocus($event)" (blur)="onDescuentoBlur()" name="descuento" inputmode="decimal"
-                class="w-full pl-3 pr-8 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                class="w-full h-11 pl-3.5 pr-8 border border-gray-200 rounded-lg text-theme-sm bg-white text-gray-800 placeholder:text-gray-400 shadow-theme-xs focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400"
                 placeholder="30,00" />
-              <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 text-sm font-medium">%</span>
+              <span class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-500 text-theme-sm font-medium">%</span>
             </div>
           </div>
         </div>
@@ -302,9 +323,9 @@
         <!-- Categoría y Marca -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Categoría *</label>
+            <label class="block text-theme-sm font-medium text-gray-700 mb-1.5">Categoría *</label>
             <select [(ngModel)]="form.categoria_id" name="categoria_id"
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+              class="w-full h-11 px-3.5 border border-gray-200 rounded-lg text-theme-sm bg-white text-gray-800 shadow-theme-xs focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400">
               <option value="">Selecciona una</option>
               @for (cat of categorias; track cat.id) {
                 <option [ngValue]="cat.id">{{ cat.nombre }}</option>
@@ -312,9 +333,9 @@
             </select>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Marca</label>
+            <label class="block text-theme-sm font-medium text-gray-700 mb-1.5">Marca</label>
             <select [(ngModel)]="form.marca_id" name="marca_id"
-              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent">
+              class="w-full h-11 px-3.5 border border-gray-200 rounded-lg text-theme-sm bg-white text-gray-800 shadow-theme-xs focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400">
               <option value="">Sin marca</option>
               @for (marca of marcas; track marca.id) {
                 <option [ngValue]="marca.id">{{ marca.nombre }}</option>
@@ -325,21 +346,21 @@
 
         <!-- Descripción -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+          <label class="block text-theme-sm font-medium text-gray-700 mb-1.5">Descripción</label>
           <textarea [(ngModel)]="form.descripcion" name="descripcion" rows="3"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            class="w-full px-3.5 py-2.5 border border-gray-200 rounded-lg text-theme-sm bg-white text-gray-800 placeholder:text-gray-400 shadow-theme-xs focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400"
             placeholder="Descripción del producto..."></textarea>
         </div>
 
         <!-- Colores -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Colores</label>
-          <div class="flex flex-wrap gap-2 p-3 border border-gray-300 rounded-lg min-h-[42px]">
+          <label class="block text-theme-sm font-medium text-gray-700 mb-1.5">Colores</label>
+          <div class="flex flex-wrap gap-2 p-3 border border-gray-200 rounded-lg min-h-[48px] bg-white">
             @for (color of allColores; track color.id) {
               <button type="button" (click)="toggleColor(color.id)"
-                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-theme-xs font-medium border transition-all"
                 [class]="isColorSelected(color.id)
-                  ? 'bg-primary-50 border-primary-500 text-primary-700 ring-1 ring-primary-500'
+                  ? 'bg-brand-50 border-brand-500 text-brand-700 ring-1 ring-brand-500'
                   : 'bg-gray-50 border-gray-200 text-gray-600 hover:border-gray-400'">
                 <span class="w-3 h-3 rounded-full border border-gray-300 shrink-0"
                   [style.background-color]="color.codigo_hex"></span>
@@ -352,46 +373,45 @@
               </button>
             }
             @if (allColores.length === 0) {
-              <span class="text-xs text-gray-400">No hay colores disponibles</span>
+              <span class="text-theme-xs text-gray-400">No hay colores disponibles</span>
             }
           </div>
         </div>
 
         <!-- Tallas -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Tallas</label>
-          <!-- Gender filter -->
+          <label class="block text-theme-sm font-medium text-gray-700 mb-1.5">Tallas</label>
+          <!-- Filtro género -->
           <div class="flex gap-2 mb-2">
             <button type="button" (click)="filtroGeneroTalla = ''"
-              class="px-3 py-1 rounded-full text-xs font-medium border transition-all"
-              [class]="!filtroGeneroTalla ? 'bg-primary-50 border-primary-500 text-primary-700' : 'bg-gray-50 border-gray-200 text-gray-600 hover:border-gray-400'">
+              class="px-3 py-1 rounded-full text-theme-xs font-medium border transition-all"
+              [class]="!filtroGeneroTalla ? 'bg-brand-50 border-brand-500 text-brand-700' : 'bg-gray-50 border-gray-200 text-gray-600 hover:border-gray-400'">
               Todas
             </button>
             <button type="button" (click)="filtroGeneroTalla = 'mujer'"
-              class="px-3 py-1 rounded-full text-xs font-medium border transition-all"
+              class="px-3 py-1 rounded-full text-theme-xs font-medium border transition-all"
               [class]="filtroGeneroTalla === 'mujer' ? 'bg-pink-50 border-pink-400 text-pink-700' : 'bg-gray-50 border-gray-200 text-gray-600 hover:border-gray-400'">
               Dama
             </button>
             <button type="button" (click)="filtroGeneroTalla = 'hombre'"
-              class="px-3 py-1 rounded-full text-xs font-medium border transition-all"
+              class="px-3 py-1 rounded-full text-theme-xs font-medium border transition-all"
               [class]="filtroGeneroTalla === 'hombre' ? 'bg-blue-50 border-blue-400 text-blue-700' : 'bg-gray-50 border-gray-200 text-gray-600 hover:border-gray-400'">
               Caballero
             </button>
           </div>
 
-          <!-- Tallas table -->
           @if (tallasFiltradas.length > 0) {
-            <div class="border border-gray-300 rounded-lg overflow-hidden">
+            <div class="border border-gray-200 rounded-lg overflow-hidden">
               <div class="overflow-x-auto max-h-[200px] overflow-y-auto">
-                <table class="w-full text-xs">
+                <table class="w-full text-theme-xs">
                   <thead class="bg-gray-50 sticky top-0">
                     <tr>
-                      <th class="px-3 py-1.5 text-left font-medium text-gray-500 w-8"></th>
-                      <th class="px-3 py-1.5 text-left font-medium text-gray-500">CO</th>
-                      <th class="px-3 py-1.5 text-left font-medium text-gray-500">US</th>
-                      <th class="px-3 py-1.5 text-left font-medium text-gray-500">EUR</th>
-                      <th class="px-3 py-1.5 text-left font-medium text-gray-500">CM</th>
-                      <th class="px-3 py-1.5 text-left font-medium text-gray-500">Género</th>
+                      <th class="px-3 py-2 text-left font-medium text-gray-500 w-8 uppercase"></th>
+                      <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase">CO</th>
+                      <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase">US</th>
+                      <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase">EUR</th>
+                      <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase">CM</th>
+                      <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase">Género</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -399,24 +419,24 @@
                       <tr
                         (click)="toggleTalla(talla.id)"
                         class="border-t border-gray-100 cursor-pointer transition-colors"
-                        [class]="isTallaSelected(talla.id) ? 'bg-primary-50' : 'hover:bg-gray-50'"
+                        [class]="isTallaSelected(talla.id) ? 'bg-brand-50' : 'hover:bg-gray-50'"
                       >
-                        <td class="px-3 py-1.5 text-center">
+                        <td class="px-3 py-2 text-center">
                           @if (isTallaSelected(talla.id)) {
-                            <svg class="w-4 h-4 text-primary-600 inline" fill="currentColor" viewBox="0 0 20 20">
+                            <svg class="w-4 h-4 text-brand-600 inline" fill="currentColor" viewBox="0 0 20 20">
                               <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                             </svg>
                           }
                         </td>
-                        <td class="px-3 py-1.5 font-medium text-gray-900">{{ talla.valor }}</td>
-                        <td class="px-3 py-1.5 text-gray-600">{{ talla.valor_us || '-' }}</td>
-                        <td class="px-3 py-1.5 text-gray-600">{{ talla.valor_eur || '-' }}</td>
-                        <td class="px-3 py-1.5 text-gray-600">{{ talla.valor_cm || '-' }}</td>
-                        <td class="px-3 py-1.5">
+                        <td class="px-3 py-2 font-medium text-gray-800">{{ talla.valor }}</td>
+                        <td class="px-3 py-2 text-gray-600">{{ talla.valor_us || '-' }}</td>
+                        <td class="px-3 py-2 text-gray-600">{{ talla.valor_eur || '-' }}</td>
+                        <td class="px-3 py-2 text-gray-600">{{ talla.valor_cm || '-' }}</td>
+                        <td class="px-3 py-2">
                           @if (talla.genero === 'mujer') {
-                            <span class="px-1.5 py-0.5 text-[10px] rounded bg-pink-50 text-pink-600">Dama</span>
+                            <span class="px-1.5 py-0.5 text-theme-xs rounded bg-pink-50 text-pink-600">Dama</span>
                           } @else if (talla.genero === 'hombre') {
-                            <span class="px-1.5 py-0.5 text-[10px] rounded bg-blue-50 text-blue-600">Caballero</span>
+                            <span class="px-1.5 py-0.5 text-theme-xs rounded bg-blue-50 text-blue-600">Caballero</span>
                           } @else {
                             <span class="text-gray-400">-</span>
                           }
@@ -428,11 +448,11 @@
               </div>
             </div>
             @if (selectedTallaIds.length > 0) {
-              <p class="text-xs text-gray-500 mt-1">{{ selectedTallaIds.length }} talla(s) seleccionada(s)</p>
+              <p class="text-theme-xs text-gray-500 mt-1.5">{{ selectedTallaIds.length }} talla(s) seleccionada(s)</p>
             }
           } @else {
-            <div class="p-3 border border-gray-300 rounded-lg">
-              <span class="text-xs text-gray-400">No hay tallas disponibles</span>
+            <div class="p-3 border border-gray-200 rounded-lg">
+              <span class="text-theme-xs text-gray-400">No hay tallas disponibles</span>
             </div>
           }
         </div>
@@ -441,21 +461,21 @@
         <div class="flex flex-col sm:flex-row gap-4">
           <label class="relative inline-flex items-center cursor-pointer">
             <input type="checkbox" [(ngModel)]="form.activo" name="activo" class="sr-only peer" />
-            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
-            <span class="ms-3 text-sm text-gray-700">Disponible</span>
+            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-success-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-success-500"></div>
+            <span class="ms-3 text-theme-sm text-gray-700">Disponible</span>
           </label>
           <label class="relative inline-flex items-center cursor-pointer">
             <input type="checkbox" [(ngModel)]="form.destacado" name="destacado" class="sr-only peer" />
-            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
-            <span class="ms-3 text-sm text-gray-700">Destacado</span>
+            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-brand-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-500"></div>
+            <span class="ms-3 text-theme-sm text-gray-700">Destacado</span>
           </label>
         </div>
 
         <!-- Imagen principal -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Imagen principal</label>
+          <label class="block text-theme-sm font-medium text-gray-700 mb-1.5">Imagen principal</label>
           <input type="file" (change)="onImagenChange($event)" accept="image/*"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-medium file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100" />
+            class="w-full px-3 py-2 border border-gray-200 rounded-lg text-theme-sm bg-white shadow-theme-xs focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-theme-xs file:font-medium file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100" />
           @if (imagenPreview) {
             <div class="mt-3">
               <img [src]="imagenPreview" alt="Preview" class="h-24 w-24 object-cover rounded-lg border border-gray-200" />
@@ -465,27 +485,26 @@
 
         <!-- Imágenes adicionales -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Imágenes adicionales</label>
+          <label class="block text-theme-sm font-medium text-gray-700 mb-1.5">Imágenes adicionales</label>
           <input type="file" (change)="onExtraImagesChange($event)" accept="image/*" multiple
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary-500 focus:border-transparent file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-medium file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100" />
+            class="w-full px-3 py-2 border border-gray-200 rounded-lg text-theme-sm bg-white shadow-theme-xs focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-theme-xs file:font-medium file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100" />
 
-          <!-- Existing images (edit mode) -->
           @if (existingImages.length > 0 || newImagePreviews.length > 0) {
             <div class="flex flex-wrap gap-3 mt-3">
               @for (img of existingImages; track img.id) {
                 <div class="relative group">
                   <img [src]="img.imagen_url" alt="Imagen" class="h-20 w-20 object-cover rounded-lg border border-gray-200" />
                   <button type="button" (click)="removeExistingImage(img)"
-                    class="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    class="absolute -top-2 -right-2 w-5 h-5 bg-error-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                     &times;
                   </button>
                 </div>
               }
               @for (preview of newImagePreviews; track $index) {
                 <div class="relative group">
-                  <img [src]="preview" alt="Nueva" class="h-20 w-20 object-cover rounded-lg border-2 border-dashed border-primary-300" />
+                  <img [src]="preview" alt="Nueva" class="h-20 w-20 object-cover rounded-lg border-2 border-dashed border-brand-300" />
                   <button type="button" (click)="removeNewImage($index)"
-                    class="absolute -top-2 -right-2 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    class="absolute -top-2 -right-2 w-5 h-5 bg-error-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                     &times;
                   </button>
                 </div>
@@ -495,13 +514,13 @@
         </div>
 
         <!-- Botones -->
-        <div class="flex justify-end gap-3 pt-4 border-t">
+        <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
           <button type="button" (click)="cerrarModal()"
-            class="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+            class="px-4 py-2.5 border border-gray-200 rounded-lg text-theme-sm font-medium text-gray-700 hover:bg-gray-50 shadow-theme-xs transition-colors">
             Cancelar
           </button>
           <button type="submit" [disabled]="loading"
-            class="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm hover:bg-primary-700 transition-colors disabled:opacity-50">
+            class="px-4 py-2.5 bg-brand-500 text-white rounded-lg text-theme-sm font-medium hover:bg-brand-600 shadow-theme-xs transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
             {{ loading ? 'Guardando...' : (modoEdicion ? 'Actualizar' : 'Crear') }}
           </button>
         </div>
