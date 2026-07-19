@@ -1,0 +1,63 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "frontend: ng serve",
+      "type": "npm",
+      "script": "start",
+      "path": "frontend",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "typescript",
+        "source": "ts",
+        "applyTo": "closedDocuments",
+        "fileLocation": "absolute",
+        "pattern": [
+          {
+            "regexp": "\\bError\\b",
+            "file": 1,
+            "location": 2,
+            "message": 3
+          }
+        ],
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".*",
+          "endsPattern": "Application bundle generation complete|Compiled successfully|Local:"
+        }
+      },
+      "presentation": {
+        "group": "lilo",
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "backend: nodemon",
+      "type": "npm",
+      "script": "dev",
+      "path": "backend",
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": [
+          {
+            "regexp": ".",
+            "file": 1,
+            "location": 2,
+            "message": 3
+          }
+        ],
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "\\[nodemon\\] starting",
+          "endsPattern": "\\[nodemon\\] (clean exit|restarting|app crashed)|Servidor|listening|running|escuchando|http://"
+        }
+      },
+      "presentation": {
+        "group": "lilo",
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Backend (debug)",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/backend",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Frontend (ng serve)",
+      "type": "chrome",
+      "request": "launch",
+      "preLaunchTask": "frontend: ng serve",
+      "url": "http://localhost:4200",
+      "webRoot": "${workspaceFolder}/frontend/src"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Full Stack (backend + frontend)",
+      "configurations": ["Backend (debug)", "Frontend (ng serve)"],
+      "stopAll": true
+    }
+  ]
+}
