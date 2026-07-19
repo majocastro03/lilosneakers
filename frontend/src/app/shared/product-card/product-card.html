@@ -1,0 +1,52 @@
+<a [routerLink]="['/producto', producto().id]"
+   class="group block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+  <!-- Imagen -->
+  <div class="relative aspect-[4/3] bg-gray-100 overflow-hidden">
+    <img
+      [src]="producto().imagen_url || 'assets/placeholder-product.jpg'"
+      [alt]="producto().nombre"
+      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+      loading="lazy"
+    />
+    @if (producto().destacado) {
+      <span class="absolute top-2 left-2 bg-primary-500 text-white text-[9px] sm:text-[11px] px-2 py-0.5 rounded-full font-semibold uppercase tracking-wide">
+        Nuevo
+      </span>
+    }
+    @if (producto().descuento > 0) {
+      <span class="absolute top-2 right-2 bg-gray-900 text-white text-[9px] sm:text-[11px] px-2 py-0.5 rounded-full font-semibold">
+        -{{ producto().descuento }}%
+      </span>
+    }
+  </div>
+
+  <!-- Info -->
+  <div class="px-3 py-2.5">
+    @if (producto().marca) {
+      <p class="text-[9px] sm:text-[11px] text-gray-400 uppercase tracking-wider mb-0.5">{{ producto().marca!.nombre }}</p>
+    } @else if (producto().categoria) {
+      <p class="text-[9px] sm:text-[11px] text-gray-400 uppercase tracking-wider mb-0.5">{{ producto().categoria }}</p>
+    }
+
+    <h3 class="font-semibold text-gray-900 text-xs sm:text-sm leading-tight truncate mb-1">{{ producto().nombre }}</h3>
+
+    <div class="flex items-baseline gap-1.5 mb-1.5">
+      @if (producto().descuento > 0) {
+        <span class="text-[10px] sm:text-xs line-through text-gray-400">${{ producto().precio | number:'1.0-0' }}</span>
+      }
+      <span class="text-sm sm:text-base font-bold text-gray-900">${{ producto().precio_final | number:'1.0-0' }}</span>
+    </div>
+
+    @if (producto().tallas && producto().tallas.length > 0) {
+      <div class="flex items-center gap-1 flex-wrap">
+        <span class="text-[9px] sm:text-[10px] text-gray-400 uppercase font-medium">Tallas:</span>
+        @for (talla of producto().tallas.slice(0, 4); track talla.talla) {
+          <span class="text-[9px] sm:text-[11px] px-1.5 py-0.5 border border-gray-200 rounded text-gray-500">{{ talla.talla }}</span>
+        }
+        @if (producto().tallas.length > 4) {
+          <span class="text-[9px] sm:text-[10px] text-gray-400">+{{ producto().tallas.length - 4 }}</span>
+        }
+      </div>
+    }
+  </div>
+</a>

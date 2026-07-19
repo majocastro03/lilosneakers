@@ -22,6 +22,15 @@ const { apiLimiter } = require('./middleware/rateLimiter');
 
 const app = express();
 
+// Ruta de salud (antes de CORS/helmet para que Render pueda hacer health checks)
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
 // Middlewares de seguridad
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" },
@@ -45,10 +54,19 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Permitir requests sin origin (apps móviles, curl) solo en desarrollo
+    // Origin 'null' (string) llega de iframes sandbox, data:/file: URIs y redirects opacos.
+    // Con credentials:true hay que bloquearlo explícitamente.
+    if (origin === 'null') {
+      console.warn('CORS bloqueado: origin opaco (null)');
+      return callback(new Error('Not allowed by CORS'));
+    }
+
+    // Sin Origin header: curl, Postman, server-to-server. En producción exigimos origin
+    // para que /api/* no quede expuesto fuera de un navegador autorizado.
     if (!origin) {
       if (process.env.NODE_ENV === 'production') {
-        return callback(new Error('Not allowed by CORS'));
+        console.warn('CORS bloqueado: request sin origin en producción');
+        return callback(new Error('Origin required'));
       }
       return callback(null, true);
     }
@@ -56,6 +74,7 @@ app.use(cors({
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
+      console.warn(`CORS bloqueado para origin: ${origin}`);
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -81,15 +100,6 @@ app.use('/api/tallas', tallasRoutes);
 app.use('/api/modificaciones', modificacionesRoutes);
 app.use('/api/carrito', carritoRoutes);
 app.use('/api/ordenes', ordenesRoutes);
-
-// Ruta de salud
-app.get('/health', (req, res) => {
-  res.json({
-    status: 'ok',
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
-  });
-});
 
 // Manejo de rutas no encontradas
 app.use((req, res) => {

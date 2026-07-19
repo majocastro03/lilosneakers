@@ -1,6 +1,4 @@
 const multer = require('multer');
-const path = require('path');
-
 const storage = multer.memoryStorage(); // Guardamos en buffer (mejor para SSR/cloud)
 
 const upload = multer({

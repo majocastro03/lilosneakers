@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient} from '@angular/common/http';
 import { Marca } from '../../interfaces/marca';
-import { environment } from '../../../../../../frontend/environments/environment';
+import { environment } from '../../../../environments/environment';
   @Injectable({
   providedIn: 'root',
 })

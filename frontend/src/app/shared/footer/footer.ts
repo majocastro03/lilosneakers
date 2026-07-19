@@ -1,15 +1,16 @@
 import { Component } from '@angular/core';
+import { UpperCasePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { SITE_CONFIG } from '../../core/config/site.config';
 
 @Component({
   selector: 'app-footer',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, UpperCasePipe],
   templateUrl: './footer.html',
   styleUrl: './footer.css'
 })
 export class FooterComponent {
   currentYear = new Date().getFullYear();
-  contactNumber = '320-939-0843';
-  email = 'lilosneakers@gmail.com';
+  config = SITE_CONFIG;
 }

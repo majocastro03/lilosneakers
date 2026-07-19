@@ -1,4 +1,5 @@
 const supabase = require('../config/supabaseCliente');
+const parseError = require('../utils/parseError');
 
 // Obtener todos los colores
 const getColores = async (req, res) => {
@@ -12,7 +13,8 @@ const getColores = async (req, res) => {
     res.json(data);
   } catch (err) {
     console.error('Error en getColores:', err);
-    res.status(500).json({ error: 'Error al obtener colores' });
+    const { status, message } = parseError(err, 'Error al obtener colores');
+    res.status(status).json({ error: message });
   }
 };
 
@@ -32,7 +34,8 @@ const getColorById = async (req, res) => {
     res.json(data);
   } catch (err) {
     console.error('Error en getColorById:', err);
-    res.status(500).json({ error: 'Error al obtener color' });
+    const { status, message } = parseError(err, 'Error al obtener color');
+    res.status(status).json({ error: message });
   }
 };
 
@@ -53,7 +56,8 @@ const crearColor = async (req, res) => {
     res.status(201).json(data);
   } catch (err) {
     console.error('Error en crearColor:', err);
-    res.status(500).json({ error: 'Error al crear color' });
+    const { status, message } = parseError(err, 'Error al crear color');
+    res.status(status).json({ error: message });
   }
 };
 
@@ -76,7 +80,8 @@ const actualizarColor = async (req, res) => {
     res.json(data);
   } catch (err) {
     console.error('Error en actualizarColor:', err);
-    res.status(500).json({ error: 'Error al actualizar color' });
+    const { status, message } = parseError(err, 'Error al actualizar color');
+    res.status(status).json({ error: message });
   }
 };
 
@@ -90,7 +95,8 @@ const eliminarColor = async (req, res) => {
     res.json({ message: 'Color eliminado correctamente' });
   } catch (err) {
     console.error('Error en eliminarColor:', err);
-    res.status(500).json({ error: 'Error al eliminar color' });
+    const { status, message } = parseError(err, 'Error al eliminar color');
+    res.status(status).json({ error: message });
   }
 };
 

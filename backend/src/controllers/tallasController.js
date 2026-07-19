@@ -1,4 +1,5 @@
 const supabase = require('../config/supabaseCliente');
+const parseError = require('../utils/parseError');
 
 // Obtener todas las tallas
 const getTallas = async (req, res) => {
@@ -12,7 +13,8 @@ const getTallas = async (req, res) => {
     res.json(data);
   } catch (err) {
     console.error('Error en getTallas:', err);
-    res.status(500).json({ error: 'Error al obtener tallas' });
+    const { status, message } = parseError(err, 'Error al obtener tallas');
+    res.status(status).json({ error: message });
   }
 };
 
@@ -32,19 +34,20 @@ const getTallaById = async (req, res) => {
     res.json(data);
   } catch (err) {
     console.error('Error en getTallaById:', err);
-    res.status(500).json({ error: 'Error al obtener talla' });
+    const { status, message } = parseError(err, 'Error al obtener talla');
+    res.status(status).json({ error: message });
   }
 };
 
 // Crear talla
 const crearTalla = async (req, res) => {
   try {
-    const { valor, tipo = 'numerica' } = req.body;
+    const { valor, tipo = 'CO', genero = 'mujer', valor_us, valor_eur, valor_cm } = req.body;
     if (!valor) return res.status(400).json({ error: 'Valor de talla requerido' });
 
     const { data, error } = await supabase
       .from('tallas')
-      .insert([{ valor, tipo }])
+      .insert([{ valor, tipo, genero, valor_us: valor_us || null, valor_eur: valor_eur || null, valor_cm: valor_cm || null }])
       .select()
       .single();
 
@@ -52,7 +55,8 @@ const crearTalla = async (req, res) => {
     res.status(201).json(data);
   } catch (err) {
     console.error('Error en crearTalla:', err);
-    res.status(500).json({ error: 'Error al crear talla' });
+    const { status, message } = parseError(err, 'Error al crear talla');
+    res.status(status).json({ error: message });
   }
 };
 
@@ -60,11 +64,11 @@ const crearTalla = async (req, res) => {
 const actualizarTalla = async (req, res) => {
   try {
     const { id } = req.params;
-    const { valor, tipo } = req.body;
+    const { valor, tipo, genero, valor_us, valor_eur, valor_cm } = req.body;
 
     const { data, error } = await supabase
       .from('tallas')
-      .update({ valor, tipo })
+      .update({ valor, tipo, genero, valor_us: valor_us || null, valor_eur: valor_eur || null, valor_cm: valor_cm || null })
       .eq('id', id)
       .select()
       .single();
@@ -75,7 +79,8 @@ const actualizarTalla = async (req, res) => {
     res.json(data);
   } catch (err) {
     console.error('Error en actualizarTalla:', err);
-    res.status(500).json({ error: 'Error al actualizar talla' });
+    const { status, message } = parseError(err, 'Error al actualizar talla');
+    res.status(status).json({ error: message });
   }
 };
 
@@ -89,7 +94,8 @@ const eliminarTalla = async (req, res) => {
     res.json({ message: 'Talla eliminada correctamente' });
   } catch (err) {
     console.error('Error en eliminarTalla:', err);
-    res.status(500).json({ error: 'Error al eliminar talla' });
+    const { status, message } = parseError(err, 'Error al eliminar talla');
+    res.status(status).json({ error: message });
   }
 };
 
