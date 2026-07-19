@@ -31,6 +31,17 @@ const validateProducto = (req, res, next) => {
     }
   }
 
+  // Precio de costo (opcional, privado)
+  if (req.body.precio_costo !== undefined && req.body.precio_costo !== null && req.body.precio_costo !== '') {
+    const costoNum = parseFloat(req.body.precio_costo);
+    if (isNaN(costoNum) || costoNum < 0) {
+      return res.status(400).json({ error: 'El precio de costo debe ser un número positivo' });
+    }
+    if (costoNum > 99999999) {
+      return res.status(400).json({ error: 'El precio de costo excede el máximo permitido' });
+    }
+  }
+
   // Validate and normalize activo (optional boolean)
   if (req.body.activo !== undefined && req.body.activo !== null) {
     const val = req.body.activo;

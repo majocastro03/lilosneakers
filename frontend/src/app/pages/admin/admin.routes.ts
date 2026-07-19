@@ -19,6 +19,14 @@ export const adminRoutes: Routes = [
         component: AdminProductosComponent,
       },
       {
+        path: 'inventario',
+        loadComponent: () => import('./admin-inventario/admin-inventario').then(m => m.AdminInventarioComponent),
+      },
+      {
+        path: 'generador',
+        loadComponent: () => import('./admin-generador/admin-generador').then(m => m.AdminGeneradorComponent),
+      },
+      {
         path: 'categorias',
         loadComponent: () => import('./admin-categorias/admin-categorias').then(m => m.AdminCategoriasComponent),
       },

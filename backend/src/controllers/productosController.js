@@ -313,7 +313,7 @@ const deleteImage = async (imageUrl) => {
 const crearProducto = async (req, res) => {
   try {
     const {
-      nombre, precio, descuento = 0, descripcion, destacado = false, categoria_id, marca_id, activo = true
+      nombre, precio, descuento = 0, precio_costo, descripcion, destacado = false, categoria_id, marca_id, activo = true
     } = req.body;
 
     let imagenUrl = null;
@@ -327,6 +327,7 @@ const crearProducto = async (req, res) => {
         nombre,
         precio: parseFloat(precio),
         descuento: parseFloat(descuento),
+        precio_costo: (precio_costo === undefined || precio_costo === null || precio_costo === '') ? null : parseFloat(precio_costo),
         imagen_url: imagenUrl,
         descripcion,
         destacado: destacado === 'true' || destacado === true,
@@ -360,7 +361,7 @@ const actualizarProducto = async (req, res) => {
   try {
     const { id } = req.params;
     const {
-      nombre, precio, descuento = 0, descripcion, destacado = false, categoria_id, marca_id, activo = true
+      nombre, precio, descuento = 0, precio_costo, descripcion, destacado = false, categoria_id, marca_id, activo = true
     } = req.body;
 
     const updateData = {
@@ -373,6 +374,11 @@ const actualizarProducto = async (req, res) => {
       categoria_id: categoria_id || null,
       marca_id: marca_id || null
     };
+
+    // Solo actualizar costo si viene en el request (privado, admin)
+    if (precio_costo !== undefined) {
+      updateData.precio_costo = (precio_costo === null || precio_costo === '') ? null : parseFloat(precio_costo);
+    }
 
     if (req.file) {
       // Delete old image
