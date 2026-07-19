@@ -116,6 +116,7 @@ export class AdminProductosComponent implements OnInit {
 
   selectedColorIds: string[] = [];
   selectedTallaIds: string[] = [];
+  tallaCantidades: { [tallaId: string]: number } = {};
   filtroGeneroTalla = '';
   imagenPreview: string | null = null;
 
@@ -267,6 +268,10 @@ export class AdminProductosComponent implements OnInit {
     this.formatDescuentoDisplay();
     this.selectedColorIds = producto.colores?.map(c => c.id) || [];
     this.selectedTallaIds = producto.tallas?.map(t => t.id) || [];
+    this.tallaCantidades = {};
+    for (const t of producto.tallas || []) {
+      this.tallaCantidades[t.id] = t.cantidad ?? 0;
+    }
     this.imagenPreview = producto.imagen_url;
     this.existingImages = producto.imagenes || [];
     this.newImageFiles = [];
@@ -296,6 +301,7 @@ export class AdminProductosComponent implements OnInit {
     this.descuentoDisplay = '';
     this.selectedColorIds = [];
     this.selectedTallaIds = [];
+    this.tallaCantidades = {};
     this.filtroGeneroTalla = '';
     this.imagenPreview = null;
     this.existingImages = [];
@@ -322,11 +328,19 @@ export class AdminProductosComponent implements OnInit {
       this.selectedTallaIds.splice(idx, 1);
     } else {
       this.selectedTallaIds.push(tallaId);
+      if (this.tallaCantidades[tallaId] == null) {
+        this.tallaCantidades[tallaId] = 1;
+      }
     }
   }
 
   isTallaSelected(tallaId: string): boolean {
     return this.selectedTallaIds.includes(tallaId);
+  }
+
+  setTallaCantidad(tallaId: string, valor: string | number) {
+    const num = Math.max(0, Math.floor(Number(valor) || 0));
+    this.tallaCantidades[tallaId] = num;
   }
 
   onImagenChange(event: any) {
@@ -480,7 +494,7 @@ export class AdminProductosComponent implements OnInit {
     if (this.selectedTallaIds.length > 0) {
       requests.push(
         this.http.post(`${apiUrl}/tallas`, {
-          tallas: this.selectedTallaIds.map(id => ({ talla_id: id, cantidad: 0 }))
+          tallas: this.selectedTallaIds.map(id => ({ talla_id: id, cantidad: this.tallaCantidades[id] ?? 0 }))
         })
       );
     }

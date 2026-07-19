@@ -412,6 +412,7 @@
                       <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase">EUR</th>
                       <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase">CM</th>
                       <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase">Género</th>
+                      <th class="px-3 py-2 text-left font-medium text-gray-500 uppercase">Stock</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -439,6 +440,21 @@
                             <span class="px-1.5 py-0.5 text-theme-xs rounded bg-blue-50 text-blue-600">Caballero</span>
                           } @else {
                             <span class="text-gray-400">-</span>
+                          }
+                        </td>
+                        <td class="px-3 py-2" (click)="$event.stopPropagation()">
+                          @if (isTallaSelected(talla.id)) {
+                            <input
+                              type="number"
+                              min="0"
+                              [ngModel]="tallaCantidades[talla.id] ?? 0"
+                              (ngModelChange)="setTallaCantidad(talla.id, $event)"
+                              [ngModelOptions]="{ standalone: true }"
+                              class="w-16 px-2 py-1 border border-gray-300 rounded text-theme-xs focus:border-brand-500 focus:outline-none"
+                              aria-label="Cantidad en stock"
+                            />
+                          } @else {
+                            <span class="text-gray-300">-</span>
                           }
                         </td>
                       </tr>

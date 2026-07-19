@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 import { HeaderComponent } from '../../shared/header/header';
 import { FooterComponent } from '../../shared/footer/footer';
 import { CartService } from '../../core/services/cart.service';
-import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-carrito',
@@ -15,23 +14,20 @@ import { AuthService } from '../../core/services/auth.service';
 })
 export class CarritoComponent {
   cartService = inject(CartService);
-  private authService = inject(AuthService);
   private router = inject(Router);
 
-  updateQuantity(productoId: string, tallaId: string, cantidad: number) {
-    this.cartService.updateQuantity(productoId, tallaId, cantidad);
+  updateQuantity(productoId: string, tallaId: string, cantidad: number, colorNombre?: string) {
+    this.cartService.updateQuantity(productoId, tallaId, cantidad, colorNombre);
   }
 
-  removeItem(productoId: string, tallaId: string) {
-    this.cartService.removeItem(productoId, tallaId);
+  removeItem(productoId: string, tallaId: string, colorNombre?: string) {
+    this.cartService.removeItem(productoId, tallaId, colorNombre);
   }
 
-  goToCheckout() {
-    if (!this.authService.isAuthenticated()) {
-      this.router.navigate(['/login']);
-      return;
-    }
-    this.router.navigate(['/checkout']);
+  pedirPorWhatsApp() {
+    if (this.cartService.items().length === 0) return;
+    const url = this.cartService.construirUrlWhatsApp();
+    window.open(url, '_blank');
   }
 
   continueShopping() {

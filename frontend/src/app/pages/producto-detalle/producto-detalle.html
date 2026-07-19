@@ -112,15 +112,25 @@
           <!-- Colors -->
           @if (prod.colores.length > 0) {
             <div class="mb-6">
-              <h3 class="text-sm font-medium text-gray-900 mb-2">Colores disponibles</h3>
+              <h3 class="text-sm font-medium text-gray-900 mb-2">
+                Selecciona el color
+                @if (selectedColor()) {
+                  <span class="text-gray-500 font-normal">— {{ selectedColor() }}</span>
+                }
+              </h3>
               <div class="flex gap-2">
                 @for (color of prod.colores; track color.nombre) {
-                  <div
+                  <button
+                    type="button"
+                    (click)="selectColor(color.nombre)"
                     [style.background-color]="color.codigo_hex"
                     [title]="color.nombre"
                     [attr.aria-label]="'Color: ' + color.nombre"
+                    [class.ring-2]="selectedColor() === color.nombre"
+                    [class.ring-primary-600]="selectedColor() === color.nombre"
+                    [class.ring-offset-2]="selectedColor() === color.nombre"
                     class="w-8 h-8 rounded-full border-2 border-gray-200 cursor-pointer hover:scale-110 transition"
-                  ></div>
+                  ></button>
                 }
               </div>
             </div>
@@ -146,13 +156,14 @@
                       @if (prod.tallas[0]?.valor_cm) {
                         <th class="px-3 py-1.5 text-left font-medium">CM</th>
                       }
+                      <th class="px-3 py-1.5 text-left font-medium">Género</th>
                     </tr>
                   </thead>
                   <tbody>
-                    @for (talla of prod.tallas; track talla.talla) {
+                    @for (talla of prod.tallas; track talla.id) {
                       <tr
                         (click)="selectTalla(talla)"
-                        [class.bg-primary-50]="selectedTalla() === talla.talla"
+                        [class.bg-primary-50]="selectedTallaId() === talla.id"
                         [class.opacity-40]="talla.cantidad <= 0"
                         [class.cursor-not-allowed]="talla.cantidad <= 0"
                         [class.cursor-pointer]="talla.cantidad > 0"
@@ -168,6 +179,15 @@
                         @if (prod.tallas[0]?.valor_cm) {
                           <td class="px-3 py-2 text-gray-600">{{ talla.valor_cm || '-' }}</td>
                         }
+                        <td class="px-3 py-2">
+                          @if (talla.genero === 'mujer') {
+                            <span class="px-1.5 py-0.5 text-xs rounded bg-pink-50 text-pink-600">Dama</span>
+                          } @else if (talla.genero === 'hombre') {
+                            <span class="px-1.5 py-0.5 text-xs rounded bg-blue-50 text-blue-600">Caballero</span>
+                          } @else {
+                            <span class="text-gray-400">-</span>
+                          }
+                        </td>
                       </tr>
                     }
                   </tbody>
@@ -176,19 +196,24 @@
 
               <!-- Selected talla buttons (quick select) -->
               <div class="flex flex-wrap gap-2">
-                @for (talla of prod.tallas; track talla.talla) {
+                @for (talla of prod.tallas; track talla.id) {
                   <button
                     (click)="selectTalla(talla)"
-                    [class.bg-primary-700]="selectedTalla() === talla.talla"
-                    [class.text-white]="selectedTalla() === talla.talla"
-                    [class.border-primary-700]="selectedTalla() === talla.talla"
+                    [class.bg-primary-700]="selectedTallaId() === talla.id"
+                    [class.text-white]="selectedTallaId() === talla.id"
+                    [class.border-primary-700]="selectedTallaId() === talla.id"
                     [class.opacity-40]="talla.cantidad <= 0"
                     [class.cursor-not-allowed]="talla.cantidad <= 0"
                     [disabled]="talla.cantidad <= 0"
-                    [attr.aria-label]="'Talla ' + talla.talla + (talla.cantidad <= 0 ? ' - Agotada' : '')"
-                    class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium hover:border-primary-500 transition min-w-[52px]"
+                    [attr.aria-label]="'Talla ' + talla.talla + (talla.genero ? ' ' + generoLabel(talla.genero) : '') + (talla.cantidad <= 0 ? ' - Agotada' : '')"
+                    class="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium hover:border-primary-500 transition min-w-[52px] flex flex-col items-center leading-tight"
                   >
-                    {{ talla.talla }}
+                    <span>{{ talla.talla }}</span>
+                    @if (talla.genero === 'mujer') {
+                      <span class="text-[10px] font-normal opacity-70">Dama</span>
+                    } @else if (talla.genero === 'hombre') {
+                      <span class="text-[10px] font-normal opacity-70">Caballero</span>
+                    }
                   </button>
                 }
               </div>
@@ -221,7 +246,7 @@
           <!-- Add to Cart -->
           <button
             (click)="addToCart()"
-            [disabled]="!selectedTalla()"
+            [disabled]="!selectedTalla() || (prod.colores.length > 0 && !selectedColor())"
             [class.bg-green-600]="addedToCart()"
             class="w-full sm:w-auto px-8 py-3 bg-primary-700 text-white rounded-lg font-medium hover:bg-primary-800 disabled:opacity-50 disabled:cursor-not-allowed transition"
           >
@@ -229,13 +254,15 @@
               Agregado al carrito
             } @else if (!selectedTalla()) {
               Selecciona una talla
+            } @else if (prod.colores.length > 0 && !selectedColor()) {
+              Selecciona un color
             } @else {
               Agregar al carrito
             }
           </button>
 
-          @if (!selectedTalla() && prod.tallas.length > 0) {
-            <p class="text-sm text-gray-500 mt-2">Selecciona una talla para agregar al carrito</p>
+          @if ((!selectedTalla() && prod.tallas.length > 0) || (prod.colores.length > 0 && !selectedColor())) {
+            <p class="text-sm text-gray-500 mt-2">Selecciona talla y color para agregar al carrito</p>
           }
         </div>
       </div>
