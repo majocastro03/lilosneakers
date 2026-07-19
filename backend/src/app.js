@@ -15,6 +15,7 @@ const tallasRoutes = require('./routes/tallasRoutes');
 const modificacionesRoutes = require('./routes/modificacionesRoutes');
 const carritoRoutes = require('./routes/carritoRoutes');
 const ordenesRoutes = require('./routes/ordenesRoutes');
+const inventarioRoutes = require('./routes/inventarioRoutes');
 
 // Importar middleware
 const errorHandler = require('./middleware/errorHandler');
@@ -100,6 +101,7 @@ app.use('/api/tallas', tallasRoutes);
 app.use('/api/modificaciones', modificacionesRoutes);
 app.use('/api/carrito', carritoRoutes);
 app.use('/api/ordenes', ordenesRoutes);
+app.use('/api/inventario', inventarioRoutes);
 
 // Manejo de rutas no encontradas
 app.use((req, res) => {

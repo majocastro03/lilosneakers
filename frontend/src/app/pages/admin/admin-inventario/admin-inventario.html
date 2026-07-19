@@ -1,0 +1,360 @@
+<div class="space-y-5">
+  <!-- Encabezado -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+    <div>
+      <h1 class="text-xl font-semibold text-gray-800">Inventario</h1>
+      <p class="text-theme-sm text-gray-500">Control de stock, costos y movimientos</p>
+    </div>
+  </div>
+
+  <!-- Tarjetas resumen -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div class="bg-white border border-gray-200 rounded-xl p-4">
+      <p class="text-theme-xs text-gray-500 uppercase">Productos con stock</p>
+      <p class="text-2xl font-bold text-gray-800 mt-1">{{ totalProductosStock() }}</p>
+    </div>
+    <div class="bg-white border border-gray-200 rounded-xl p-4">
+      <p class="text-theme-xs text-gray-500 uppercase">Unidades totales</p>
+      <p class="text-2xl font-bold text-gray-800 mt-1">{{ totalUnidades() }}</p>
+    </div>
+    <div class="bg-white border border-gray-200 rounded-xl p-4">
+      <p class="text-theme-xs text-gray-500 uppercase">Valor inventario (costo)</p>
+      <p class="text-2xl font-bold text-brand-700 mt-1">${{ valorInventario() | number:'1.0-0' }}</p>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="flex gap-1 border-b border-gray-200">
+    <button type="button" (click)="cambiarTab('inventario')"
+      class="px-4 py-2 text-theme-sm font-medium border-b-2 -mb-px transition"
+      [class]="tab() === 'inventario' ? 'border-brand-600 text-brand-700' : 'border-transparent text-gray-500 hover:text-gray-700'">
+      Inventario
+    </button>
+    <button type="button" (click)="cambiarTab('movimientos')"
+      class="px-4 py-2 text-theme-sm font-medium border-b-2 -mb-px transition"
+      [class]="tab() === 'movimientos' ? 'border-brand-600 text-brand-700' : 'border-transparent text-gray-500 hover:text-gray-700'">
+      Movimientos
+    </button>
+    <button type="button" (click)="cambiarTab('reporte')"
+      class="px-4 py-2 text-theme-sm font-medium border-b-2 -mb-px transition"
+      [class]="tab() === 'reporte' ? 'border-brand-600 text-brand-700' : 'border-transparent text-gray-500 hover:text-gray-700'">
+      Reporte por día
+    </button>
+  </div>
+
+  <!-- ===== TAB INVENTARIO ===== -->
+  @if (tab() === 'inventario') {
+    <div class="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+      <input
+        type="text"
+        [ngModel]="busqueda()"
+        (ngModelChange)="busqueda.set($event)"
+        placeholder="Buscar producto, marca o categoría..."
+        class="w-full sm:w-80 px-3 py-2 border border-gray-300 rounded-lg text-theme-sm focus:border-brand-500 focus:outline-none"
+      />
+      <label class="flex items-center gap-2 text-theme-sm text-gray-600 cursor-pointer select-none">
+        <input type="checkbox" [checked]="soloDisponibles()" (change)="toggleDisponibles()"
+          class="w-4 h-4 accent-brand-600" />
+        Solo entrega inmediata (con stock)
+      </label>
+    </div>
+
+    @if (loading()) {
+      <div class="py-16 text-center text-gray-400 text-theme-sm">Cargando inventario...</div>
+    } @else if (productosFiltrados().length === 0) {
+      <div class="py-16 text-center text-gray-400 text-theme-sm">No hay productos para mostrar.</div>
+    } @else {
+      <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-theme-sm">
+            <thead class="bg-gray-50 text-gray-500">
+              <tr>
+                <th class="px-4 py-3 text-left font-medium uppercase text-theme-xs">Producto</th>
+                <th class="px-4 py-3 text-right font-medium uppercase text-theme-xs">Costo</th>
+                <th class="px-4 py-3 text-right font-medium uppercase text-theme-xs">Venta</th>
+                <th class="px-4 py-3 text-right font-medium uppercase text-theme-xs">Ganancia</th>
+                <th class="px-4 py-3 text-center font-medium uppercase text-theme-xs">Margen</th>
+                <th class="px-4 py-3 text-center font-medium uppercase text-theme-xs">Stock</th>
+                <th class="px-4 py-3 text-right font-medium uppercase text-theme-xs">Acción</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (p of productosFiltrados(); track p.id) {
+                <tr class="border-t border-gray-100">
+                  <td class="px-4 py-3">
+                    <button type="button" (click)="toggleExpandir(p.id)" class="flex items-center gap-3 text-left">
+                      <img [src]="p.imagen_url || 'assets/placeholder-product.jpg'" [alt]="p.nombre"
+                        class="w-10 h-10 rounded object-contain bg-gray-50 shrink-0" />
+                      <span>
+                        <span class="font-medium text-gray-800 block">{{ p.nombre }}</span>
+                        <span class="text-theme-xs text-gray-400">{{ p.marca || p.categoria }}</span>
+                      </span>
+                    </button>
+                  </td>
+                  <td class="px-4 py-3 text-right text-gray-600">
+                    @if (p.precio_costo != null) { ${{ p.precio_costo | number:'1.0-0' }} }
+                    @else { <span class="text-warning-500 text-theme-xs">sin costo</span> }
+                  </td>
+                  <td class="px-4 py-3 text-right font-medium text-gray-800">${{ p.precio_final | number:'1.0-0' }}</td>
+                  <td class="px-4 py-3 text-right">
+                    @if (p.ganancia_unit != null) {
+                      <span [class]="p.ganancia_unit >= 0 ? 'text-success-600' : 'text-error-600'">
+                        ${{ p.ganancia_unit | number:'1.0-0' }}
+                      </span>
+                    } @else { <span class="text-gray-300">—</span> }
+                  </td>
+                  <td class="px-4 py-3 text-center">
+                    @if (p.margen != null) {
+                      <span class="px-2 py-0.5 rounded-full text-theme-xs font-medium"
+                        [class]="p.margen >= 0 ? 'bg-success-50 text-success-700' : 'bg-error-50 text-error-700'">
+                        {{ p.margen }}%
+                      </span>
+                    } @else { <span class="text-gray-300">—</span> }
+                  </td>
+                  <td class="px-4 py-3 text-center">
+                    <span class="px-2 py-0.5 rounded-full text-theme-xs font-medium"
+                      [class]="p.stock_total > 0 ? 'bg-brand-50 text-brand-700' : 'bg-gray-100 text-gray-500'">
+                      {{ p.stock_total }}
+                    </span>
+                  </td>
+                  <td class="px-4 py-3 text-right">
+                    <button type="button" (click)="abrirMovimiento(p)"
+                      class="text-theme-xs font-medium text-brand-700 hover:text-brand-800 whitespace-nowrap">
+                      + Movimiento
+                    </button>
+                  </td>
+                </tr>
+                @if (expandido().has(p.id)) {
+                  <tr class="bg-gray-50/60">
+                    <td colspan="7" class="px-4 py-3">
+                      @if (p.tallas.length === 0) {
+                        <p class="text-theme-xs text-gray-400">Este producto no tiene tallas asignadas.</p>
+                      } @else {
+                        <div class="flex flex-wrap gap-2">
+                          @for (t of p.tallas; track t.talla_id) {
+                            <button type="button" (click)="abrirMovimiento(p, t.talla_id)"
+                              class="flex items-center gap-2 px-3 py-1.5 rounded-lg border text-theme-xs transition hover:border-brand-400"
+                              [class]="t.cantidad > 0 ? 'border-gray-200 bg-white' : 'border-gray-200 bg-gray-100 text-gray-400'">
+                              <span class="font-medium text-gray-800">{{ t.talla }}</span>
+                              @if (generoLabel(t.genero)) {
+                                <span class="text-[10px] text-gray-400">{{ generoLabel(t.genero) }}</span>
+                              }
+                              <span class="px-1.5 py-0.5 rounded-full font-semibold"
+                                [class]="t.cantidad > 0 ? 'bg-brand-50 text-brand-700' : 'bg-gray-200 text-gray-500'">
+                                {{ t.cantidad }}
+                              </span>
+                            </button>
+                          }
+                        </div>
+                      }
+                    </td>
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  }
+
+  <!-- ===== TAB MOVIMIENTOS ===== -->
+  @if (tab() === 'movimientos') {
+    @if (loadingMov()) {
+      <div class="py-16 text-center text-gray-400 text-theme-sm">Cargando movimientos...</div>
+    } @else if (movimientos().length === 0) {
+      <div class="py-16 text-center text-gray-400 text-theme-sm">Aún no hay movimientos registrados.</div>
+    } @else {
+      <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-theme-sm">
+            <thead class="bg-gray-50 text-gray-500">
+              <tr>
+                <th class="px-4 py-3 text-left font-medium uppercase text-theme-xs">Fecha</th>
+                <th class="px-4 py-3 text-left font-medium uppercase text-theme-xs">Producto</th>
+                <th class="px-4 py-3 text-center font-medium uppercase text-theme-xs">Tipo</th>
+                <th class="px-4 py-3 text-center font-medium uppercase text-theme-xs">Cant.</th>
+                <th class="px-4 py-3 text-left font-medium uppercase text-theme-xs">Motivo</th>
+                <th class="px-4 py-3 text-right font-medium uppercase text-theme-xs">Ganancia</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (m of movimientos(); track m.id) {
+                <tr class="border-t border-gray-100">
+                  <td class="px-4 py-3 text-gray-500 text-theme-xs whitespace-nowrap">{{ m.creado_en | date:'dd/MM/yy HH:mm' }}</td>
+                  <td class="px-4 py-3">
+                    <span class="font-medium text-gray-800">{{ m.producto?.nombre || '—' }}</span>
+                    @if (m.talla) {
+                      <span class="text-theme-xs text-gray-400 block">Talla {{ m.talla.valor }}{{ generoLabel(m.talla.genero) ? ' · ' + generoLabel(m.talla.genero) : '' }}</span>
+                    }
+                  </td>
+                  <td class="px-4 py-3 text-center">
+                    <span class="px-2 py-0.5 rounded-full text-theme-xs font-medium"
+                      [class]="{
+                        'bg-success-50 text-success-700': m.tipo === 'entrada',
+                        'bg-error-50 text-error-700': m.tipo === 'salida',
+                        'bg-warning-50 text-warning-700': m.tipo === 'ajuste'
+                      }">
+                      {{ m.tipo }}
+                    </span>
+                  </td>
+                  <td class="px-4 py-3 text-center font-medium text-gray-800">{{ m.cantidad }}</td>
+                  <td class="px-4 py-3 text-gray-600 text-theme-xs">
+                    {{ m.motivo || '—' }}
+                    @if (m.origen === 'web') { <span class="ml-1 px-1.5 py-0.5 rounded bg-brand-50 text-brand-700 text-[10px]">web</span> }
+                  </td>
+                  <td class="px-4 py-3 text-right">
+                    @if (m.ganancia != null) {
+                      <span [class]="m.ganancia >= 0 ? 'text-success-600' : 'text-error-600'">${{ m.ganancia | number:'1.0-0' }}</span>
+                    } @else { <span class="text-gray-300">—</span> }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  }
+
+  <!-- ===== TAB REPORTE ===== -->
+  @if (tab() === 'reporte') {
+    @if (loadingRep()) {
+      <div class="py-16 text-center text-gray-400 text-theme-sm">Cargando reporte...</div>
+    } @else if (reporte().length === 0) {
+      <div class="py-16 text-center text-gray-400 text-theme-sm">Sin datos para el reporte todavía.</div>
+    } @else {
+      <div class="bg-white border border-gray-200 rounded-xl overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-theme-sm">
+            <thead class="bg-gray-50 text-gray-500">
+              <tr>
+                <th class="px-4 py-3 text-left font-medium uppercase text-theme-xs">Día</th>
+                <th class="px-4 py-3 text-center font-medium uppercase text-theme-xs">Entradas</th>
+                <th class="px-4 py-3 text-center font-medium uppercase text-theme-xs">Vendidas</th>
+                <th class="px-4 py-3 text-right font-medium uppercase text-theme-xs">Ingresos</th>
+                <th class="px-4 py-3 text-right font-medium uppercase text-theme-xs">Ganancia</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (d of reporte(); track d.fecha) {
+                <tr class="border-t border-gray-100">
+                  <td class="px-4 py-3 font-medium text-gray-800 whitespace-nowrap">{{ d.fecha | date:'EEE dd/MM/yyyy' }}</td>
+                  <td class="px-4 py-3 text-center text-success-600">+{{ d.entradas }}</td>
+                  <td class="px-4 py-3 text-center text-error-600">{{ d.unidades_vendidas }}</td>
+                  <td class="px-4 py-3 text-right font-medium text-gray-800">${{ d.ingresos | number:'1.0-0' }}</td>
+                  <td class="px-4 py-3 text-right text-success-700 font-medium">${{ d.ganancia | number:'1.0-0' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  }
+</div>
+
+<!-- ===== MODAL REGISTRAR MOVIMIENTO ===== -->
+@if (modalOpen() && movProducto(); as prod) {
+  <div class="fixed inset-0 z-[70] flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-gray-900/50" (click)="cerrarModal()"></div>
+    <div class="relative bg-white rounded-2xl shadow-theme-xl w-full max-w-md p-5">
+      <div class="flex items-start justify-between mb-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-800">Registrar movimiento</h3>
+          <p class="text-theme-sm text-gray-500">{{ prod.nombre }}</p>
+        </div>
+        <button type="button" (click)="cerrarModal()" class="text-gray-400 hover:text-gray-700" aria-label="Cerrar">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="space-y-4">
+        <!-- Talla -->
+        <div>
+          <label class="block text-theme-sm font-medium text-gray-700 mb-1.5">Talla</label>
+          <select [(ngModel)]="movForm.talla_id"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-theme-sm focus:border-brand-500 focus:outline-none">
+            @for (t of prod.tallas; track t.talla_id) {
+              <option [value]="t.talla_id">
+                {{ t.talla }}{{ generoLabel(t.genero) ? ' (' + generoLabel(t.genero) + ')' : '' }} — stock actual: {{ t.cantidad }}
+              </option>
+            }
+          </select>
+        </div>
+
+        <!-- Tipo -->
+        <div>
+          <label class="block text-theme-sm font-medium text-gray-700 mb-1.5">Tipo de movimiento</label>
+          <div class="grid grid-cols-3 gap-2">
+            <button type="button" (click)="movForm.tipo = 'entrada'"
+              class="py-2 rounded-lg border text-theme-sm font-medium transition"
+              [class]="movForm.tipo === 'entrada' ? 'bg-success-50 border-success-400 text-success-700' : 'border-gray-200 text-gray-600 hover:border-gray-400'">
+              Entrada
+            </button>
+            <button type="button" (click)="movForm.tipo = 'salida'"
+              class="py-2 rounded-lg border text-theme-sm font-medium transition"
+              [class]="movForm.tipo === 'salida' ? 'bg-error-50 border-error-400 text-error-700' : 'border-gray-200 text-gray-600 hover:border-gray-400'">
+              Salida
+            </button>
+            <button type="button" (click)="movForm.tipo = 'ajuste'"
+              class="py-2 rounded-lg border text-theme-sm font-medium transition"
+              [class]="movForm.tipo === 'ajuste' ? 'bg-warning-50 border-warning-400 text-warning-700' : 'border-gray-200 text-gray-600 hover:border-gray-400'">
+              Ajuste
+            </button>
+          </div>
+          <p class="text-theme-xs text-gray-400 mt-1">
+            @if (movForm.tipo === 'entrada') { Suma unidades al stock (llegada de pares). }
+            @else if (movForm.tipo === 'salida') { Resta unidades (venta, apartado, devolución...). }
+            @else { Establece el stock exacto (corrección de conteo). }
+          </p>
+        </div>
+
+        <!-- Cantidad -->
+        <div>
+          <label class="block text-theme-sm font-medium text-gray-700 mb-1.5">
+            {{ movForm.tipo === 'ajuste' ? 'Stock nuevo' : 'Cantidad' }}
+          </label>
+          <input type="number" min="0" [(ngModel)]="movForm.cantidad"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-theme-sm focus:border-brand-500 focus:outline-none" />
+        </div>
+
+        <!-- Precio de venta (solo salida) -->
+        @if (movForm.tipo === 'salida') {
+          <div>
+            <label class="block text-theme-sm font-medium text-gray-700 mb-1.5">
+              Precio de venta <span class="text-gray-400 font-normal">(opcional, por unidad)</span>
+            </label>
+            <input type="number" min="0" [(ngModel)]="movForm.precio_venta"
+              [placeholder]="'Por defecto: $' + (prod.precio_final | number:'1.0-0')"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-theme-sm focus:border-brand-500 focus:outline-none" />
+            <p class="text-theme-xs text-gray-400 mt-1">Si lo dejas vacío se usa el precio de venta del producto.</p>
+          </div>
+        }
+
+        <!-- Motivo -->
+        <div>
+          <label class="block text-theme-sm font-medium text-gray-700 mb-1.5">
+            Motivo <span class="text-gray-400 font-normal">(opcional)</span>
+          </label>
+          <input type="text" [(ngModel)]="movForm.motivo" maxlength="120"
+            placeholder="Ej: Venta WhatsApp, llegada de pedido, apartado..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-theme-sm focus:border-brand-500 focus:outline-none" />
+        </div>
+      </div>
+
+      <div class="flex gap-3 mt-6">
+        <button type="button" (click)="cerrarModal()"
+          class="flex-1 py-2.5 border border-gray-300 rounded-lg text-theme-sm font-medium text-gray-700 hover:bg-gray-50">
+          Cancelar
+        </button>
+        <button type="button" (click)="guardarMovimiento()" [disabled]="guardando()"
+          class="flex-1 py-2.5 bg-brand-600 text-white rounded-lg text-theme-sm font-medium hover:bg-brand-700 disabled:opacity-50">
+          {{ guardando() ? 'Guardando...' : 'Registrar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

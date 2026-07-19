@@ -36,6 +36,16 @@ export class AdminLayoutComponent {
       icon: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M3.5 7.5L12 3.25l8.5 4.25L12 11.75 3.5 7.5zm0 4.5L12 16.25 20.5 12M3.5 16.5L12 20.75 20.5 16.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
     },
     {
+      name: 'Inventario',
+      path: '/admin/inventario',
+      icon: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 7.5L12 3.75l8 3.75v9L12 20.25 4 16.5v-9z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 7.5L12 11.25 20 7.5M12 11.25V20.25" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    },
+    {
+      name: 'Publicar',
+      path: '/admin/generador',
+      icon: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3.25" y="3.25" width="17.5" height="17.5" rx="3" stroke="currentColor" stroke-width="1.5"/><circle cx="8.5" cy="8.5" r="1.75" stroke="currentColor" stroke-width="1.5"/><path d="M4 16l4.5-4.5 4 4L16 12l4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+    },
+    {
       name: 'Categorías',
       path: '/admin/categorias',
       icon: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M3.25 5.5C3.25 4.25736 4.25736 3.25 5.5 3.25H10.25V10.25H3.25V5.5ZM13.75 3.25H18.5C19.7426 3.25 20.75 4.25736 20.75 5.5V10.25H13.75V3.25ZM3.25 13.75H10.25V20.75H5.5C4.25736 20.75 3.25 19.7426 3.25 18.5V13.75ZM13.75 13.75H20.75V18.5C20.75 19.7426 19.7426 20.75 18.5 20.75H13.75V13.75Z" fill="currentColor"/></svg>`,

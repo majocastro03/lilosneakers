@@ -1,5 +1,6 @@
 const supabase = require('../config/supabaseCliente');
 const parseError = require('../utils/parseError');
+const { registrarMovimiento } = require('./inventarioController');
 
 // POST /api/ordenes - Create a new order
 const crearOrden = async (req, res) => {
@@ -88,21 +89,23 @@ const crearOrden = async (req, res) => {
 
     if (itemsError) throw itemsError;
 
-    // Update stock
+    // Update stock + registrar movimiento de salida (automático, origen web)
     for (const item of itemsValidados) {
-      const { data: currentStock } = await supabase
-        .from('producto_tallas')
-        .select('cantidad')
-        .eq('producto_id', item.producto_id)
-        .eq('talla_id', item.talla_id)
-        .single();
-
-      if (currentStock) {
-        await supabase
-          .from('producto_tallas')
-          .update({ cantidad: currentStock.cantidad - item.cantidad })
-          .eq('producto_id', item.producto_id)
-          .eq('talla_id', item.talla_id);
+      try {
+        await registrarMovimiento({
+          producto_id: item.producto_id,
+          talla_id: item.talla_id,
+          tipo: 'salida',
+          cantidad: item.cantidad,
+          motivo: 'Venta web',
+          precio_venta: item.precio_unitario,
+          referencia: `Orden ${orden.id}`,
+          origen: 'web',
+          creado_por: userId
+        });
+      } catch (movErr) {
+        // No abortar la orden si el registro de inventario falla; dejar traza.
+        console.error('Error al registrar movimiento de inventario (orden ' + orden.id + '):', movErr);
       }
     }
 

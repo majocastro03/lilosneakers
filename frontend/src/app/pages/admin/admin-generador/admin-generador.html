@@ -1,0 +1,204 @@
+<div class="space-y-5">
+  <div>
+    <h1 class="text-xl font-semibold text-gray-800">Generar imágenes para WhatsApp</h1>
+    <p class="text-theme-sm text-gray-500">Filtra por lo que pide el cliente, selecciona varios y descárgalos para reenviarlos.</p>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Columna izquierda: filtros + selección -->
+    <div class="space-y-5">
+      <!-- Filtros -->
+      <div class="bg-white border border-gray-200 rounded-xl p-4 space-y-3">
+        <div class="flex items-center justify-between">
+          <label class="block text-theme-sm font-medium text-gray-700">1. Busca / filtra</label>
+          @if (hayFiltros()) {
+            <button type="button" (click)="limpiarFiltros()" class="text-theme-xs text-gray-500 hover:text-gray-700">Limpiar filtros</button>
+          }
+        </div>
+        <input
+          type="text"
+          [ngModel]="busqueda()"
+          (ngModelChange)="busqueda.set($event)"
+          placeholder="Buscar producto o marca..."
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg text-theme-sm focus:border-brand-500 focus:outline-none"
+        />
+        <div class="grid grid-cols-3 gap-2">
+          <select [ngModel]="filtroTalla()" (ngModelChange)="filtroTalla.set($event)"
+            class="w-full px-2 py-2 border border-gray-300 rounded-lg text-theme-sm focus:border-brand-500 focus:outline-none">
+            <option value="">Talla</option>
+            @for (t of tallasDisponiblesFiltro(); track t) { <option [value]="t">{{ t }}</option> }
+          </select>
+          <select [ngModel]="filtroColor()" (ngModelChange)="filtroColor.set($event)"
+            class="w-full px-2 py-2 border border-gray-300 rounded-lg text-theme-sm focus:border-brand-500 focus:outline-none">
+            <option value="">Color</option>
+            @for (c of coloresDisponiblesFiltro(); track c) { <option [value]="c">{{ c }}</option> }
+          </select>
+          <select [ngModel]="filtroGenero()" (ngModelChange)="filtroGenero.set($event)"
+            class="w-full px-2 py-2 border border-gray-300 rounded-lg text-theme-sm focus:border-brand-500 focus:outline-none">
+            <option value="">Género</option>
+            <option value="hombre">Caballero</option>
+            <option value="mujer">Dama</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Grid de productos con selección -->
+      <div class="bg-white border border-gray-200 rounded-xl p-4">
+        <div class="flex items-center justify-between mb-3">
+          <label class="text-theme-sm font-medium text-gray-700">2. Selecciona los productos</label>
+          <div class="flex gap-3 text-theme-xs">
+            <button type="button" (click)="seleccionarTodosFiltrados()" class="text-brand-700 hover:text-brand-800 font-medium">Seleccionar todo</button>
+            @if (seleccionMultiple().size > 0) {
+              <button type="button" (click)="limpiarSeleccion()" class="text-gray-500 hover:text-gray-700">Quitar ({{ seleccionMultiple().size }})</button>
+            }
+          </div>
+        </div>
+
+        @if (loading()) {
+          <p class="text-theme-sm text-gray-400 py-6 text-center">Cargando...</p>
+        } @else if (productosFiltrados().length === 0) {
+          <p class="text-theme-sm text-gray-400 py-6 text-center">No hay productos con esos filtros.</p>
+        } @else {
+          <div class="max-h-80 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 gap-2">
+            @for (p of productosFiltrados(); track p.id) {
+              <div class="relative border rounded-lg p-2 transition cursor-pointer"
+                [class]="seleccionado()?.id === p.id ? 'border-brand-500 ring-2 ring-brand-500/20' : 'border-gray-200 hover:border-gray-300'"
+                (click)="seleccionar(p)">
+                <!-- Checkbox de lote -->
+                <label class="absolute top-1.5 left-1.5 z-10" (click)="$event.stopPropagation()">
+                  <input type="checkbox" [checked]="estaSeleccionado(p.id)" (change)="toggleSeleccion(p.id, $event)"
+                    class="w-4 h-4 accent-brand-600" />
+                </label>
+                <img [src]="p.imagen_url || 'assets/placeholder-product.jpg'" [alt]="p.nombre"
+                  class="w-full aspect-square object-contain rounded bg-gray-50 mb-1" />
+                <span class="block text-theme-xs font-medium text-gray-700 truncate">{{ p.nombre }}</span>
+                <span class="block text-[10px] text-gray-400">Stock: {{ p.stock_total }}</span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Barra de descarga / compartir por lote -->
+      @if (seleccionMultiple().size > 0) {
+        <div class="bg-brand-50 border border-brand-200 rounded-xl p-4 space-y-3">
+          <div>
+            <p class="text-theme-sm font-medium text-brand-800">{{ seleccionMultiple().size }} producto(s) seleccionado(s)</p>
+            <p class="text-theme-xs text-brand-600">
+              @if (descargandoLote()) { Generando {{ progreso().done }} / {{ progreso().total }}... }
+              @else { Una imagen por producto (diseño automático). }
+            </p>
+          </div>
+          <div class="flex flex-col sm:flex-row gap-2">
+            @if (soportaCompartir()) {
+              <button type="button" (click)="compartirLote()" [disabled]="descargandoLote()"
+                class="flex-1 px-4 py-2.5 bg-green-600 text-white rounded-lg text-theme-sm font-medium hover:bg-green-700 disabled:opacity-50 whitespace-nowrap flex items-center justify-center gap-2">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.71.306 1.263.489 1.694.625.712.227 1.36.195 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                {{ descargandoLote() ? 'Generando...' : 'Compartir ' + seleccionMultiple().size }}
+              </button>
+            }
+            <button type="button" (click)="descargarLote()" [disabled]="descargandoLote()"
+              class="flex-1 px-4 py-2.5 rounded-lg text-theme-sm font-medium disabled:opacity-50 whitespace-nowrap"
+              [class]="soportaCompartir() ? 'bg-white border border-brand-300 text-brand-700 hover:bg-brand-100' : 'bg-brand-600 text-white hover:bg-brand-700'">
+              {{ descargandoLote() ? 'Generando...' : 'Descargar ' + seleccionMultiple().size }}
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Columna derecha: preview individual -->
+    <div class="space-y-3">
+      <p class="text-theme-sm font-medium text-gray-700">
+        Vista previa
+        @if (seleccionado()) { <span class="text-gray-400 font-normal">— ajusta el texto y arrástralo</span> }
+      </p>
+
+      @if (seleccionado()) {
+        <!-- Campos editables -->
+        <div class="bg-white border border-gray-200 rounded-xl p-4 space-y-3">
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-theme-xs font-medium text-gray-600">Nombre</span>
+              <label class="flex items-center gap-1.5 text-theme-xs text-gray-500 cursor-pointer">
+                <input type="checkbox" [(ngModel)]="mostrarNombre" (ngModelChange)="redraw()" class="w-3.5 h-3.5 accent-brand-600" /> Mostrar
+              </label>
+            </div>
+            <input type="text" [(ngModel)]="nombreTexto" (ngModelChange)="redraw()"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-theme-sm focus:border-brand-500 focus:outline-none" />
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <span class="block text-theme-xs font-medium text-gray-600 mb-1.5">Tallas</span>
+              <input type="text" [(ngModel)]="tallasTexto" (ngModelChange)="redraw()"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-theme-sm focus:border-brand-500 focus:outline-none" />
+            </div>
+            <div>
+              <span class="block text-theme-xs font-medium text-gray-600 mb-1.5">Género</span>
+              <input type="text" [(ngModel)]="generoTexto" (ngModelChange)="redraw()" placeholder="vacío = ocultar"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-theme-sm focus:border-brand-500 focus:outline-none" />
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <span class="block text-theme-xs font-medium text-gray-600 mb-1.5">Precio</span>
+              <div class="flex gap-2">
+                <input type="text" [(ngModel)]="precioTexto" (ngModelChange)="redraw()"
+                  class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-theme-sm focus:border-brand-500 focus:outline-none" />
+                <button type="button" (click)="precioCorto()"
+                  class="px-3 py-2 border border-gray-300 rounded-lg text-theme-xs font-medium text-gray-600 hover:bg-gray-50 whitespace-nowrap">$125k</button>
+              </div>
+            </div>
+            <div>
+              <span class="block text-theme-xs font-medium text-gray-600 mb-1.5">Formato</span>
+              <div class="flex gap-2">
+                <button type="button" (click)="cambiarFormato('historia')"
+                  class="flex-1 py-2 rounded-lg border text-theme-xs font-medium transition"
+                  [class]="formato === 'historia' ? 'bg-brand-50 border-brand-400 text-brand-700' : 'border-gray-200 text-gray-600 hover:border-gray-400'">Historia</button>
+                <button type="button" (click)="cambiarFormato('post')"
+                  class="flex-1 py-2 rounded-lg border text-theme-xs font-medium transition"
+                  [class]="formato === 'post' ? 'bg-brand-50 border-brand-400 text-brand-700' : 'border-gray-200 text-gray-600 hover:border-gray-400'">Publicación</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+
+      <div class="bg-gray-100 border border-gray-200 rounded-xl p-4 flex items-center justify-center min-h-[300px]">
+        @if (!seleccionado()) {
+          <p class="text-theme-sm text-gray-400 text-center">Toca un producto para ver y ajustar su imagen.</p>
+        }
+        <canvas #canvas class="preview-canvas max-w-full rounded-lg shadow-theme-md"
+          [class.hidden]="!seleccionado()"
+          (pointerdown)="onPointerDown($event)"
+          (pointermove)="onPointerMove($event)"
+          (pointerup)="onPointerUp($event)"
+          (pointercancel)="onPointerUp($event)"></canvas>
+      </div>
+
+      @if (seleccionado()) {
+        <div class="flex items-center justify-between gap-2">
+          <p class="text-theme-xs text-gray-500">✋ Arrastra los textos sobre la imagen.</p>
+          <button type="button" (click)="restablecerPosiciones()" class="text-theme-xs font-medium text-gray-500 hover:text-gray-700 whitespace-nowrap">Restablecer posiciones</button>
+        </div>
+        <div class="flex flex-col sm:flex-row gap-2">
+          @if (soportaCompartir()) {
+            <button type="button" (click)="compartir()"
+              class="flex-1 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition flex items-center justify-center gap-2">
+              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.71.306 1.263.489 1.694.625.712.227 1.36.195 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              Compartir por WhatsApp
+            </button>
+          }
+          <button type="button" (click)="descargar()"
+            class="flex-1 py-3 rounded-lg font-medium transition flex items-center justify-center gap-2"
+            [class]="soportaCompartir() ? 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-50' : 'bg-brand-600 text-white hover:bg-brand-700'">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5 5-5M12 15V3" />
+            </svg>
+            Descargar
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+</div>

@@ -8,6 +8,7 @@ import { CategoriaService, Categoria } from '../../../core/services/categoria.se
 import { MarcaService } from '../../../core/services/marca/marca-service';
 import { ColoresService } from '../../../core/services/colores/colores-service';
 import { TallaService } from '../../../core/services/talla/talla-service';
+import { InventarioService } from '../../../core/services/inventario/inventario-service';
 import { Marca } from '../../../core/interfaces/marca';
 import { ModalService } from '../../../shared/modal/modal.service';
 import { environment } from '../../../../environments/environment';
@@ -25,6 +26,7 @@ export class AdminProductosComponent implements OnInit {
   private marcaService = inject(MarcaService);
   private coloresService = inject(ColoresService);
   private tallaService = inject(TallaService);
+  private inventarioService = inject(InventarioService);
   private http = inject(HttpClient);
   private cdr = inject(ChangeDetectorRef);
   private modalService = inject(ModalService);
@@ -102,6 +104,7 @@ export class AdminProductosComponent implements OnInit {
     nombre: '',
     precio: 0,
     descuento: 0,
+    precio_costo: 0,
     descripcion: '',
     destacado: false,
     activo: true,
@@ -113,6 +116,10 @@ export class AdminProductosComponent implements OnInit {
   // Display strings for formatted inputs
   precioDisplay = '';
   descuentoDisplay = '';
+  costoDisplay = '';
+
+  // Costo por producto (privado) — se carga aparte porque el endpoint público no lo expone
+  private costoMap: { [productoId: string]: number | null } = {};
 
   selectedColorIds: string[] = [];
   selectedTallaIds: string[] = [];
@@ -135,13 +142,18 @@ export class AdminProductosComponent implements OnInit {
       categorias: this.categoriaService.getCategorias(),
       marcas: this.marcaService.getMarcas(),
       colores: this.coloresService.getColores(),
-      tallas: this.tallaService.getTallas()
+      tallas: this.tallaService.getTallas(),
+      inventario: this.inventarioService.getInventario()
     }).subscribe({
       next: (data) => {
         this.categorias = data.categorias;
         this.marcas = data.marcas;
         this.allColores = data.colores;
         this.allTallas = data.tallas;
+        this.costoMap = {};
+        for (const p of data.inventario) {
+          this.costoMap[p.id] = p.precio_costo;
+        }
         this.cdr.markForCheck();
       },
       error: (err) => {
@@ -240,6 +252,47 @@ export class AdminProductosComponent implements OnInit {
     return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   }
 
+  // === Costo (precio de compra) ===
+  formatCostoDisplay() {
+    this.costoDisplay = this.form.precio_costo > 0 ? this.formatThousands(this.form.precio_costo) : '';
+  }
+
+  onCostoInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const raw = input.value.replace(/\./g, '').replace(/[^0-9]/g, '');
+    const num = parseInt(raw, 10) || 0;
+    this.form.precio_costo = num;
+    this.costoDisplay = num > 0 ? this.formatThousands(num) : '';
+    setTimeout(() => { input.value = this.costoDisplay; });
+  }
+
+  onCostoFocus(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (this.form.precio_costo === 0) {
+      this.costoDisplay = '';
+      input.value = '';
+    }
+  }
+
+  onCostoBlur() {
+    this.formatCostoDisplay();
+  }
+
+  /** Precio de venta final (con descuento aplicado) */
+  private precioVentaFinal(): number {
+    return Math.round(this.form.precio * (1 - (this.form.descuento || 0) / 100));
+  }
+
+  gananciaProducto(): number {
+    return this.precioVentaFinal() - (this.form.precio_costo || 0);
+  }
+
+  margenProducto(): number {
+    const venta = this.precioVentaFinal();
+    if (venta <= 0) return 0;
+    return Math.round((this.gananciaProducto() / venta) * 100);
+  }
+
   abrirModalCrear() {
     this.modoEdicion = false;
     this.resetForm();
@@ -256,6 +309,7 @@ export class AdminProductosComponent implements OnInit {
       nombre: producto.nombre,
       precio: producto.precio,
       descuento: producto.descuento,
+      precio_costo: this.costoMap[producto.id] ?? 0,
       descripcion: producto.descripcion || '',
       destacado: producto.destacado,
       activo: producto.activo ?? true,
@@ -266,6 +320,7 @@ export class AdminProductosComponent implements OnInit {
 
     this.formatPrecioDisplay();
     this.formatDescuentoDisplay();
+    this.formatCostoDisplay();
     this.selectedColorIds = producto.colores?.map(c => c.id) || [];
     this.selectedTallaIds = producto.tallas?.map(t => t.id) || [];
     this.tallaCantidades = {};
@@ -290,6 +345,7 @@ export class AdminProductosComponent implements OnInit {
       nombre: '',
       precio: 0,
       descuento: 0,
+      precio_costo: 0,
       descripcion: '',
       destacado: false,
       activo: true,
@@ -299,6 +355,7 @@ export class AdminProductosComponent implements OnInit {
     };
     this.precioDisplay = '';
     this.descuentoDisplay = '';
+    this.costoDisplay = '';
     this.selectedColorIds = [];
     this.selectedTallaIds = [];
     this.tallaCantidades = {};
@@ -409,6 +466,7 @@ export class AdminProductosComponent implements OnInit {
     formData.append('nombre', this.form.nombre);
     formData.append('precio', this.form.precio.toString());
     formData.append('descuento', this.form.descuento.toString());
+    formData.append('precio_costo', (this.form.precio_costo || 0).toString());
     formData.append('descripcion', this.form.descripcion);
     formData.append('destacado', this.form.destacado.toString());
     formData.append('activo', this.form.activo.toString());
