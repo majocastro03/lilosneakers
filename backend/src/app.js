@@ -53,30 +53,31 @@ const allowedOrigins = [
   process.env.FRONTEND_URL
 ].filter(Boolean);
 
+// Negar = callback(null, false): la request sigue, pero sin headers
+// Access-Control-Allow-Origin, así que el navegador bloquea la lectura cross-origin.
+// Lanzar un Error aquí solo produce 500s (health checks de Render, curl, monitoring)
+// sin cerrar nada: el header Origin lo pone el navegador y cualquier otro cliente
+// puede omitirlo o falsificarlo. Quien protege /api/* es la auth + el rate limiting.
 app.use(cors({
   origin: function (origin, callback) {
-    // Origin 'null' (string) llega de iframes sandbox, data:/file: URIs y redirects opacos.
-    // Con credentials:true hay que bloquearlo explícitamente.
-    if (origin === 'null') {
-      console.warn('CORS bloqueado: origin opaco (null)');
-      return callback(new Error('Not allowed by CORS'));
+    // Sin Origin header: curl, Postman, health checks, server-to-server.
+    // No es una request de navegador, así que no hay nada que autorizar.
+    if (!origin) {
+      return callback(null, false);
     }
 
-    // Sin Origin header: curl, Postman, server-to-server. En producción exigimos origin
-    // para que /api/* no quede expuesto fuera de un navegador autorizado.
-    if (!origin) {
-      if (process.env.NODE_ENV === 'production') {
-        console.warn('CORS bloqueado: request sin origin en producción');
-        return callback(new Error('Origin required'));
-      }
-      return callback(null, true);
+    // Origin 'null' (string) llega de iframes sandbox, data:/file: URIs y redirects
+    // opacos. Con credentials:true nunca debe pasar.
+    if (origin === 'null') {
+      console.warn('CORS bloqueado: origin opaco (null)');
+      return callback(null, false);
     }
 
     if (allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
       console.warn(`CORS bloqueado para origin: ${origin}`);
-      callback(new Error('Not allowed by CORS'));
+      callback(null, false);
     }
   },
   credentials: true
